@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Dashboard - Test</title>
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+        .box { padding: 20px; border-radius: 8px; margin: 15px 0; }
+        .ok { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        code { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px; }
+        button { padding: 12px 24px; font-size: 1rem; cursor: pointer; background: #4285f4; color: white; border: none; border-radius: 6px; }
+        button:hover { background: #3367d6; }
+        #status { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Expense Dashboard - Diagnostic Test</h1>
+
+    <div class="box info">
+        <strong>How you're accessing this file:</strong><br>
+        Protocol: <code id="protocol">checking...</code><br>
+        Hostname: <code id="hostname">checking...</code><br>
+        URL: <code id="url">checking...</code>
+    </div>
+
+    <div id="firebaseStatus" class="box fail">
+        <strong>Firebase SDK:</strong> <span id="firebaseText">Loading...</span>
+    </div>
+
+    <div id="initStatus" class="box fail">
+        <strong>Firebase Initialization:</strong> <span id="initText">Not started</span>
+    </div>
+
+    <div id="authStatus" class="box fail">
+        <strong>Auth Status:</strong> <span id="authText">Not checked</span>
+    </div>
+
+    <button id="signInBtn" onclick="signIn()" disabled>Sign in with Google</button>
+
+    <div id="status" class="box info" style="display:none;"></div>
+
+    <script type="module">
+        // Show page info immediately
+        document.getElementById('protocol').textContent = window.location.protocol;
+        document.getElementById('hostname').textContent = window.location.hostname;
+        document.getElementById('url').textContent = window.location.href;
+
+        // Check if running from file://
+        if (window.location.protocol === 'file:') {
+            showStatus('fail', 'ERROR: You opened this file directly (file://). You MUST use a local server. Run: <code>python -m http.server 8080</code> then open <code>http://localhost:8080</code>');
+            throw new Error('file:// protocol not supported');
+        }
+
+        // Import Firebase
+        try {
+            const { initializeApp } = await import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js");
+            const { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js");
+
+            document.getElementById('firebaseStatus').className = 'box ok';
+            document.getElementById('firebaseText').textContent = 'Firebase SDK v12 loaded successfully';
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyCnLN41Mlt8KSxGhyiR7DKT8_3VpzuTFsg",
+                authDomain: "expense-dashboard-21c59.firebaseapp.com",
+                projectId: "expense-dashboard-21c59",
+                storageBucket: "expense-dashboard-21c59.firebasestorage.app",
+                messagingSenderId: "269962454783",
+                appId: "1:269962454783:web:f219eea0367d2b6d27ceca",
+                measurementId: "G-L7X2GD3NDZ"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+
+            document.getElementById('initStatus').className = 'box ok';
+            document.getElementById('initText').textContent = 'Firebase initialized for project: expense-dashboard-21c59';
+
+            // Check auth state
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    document.getElementById('authStatus').className = 'box ok';
+                    document.getElementById('authText').textContent = 'Signed in as: ' + user.email;
+                } else {
+                    document.getElementById('authStatus').className = 'box info';
+                    document.getElementById('authText').textContent = 'Not signed in (this is normal)';
+                    document.getElementById('signInBtn').disabled = false;
+                }
+            });
+
+            // Make signIn available globally
+            window.signIn = async function() {
+                const btn = document.getElementById('signInBtn');
+                btn.disabled = true;
+                btn.textContent = 'Signing in...';
+
+                try {
+                    const provider = new GoogleAuthProvider();
+                    const result = await signInWithPopup(auth, provider);
+                    showStatus('ok', 'Success! Signed in as: ' + result.user.email);
+                } catch (error) {
+                    showStatus('fail', 'Error: ' + error.code + ' - ' + error.message);
+                    if (error.code === 'auth/unauthorized-domain') {
+                        showStatus('fail', 'FIX: Add <code>' + window.location.hostname + '</code> to Firebase Console > Authentication > Settings > Authorized domains');
+                    }
+                    btn.disabled = false;
+                    btn.textContent = 'Sign in with Google';
+                }
+            };
+
+        } catch (e) {
+            document.getElementById('initStatus').className = 'box fail';
+            document.getElementById('initText').textContent = 'Failed: ' + e.message;
+        }
+
+        function showStatus(type, msg) {
+            const el = document.getElementById('status');
+            el.className = 'box ' + type;
+            el.innerHTML = msg;
+            el.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
