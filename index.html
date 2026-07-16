@@ -155,6 +155,10 @@
                 <svg width="20" height="20" viewBox="0 0 24 24"><path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                 Sign in with Google
             </button>
+            <div id="authDebug" style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; display: none; font-size: 0.85rem; color: #856404; text-align: left;">
+                <strong>Debug Info:</strong>
+                <div id="authDebugText"></div>
+            </div>
         </div>
 
         <!-- Dashboard Content -->
@@ -327,7 +331,7 @@
             apiKey: "AIzaSyCnLN41Mlt8KSxGhyiR7DKT8_3VpzuTFsg",
             authDomain: "expense-dashboard-21c59.firebaseapp.com",
             projectId: "expense-dashboard-21c59",
-            storageBucket: "expense-dashboard-21c59.firebasestorage.app",
+            storageBucket: "expense-dashboard-21c59.appspot.com",
             messagingSenderId: "269962454783",
             appId: "1:269962454783:web:f219eea0367d2b6d27ceca"
         };
@@ -357,6 +361,12 @@
         // Initialize Firebase
         function initFirebase() {
             try {
+                // Check if Firebase SDK loaded
+                if (typeof firebase === 'undefined') {
+                    showAuthDebug('Firebase SDK not loaded. Check your internet connection.');
+                    return;
+                }
+
                 app = firebase.initializeApp(firebaseConfig);
                 auth = firebase.auth();
                 db = firebase.firestore();
@@ -369,19 +379,52 @@
                     } else {
                         showAuth();
                     }
+                }, (error) => {
+                    showAuthDebug('Auth state error: ' + error.message);
                 });
+
+                // Show domain info for debugging
+                showAuthDebug('Domain: ' + window.location.hostname + '<br>Protocol: ' + window.location.protocol + '<br>Firebase initialized OK');
+
             } catch (e) {
                 console.error('Firebase init error:', e);
-                showToast('Firebase not configured. Please add your config.', 'error');
+                showAuthDebug('Firebase init failed: ' + e.message);
+            }
+        }
+
+        function showAuthDebug(msg) {
+            const debugDiv = document.getElementById('authDebug');
+            const debugText = document.getElementById('authDebugText');
+            if (debugDiv && debugText) {
+                debugDiv.style.display = 'block';
+                debugText.innerHTML = msg;
             }
         }
 
         // ===================== AUTH FUNCTIONS =====================
         function signInWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch((error) => {
-                showToast('Sign in failed: ' + error.message, 'error');
-            });
+
+            // Try popup first, fallback to redirect if blocked
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    console.log('Sign-in successful', result.user);
+                })
+                .catch((error) => {
+                    console.error('Popup sign-in error:', error.code, error.message);
+
+                    if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+                        showToast('Popup blocked. Trying redirect method...', 'info');
+                        // Fallback to redirect
+                        auth.signInWithRedirect(provider);
+                    } else if (error.code === 'auth/unauthorized-domain') {
+                        showToast('ERROR: This domain is not authorized. Add "' + window.location.hostname + '" to Firebase Auth > Settings > Authorized domains', 'error');
+                    } else if (error.code === 'auth/network-request-failed') {
+                        showToast('Network error. Check your internet connection.', 'error');
+                    } else {
+                        showToast('Sign in failed: ' + error.message + ' (Code: ' + error.code + ')', 'error');
+                    }
+                });
         }
 
         function signOut() {
