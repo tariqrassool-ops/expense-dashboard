@@ -1314,44 +1314,18 @@ const normalizedBody = (body || '')
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ');
 
-let amount = 0;
+// Extract every currency amount
+const amounts = [...normalizedBody.matchAll(
+    /(?:LKR|Rs\.?)\s*([+-]?\d[\d,]*\.\d{2})/gi
+)].map(m => parseFloat(m[1].replace(/,/g, '')));
 
-// Find every LKR amount in the email
-const amounts = [...normalizedBody.matchAll(/(?:LKR|Rs\.?)\s*([+-]?[0-9,]+\.\d{2})/gi)]
-    .map(m => parseFloat(m[1].replace(/,/g, '')));
-
-// Debug
 console.log("ALL AMOUNTS FOUND:", amounts);
 
-// Rides
-if (category === "Travel") {
+let amount = 0;
 
-    const rideMatch = normalizedBody.match(
-        /total\s+trip\s+fare.*?(?:LKR|Rs\.?)\s*([0-9,]+\.\d{2})/i
-    );
-
-    if (rideMatch) {
-        amount = parseFloat(rideMatch[1].replace(/,/g, ''));
-    }
-}
-
-// Food / Marketplace
-else {
-
-    const totalMatch = normalizedBody.match(
-        /total.*?(?:LKR|Rs\.?)\s*([0-9,]+\.\d{2})/i
-    );
-
-    if (totalMatch) {
-        amount = parseFloat(totalMatch[1].replace(/,/g, ''));
-    }
-}
-
-// Final fallback
-if (amount === 0 && amounts.length) {
-
+// PickMe receipts always repeat the final charged amount as the LAST amount
+if (amounts.length > 0) {
     amount = amounts[amounts.length - 1];
-
 }
 
 console.log("FINAL AMOUNT:", amount);
