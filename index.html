@@ -1246,6 +1246,24 @@ function parsePickMeEmail(subject, body, date) {
         .replace(/\s+/g, ' ')
         .toLowerCase();
 
+    console.log("==========================================");
+console.log("PICKME EMAIL DEBUG");
+console.log("Subject:", subject);
+
+console.log("RAW BODY:");
+console.log(body);
+
+console.log("CLEAN BODY:");
+console.log(cleanBody);
+
+console.log("Contains Marketplace:", cleanBody.includes("marketplace"));
+console.log("Contains Merchant Price Amendment:", cleanBody.includes("merchant price amendment"));
+console.log("Contains Packaging Charge:", cleanBody.includes("packaging charge"));
+console.log("Contains Food:", cleanBody.includes("food"));
+console.log("Contains food@pickme.lk:", cleanBody.includes("food@pickme.lk"));
+console.log("Contains market@pickme.lk:", cleanBody.includes("market@pickme.lk"));
+console.log("==========================================");
+
     // -----------------------------
     // Category Detection
     // -----------------------------
