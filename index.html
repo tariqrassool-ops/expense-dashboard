@@ -1239,6 +1239,8 @@ function parsePickMeEmail(subject, body, date) {
 
     const htmlLower = (body || '').toLowerCase();
 
+    const bodyLower = (body || '').toLowerCase();
+
     const cleanBody = (body || '')
         .replace(/<style[\s\S]*?<\/style>/gi, '')
         .replace(/<script[\s\S]*?<\/script>/gi, '')
@@ -1256,18 +1258,15 @@ function parsePickMeEmail(subject, body, date) {
 
     let category = 'Uncategorized';
 
-    // FOOD detection
-    if (
-        subjectLower.includes('delivery email receipt') ||
-        cleanBody.includes('order details') ||
-        cleanBody.includes('delivered to') ||
-        cleanBody.includes('picked up from') ||
-        htmlLower.includes('food') ||
-        htmlLower.includes('restaurant-details-div') ||
-        htmlLower.includes('order-details-topic-div')
-    ) {
-        category = 'Food';
-    }
+// FOOD detection
+if (
+    htmlLower.includes('restaurant-details-div') ||
+    htmlLower.includes('order-details-topic-div') ||
+    htmlLower.includes('service-code-div') && htmlLower.includes('food') ||
+    cleanBody.includes('order details')
+) {
+    category = 'Food';
+}
      // Check for Rides service indicators  
             else if (subjectLower.includes('rides') ||
                      bodyLower.includes('ride') ||
