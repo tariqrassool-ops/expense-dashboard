@@ -1316,46 +1316,45 @@ const normalizedBody = (body || '')
 
 let amount = 0;
 
-// -----------------------------
+// Find every LKR amount in the email
+const amounts = [...normalizedBody.matchAll(/(?:LKR|Rs\.?)\s*([+-]?[0-9,]+\.\d{2})/gi)]
+    .map(m => parseFloat(m[1].replace(/,/g, '')));
+
+// Debug
+console.log("ALL AMOUNTS FOUND:", amounts);
+
 // Rides
-// -----------------------------
-let match = normalizedBody.match(
-    /Total\s+Trip\s+Fare\s*(?:LKR|Rs\.?)?\s*([0-9,]+\.\d{2})/i
-);
+if (category === "Travel") {
 
-if (match) {
-    amount = parseFloat(match[1].replace(/,/g, ''));
-}
-
-// -----------------------------
-// Food & Marketplace
-// -----------------------------
-if (amount === 0) {
-
-    match = normalizedBody.match(
-        /Total\s*(?:LKR|Rs\.?)?\s*([0-9,]+\.\d{2})/i
+    const rideMatch = normalizedBody.match(
+        /total\s+trip\s+fare.*?(?:LKR|Rs\.?)\s*([0-9,]+\.\d{2})/i
     );
 
-    if (match) {
-        amount = parseFloat(match[1].replace(/,/g, ''));
+    if (rideMatch) {
+        amount = parseFloat(rideMatch[1].replace(/,/g, ''));
     }
 }
 
-// -----------------------------
-// Fallback
-// -----------------------------
-if (amount === 0) {
+// Food / Marketplace
+else {
 
-    const amounts = [
-        ...normalizedBody.matchAll(/(?:LKR|Rs\.?)\s*([0-9,]+\.\d{2})/gi)
-    ];
+    const totalMatch = normalizedBody.match(
+        /total.*?(?:LKR|Rs\.?)\s*([0-9,]+\.\d{2})/i
+    );
 
-    if (amounts.length) {
-        amount = parseFloat(
-            amounts[amounts.length - 1][1].replace(/,/g, '')
-        );
+    if (totalMatch) {
+        amount = parseFloat(totalMatch[1].replace(/,/g, ''));
     }
 }
+
+// Final fallback
+if (amount === 0 && amounts.length) {
+
+    amount = amounts[amounts.length - 1];
+
+}
+
+console.log("FINAL AMOUNT:", amount);
 
     // -----------------------------
     // Merchant Extraction
