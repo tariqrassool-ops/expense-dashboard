@@ -768,10 +768,23 @@
             <div class="action-bar" role="region" aria-label="Actions">
                 <button class="btn btn-primary" onclick="openAddModal()">
                     <span aria-hidden="true">+</span> Add Expense
-                </button>
-                <button class="btn btn-success" id="syncBtn" onclick="syncGmail()">
-                    <span aria-hidden="true">&#x1F504;</span> Sync Gmail
-                </button>
+              <div style="display:flex;align-items:end;gap:12px;flex-wrap:wrap;">
+
+    <div>
+        <label style="font-size:12px;">Sync From</label><br>
+        <input type="date" id="syncFromDate">
+    </div>
+
+    <div>
+        <label style="font-size:12px;">Sync To</label><br>
+        <input type="date" id="syncToDate">
+    </div>
+
+    <button class="btn btn-success" id="syncBtn" onclick="syncGmail()">
+        <span aria-hidden="true">&#x1F504;</span> Sync Gmail
+    </button>
+
+</div>
                 <button class="btn btn-warning" onclick="exportData()">
                     <span aria-hidden="true">&#x1F4E5;</span> Export CSV
                 </button>
@@ -1112,17 +1125,34 @@
             }
 
             showLoading('Syncing with Gmail...');
-            try {
-                const thirtyDaysAgo = new Date();
-                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                const afterDate = Math.floor(thirtyDaysAgo.getTime() / 1000);
+try {
+    const fromDateInput = document.getElementById('syncFromDate').value;
+    const toDateInput = document.getElementById('syncToDate').value;
+
+    let afterDate;
+
+    if (fromDateInput) {
+        const fromDate = new Date(fromDateInput);
+        afterDate = Math.floor(fromDate.getTime() / 1000);
+    } else {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        afterDate = Math.floor(thirtyDaysAgo.getTime() / 1000);
+    }
 
                 let newExpenses = [];
                 const existingIds = new Set(allExpenses.map(e => e.gmailMessageId).filter(Boolean));
 
                 for (const [email, config] of Object.entries(EMAIL_SOURCES)) {
-                    const queryStr = `from:${email} after:${afterDate}`;
-                    const messages = await fetchGmailMessages(queryStr);
+    let queryStr = `from:${email} after:${afterDate}`;
+
+    if (toDateInput) {
+        const beforeDate = new Date(toDateInput);
+        const beforeTimestamp = Math.floor(beforeDate.getTime() / 1000);
+        queryStr += ` before:${beforeTimestamp}`;
+    }
+
+    const messages = await fetchGmailMessages(queryStr);
 
                     for (const message of messages) {
                         if (existingIds.has(message.id)) continue;
