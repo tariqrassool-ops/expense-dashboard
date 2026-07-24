@@ -1268,76 +1268,46 @@ function parsePickMeEmail(subject, body, date) {
     
     let category = 'Uncategorized';
 
-// MARKETPLACE DETECTION FIRST
+// ---------------------------
+// RIDES (Most Unique)
+// ---------------------------
 if (
-    htmlLower.includes('marketplace') ||
+    subjectLower.includes('trip id') ||
+    cleanBody.includes('trip id') ||
+    cleanBody.includes('driver partner') ||
+    cleanBody.includes('total trip fare') ||
+    cleanBody.includes('estimated fare') ||
+    cleanBody.includes('actual fare') ||
+    cleanBody.includes('estimated distance') ||
+    cleanBody.includes('actual distance') ||
+    cleanBody.includes('rides')
+) {
+    category = 'Travel';
+}
+
+// ---------------------------
+// MARKETPLACE
+// ---------------------------
+else if (
     cleanBody.includes('marketplace') ||
+    cleanBody.includes('merchant price amendment') ||
+    cleanBody.includes('packaging charge') ||
+    cleanBody.includes('market@pickme.lk') ||
     htmlLower.includes('marketplace_image')
 ) {
     category = 'Groceries';
 }
 
-
-// FOOD DETECTION
+// ---------------------------
+// FOOD
+// ---------------------------
 else if (
-    htmlLower.includes('food') ||
-    htmlLower.includes('food_image') ||
-    cleanBody.includes('restaurant')
+    cleanBody.includes('food') ||
+    cleanBody.includes('food@pickme.lk') ||
+    htmlLower.includes('food_image')
 ) {
     category = 'Food';
 }
-
-
-// RIDE DETECTION
-else if (
-    htmlLower.includes('ride') ||
-    cleanBody.includes('driver') ||
-    cleanBody.includes('trip') ||
-    cleanBody.includes('fare') ||
-    cleanBody.includes('distance')
-) {
-    category = 'Travel';
-}
-            
-            // Amount extraction
-            const amountMatch = body.match(/(?:LKR|Rs\.?|RS)\s*([0-9,]+\.?\d{0,2})/i) || 
-                               body.match(/([0-9,]+\.?\d{0,2})\s*(?:LKR|Rs)/i) ||
-                               body.match(/Total:?\s*Rs\.?\s*([0-9,]+\.?\d{0,2})/i) ||
-                               body.match(/Amount:?\s*Rs\.?\s*([0-9,]+\.?\d{0,2})/i);
-            const amount = amountMatch ? parseFloat(amountMatch[1].replace(/,/g, '')) : 0;
-
-            // Merchant extraction with category refinement
-            let merchant = 'PickMe';
-            const merchantMatch = body.match(/from\s+([A-Za-z\s&]+?)(?:\s+on|\s+at|\s*\n|$)/i) ||
-                                 body.match(/at\s+([A-Za-z\s&]+?)(?:\s+on|\s*\n|$)/i) ||
-                                 subject.match(/pickme\s*-\s*(.+)/i);
-            if (merchantMatch) {
-                merchant = 'PickMe - ' + merchantMatch[1].trim().substring(0, 50);
-            }
-            
-            // Refine merchant display based on detected category
-            if (category === 'Food') {
-                const restaurantMatch = body.match(/(?:from|at|restaurant)\s*[:\\-]?\s*([A-Za-z0-9\s&',-]+?)(?:\s+on|\s+at|\s*\n|$)/i) ||
-                                       body.match(/order\s+from\s+([A-Za-z0-9\s&',-]+)/i);
-                if (restaurantMatch) {
-                    merchant = 'PickMe Food - ' + restaurantMatch[1].trim();
-                } else {
-                    merchant = 'PickMe Food';
-                }
-            } else if (category === 'Travel') {
-                merchant = 'PickMe Rides';
-            } else if (category === 'Groceries') {
-                merchant = 'PickMe Marketplace';
-            }
-
-            return { 
-                date: date.toISOString().split('T')[0], 
-                merchant, 
-                amount, 
-                category, 
-                description: subject 
-            };
-        }
 
         // ===================== UI =====================
         window.applyFilters = function() {
