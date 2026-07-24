@@ -1308,31 +1308,53 @@ else if (
     // Amount Extraction
     // -----------------------------
     
-// Convert HTML non-breaking spaces into normal spaces
-const normalizedBody = body
+const normalizedBody = (body || '')
     .replace(/&nbsp;/gi, ' ')
-    .replace(/\u00A0/g, ' ');
+    .replace(/\u00A0/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ');
 
 let amount = 0;
 
-// Prefer the TOTAL amount
-const totalMatch = normalizedBody.match(
-    /total\s*(?:lkr|rs\.?)?\s*([0-9,]+\.\d{2})/i
+// -----------------------------
+// Rides
+// -----------------------------
+let match = normalizedBody.match(
+    /Total\s+Trip\s+Fare\s*(?:LKR|Rs\.?)?\s*([0-9,]+\.\d{2})/i
 );
 
-if (totalMatch) {
-    amount = parseFloat(totalMatch[1].replace(/,/g, ''));
+if (match) {
+    amount = parseFloat(match[1].replace(/,/g, ''));
 }
-else {
 
-    const amountMatch = normalizedBody.match(
-        /(?:lkr|rs\.?)\s*([0-9,]+\.\d{2})/i
+// -----------------------------
+// Food & Marketplace
+// -----------------------------
+if (amount === 0) {
+
+    match = normalizedBody.match(
+        /Total\s*(?:LKR|Rs\.?)?\s*([0-9,]+\.\d{2})/i
     );
 
-    if (amountMatch) {
-        amount = parseFloat(amountMatch[1].replace(/,/g, ''));
+    if (match) {
+        amount = parseFloat(match[1].replace(/,/g, ''));
     }
+}
 
+// -----------------------------
+// Fallback
+// -----------------------------
+if (amount === 0) {
+
+    const amounts = [
+        ...normalizedBody.matchAll(/(?:LKR|Rs\.?)\s*([0-9,]+\.\d{2})/gi)
+    ];
+
+    if (amounts.length) {
+        amount = parseFloat(
+            amounts[amounts.length - 1][1].replace(/,/g, '')
+        );
+    }
 }
 
     // -----------------------------
