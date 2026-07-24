@@ -714,17 +714,6 @@
     </section>
 
     <div class="container">
-        <header class="header hidden" id="dashboardHeader" role="banner">
-            <h1>Expendiamus</h1>
-            <p>Track, manage, and analyze your expenses in one place</p>
-            <div class="user-info hidden" id="userInfo">
-                <div class="user-avatar" id="userAvatar" aria-hidden="true"></div>
-                <div>
-                    <div id="userName" style="font-weight: 600;"></div>
-                    <div id="userEmail" style="font-size: 0.85rem; opacity: 0.8;"></div>
-                </div>
-            </div>
-        </header>
 
         <main id="dashboardContent" class="hidden" role="main">
             <div class="stats-grid" role="region" aria-label="Statistics">
@@ -966,6 +955,7 @@
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     currentUser = user;
+                    document.getElementById('signInBtn').style.display = 'none';
                     showDashboard();
                 } else {
                     showAuth();
@@ -1032,8 +1022,6 @@
             document.getElementById('dashboardContent').classList.remove('hidden');
             document.getElementById('userInfo').classList.remove('hidden');
 
-            document.getElementById('userName').textContent = currentUser.displayName || currentUser.email;
-            document.getElementById('userEmail').textContent = currentUser.email;
             document.getElementById('userAvatar').textContent = (currentUser.displayName || currentUser.email || '?')[0].toUpperCase();
 
             loadExpenses();
