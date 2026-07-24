@@ -1242,28 +1242,16 @@
             let category = 'Uncategorized';
             
             // Check for Food service indicators
-            if (bodyLower.includes('food') || 
-                bodyLower.includes('restaurant') || 
-                bodyLower.includes('cuisine') ||
-                bodyLower.includes('delivery') ||
-                bodyLower.includes('order from') ||
-                bodyLower.includes('meal') ||
-                bodyLower.includes('menu') ||
-                /preparing your order|order confirmed|food is on the way/.test(bodyLower)) {
-                category = 'Food';
+                 if (
+                    subjectLower.includes('delivery email receipt') ||
+                     /order id|order details|delivered to|picked up from/i.test(bodyLower)
+) {
+                    category = 'Food';
             }
-            // Check for Rides service indicators  
-            else if (subjectLower.includes('rides') ||
-                     bodyLower.includes('ride') ||
-                     bodyLower.includes('trip') ||
-                     bodyLower.includes('driver') ||
-                     bodyLower.includes('vehicle') ||
-                     bodyLower.includes('your captain') ||
-                     bodyLower.includes('km') ||
-                     bodyLower.includes('distance') ||
-                     bodyLower.includes('fare') ||
-                     /captain|pickup|drop-off|trip completed/.test(bodyLower)) {
-                category = 'Travel';
+             else if (
+                     /trip|ride completed|driver|pickup|drop-off|captain/i.test(bodyLower)
+) {
+                     category = 'Travel';
             }
             // Check for Marketplace/Shopping indicators
             else if (bodyLower.includes('marketplace') ||
