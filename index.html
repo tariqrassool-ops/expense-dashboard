@@ -1009,23 +1009,17 @@
             gmailAccessToken = null;
         };
 
-        function showAuth() {
-            document.getElementById('landingSection').classList.remove('hidden');
-            document.getElementById('dashboardHeader').classList.add('hidden');
-            document.getElementById('dashboardContent').classList.add('hidden');
-            document.getElementById('userInfo').classList.add('hidden');
-        }
+function showAuth() {
+    document.getElementById('landingSection').classList.remove('hidden');
+    document.getElementById('dashboardContent').classList.add('hidden');
+}
 
-        function showDashboard() {
-            document.getElementById('landingSection').classList.add('hidden');
-            document.getElementById('dashboardHeader').classList.remove('hidden');
-            document.getElementById('dashboardContent').classList.remove('hidden');
-            document.getElementById('userInfo').classList.remove('hidden');
+function showDashboard() {
+    document.getElementById('landingSection').classList.add('hidden');
+    document.getElementById('dashboardContent').classList.remove('hidden');
 
-            document.getElementById('userAvatar').textContent = (currentUser.displayName || currentUser.email || '?')[0].toUpperCase();
-
-            loadExpenses();
-        }
+    loadExpenses();
+}
 
         // ===================== DATA =====================
         async function loadExpenses() {
