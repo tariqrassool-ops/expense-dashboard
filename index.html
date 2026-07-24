@@ -1237,7 +1237,6 @@
 function parsePickMeEmail(subject, body, date) {
     const subjectLower = (subject || '').toLowerCase();
 
-    // ✅ DEFINE cleanBody FIRST
     const cleanBody = (body || '')
         .replace(/<style[\s\S]*?<\/style>/gi, '')
         .replace(/<script[\s\S]*?<\/script>/gi, '')
@@ -1247,7 +1246,6 @@ function parsePickMeEmail(subject, body, date) {
 
     let category = 'Uncategorized';
 
-    // ✅ NOW you can use cleanBody
     if (
         subjectLower.includes('delivery') ||
         cleanBody.includes('food')
@@ -1266,9 +1264,6 @@ function parsePickMeEmail(subject, body, date) {
     ) {
         category = 'Groceries';
     }
-
-    return { category };
-}
             
             // Amount extraction
             const amountMatch = body.match(/(?:LKR|Rs\.?|RS)\s*([0-9,]+\.?\d{0,2})/i) || 
