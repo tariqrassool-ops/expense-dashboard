@@ -1307,61 +1307,72 @@ else if (
     // -----------------------------
     // Amount Extraction
     // -----------------------------
-    const amountMatch =
-        body.match(/(?:LKR|Rs\.?|RS)\s*([0-9,]+(?:\.\d{1,2})?)/i) ||
-        body.match(/([0-9,]+(?:\.\d{1,2})?)\s*(?:LKR|Rs)/i) ||
-        body.match(/Total\s*[:\-]?\s*(?:LKR|Rs\.?)?\s*([0-9,]+(?:\.\d{1,2})?)/i);
+    
+// Convert HTML non-breaking spaces into normal spaces
+const normalizedBody = body
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\u00A0/g, ' ');
 
-    const amount = amountMatch
-        ? parseFloat(amountMatch[1].replace(/,/g, ''))
-        : 0;
+let amount = 0;
+
+// Prefer the TOTAL amount
+const totalMatch = normalizedBody.match(
+    /total\s*(?:lkr|rs\.?)?\s*([0-9,]+\.\d{2})/i
+);
+
+if (totalMatch) {
+    amount = parseFloat(totalMatch[1].replace(/,/g, ''));
+}
+else {
+
+    const amountMatch = normalizedBody.match(
+        /(?:lkr|rs\.?)\s*([0-9,]+\.\d{2})/i
+    );
+
+    if (amountMatch) {
+        amount = parseFloat(amountMatch[1].replace(/,/g, ''));
+    }
+
+}
 
     // -----------------------------
     // Merchant Extraction
     // -----------------------------
-    let merchant = 'PickMe';
+let merchant = 'PickMe';
 
-    if (category === 'Travel') {
+if (category === 'Travel') {
 
-        merchant = 'PickMe Rides';
+    merchant = 'PickMe Rides';
 
-    } else {
+}
+else {
 
-        const merchantPatterns = [
+    const merchantMatch = normalizedBody.match(
+        /thanks for ordering,.*?([a-z0-9&(),.' -]+?)\s+(marketplace|food)/is
+    );
 
-            /restaurant-details-div[^>]*>\s*([^<]+)/i,
+    if (merchantMatch) {
 
-            /merchant\s*[:\-]?\s*([A-Za-z0-9&',(). -]+)/i,
+        merchant = merchantMatch[1].trim();
 
-            /from\s+([A-Za-z0-9&',(). -]+?)(?:\s+on|\s*\n|$)/i,
-
-            /at\s+([A-Za-z0-9&',(). -]+?)(?:\s+on|\s*\n|$)/i
-
-        ];
-
-        for (const pattern of merchantPatterns) {
-
-            const match = body.match(pattern);
-
-            if (match) {
-                merchant = match[1].trim();
-                break;
-            }
-
-        }
-
-        if (category === 'Food') {
-            merchant = merchant === 'PickMe'
-                ? 'PickMe Food'
-                : `PickMe Food - ${merchant}`;
-        }
-
-        if (category === 'Groceries') {
-            merchant = merchant === 'PickMe'
-                ? 'PickMe Marketplace'
-                : `PickMe Marketplace - ${merchant}`;
-        }
     }
+
+    if (category === 'Food') {
+
+        merchant = merchant
+            ? `PickMe Food - ${merchant}`
+            : 'PickMe Food';
+
+    }
+    else if (category === 'Groceries') {
+
+        merchant = merchant
+            ? `PickMe Marketplace - ${merchant}`
+            : 'PickMe Marketplace';
+
+    }
+
+}
 
     // -----------------------------
     // Return
