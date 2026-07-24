@@ -1366,14 +1366,17 @@ else if (
     // -----------------------------
     // Return
     // -----------------------------
-    return {
-        date: date.toISOString().split('T')[0],
-        merchant,
-        amount,
-        category,
-        description: subject
-    };
-}
+const result = {
+    date: date.toISOString().split('T')[0],
+    merchant,
+    amount,
+    category,
+    description: subject
+};
+
+console.log("PARSED PICKME RESULT:", result);
+
+return result;
 
         // ===================== UI =====================
         window.applyFilters = function() {
