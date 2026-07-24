@@ -1256,41 +1256,48 @@ function parsePickMeEmail(subject, body, date) {
     console.log('BODY:', cleanBody.substring(0,500));
 
 
+    
+     const serviceMatch = body.match(/service-code-span[^>]*>(.*?)<\/span>/is);
+
+    const serviceType = serviceMatch 
+        ? serviceMatch[1].trim().toLowerCase()
+        : '';
+
+    console.log("SERVICE TYPE:", serviceType);
+
+    
     let category = 'Uncategorized';
 
-// FOOD detection
+// MARKETPLACE DETECTION FIRST
 if (
-    htmlLower.includes('restaurant-details-div') ||
-    htmlLower.includes('order-details-topic-div') ||
-    htmlLower.includes('service-code-div') && htmlLower.includes('food') ||
-    cleanBody.includes('order details')
+    htmlLower.includes('marketplace') ||
+    cleanBody.includes('marketplace') ||
+    htmlLower.includes('marketplace_image')
+) {
+    category = 'Groceries';
+}
+
+
+// FOOD DETECTION
+else if (
+    htmlLower.includes('food') ||
+    htmlLower.includes('food_image') ||
+    cleanBody.includes('restaurant')
 ) {
     category = 'Food';
 }
-     // Check for Rides service indicators  
-            else if (subjectLower.includes('rides') ||
-                     bodyLower.includes('ride') ||
-                     bodyLower.includes('trip') ||
-                     bodyLower.includes('driver') ||
-                     bodyLower.includes('vehicle') ||
-                     bodyLower.includes('your captain') ||
-                     bodyLower.includes('km') ||
-                     bodyLower.includes('distance') ||
-                     bodyLower.includes('fare') ||
-                     /captain|pickup|drop-off|trip completed/.test(bodyLower)) {
-                category = 'Travel';
-            }
-            // Check for Marketplace/Shopping indicators
-            else if (bodyLower.includes('marketplace') ||
-                     bodyLower.includes('shop') ||
-                     bodyLower.includes('store') ||
-                     bodyLower.includes('item') ||
-                     bodyLower.includes('product') ||
-                     bodyLower.includes('delivered') ||
-                     bodyLower.includes('package') ||
-                     /order delivered|out for delivery|shopping/.test(bodyLower)) {
-                category = 'Groceries';
-            }
+
+
+// RIDE DETECTION
+else if (
+    htmlLower.includes('ride') ||
+    cleanBody.includes('driver') ||
+    cleanBody.includes('trip') ||
+    cleanBody.includes('fare') ||
+    cleanBody.includes('distance')
+) {
+    category = 'Travel';
+}
             
             // Amount extraction
             const amountMatch = body.match(/(?:LKR|Rs\.?|RS)\s*([0-9,]+\.?\d{0,2})/i) || 
