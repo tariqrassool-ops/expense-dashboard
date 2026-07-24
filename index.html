@@ -781,6 +781,14 @@
         <span aria-hidden="true">&#x1F504;</span> Sync Gmail
     </button>
 
+    <button 
+    class="btn btn-danger" 
+    id="bulkDeleteBtn"
+    onclick="deleteSelectedExpenses()"
+    style="display:none;">
+    🗑 Delete Selected
+</button>
+
 </div>
                 <button class="btn btn-warning" onclick="exportData()">
                     <span aria-hidden="true">&#x1F4E5;</span> Export CSV
@@ -925,6 +933,7 @@
         let currentUser = null;
         let allExpenses = [];
         let gmailAccessToken = null;
+        let selectedExpenses = new Set();
 
         // ===================== DEBUG =====================
         function showDebug(msg) {
@@ -1108,6 +1117,34 @@
                 hideLoading();
             }
         };
+
+        window.deleteSelectedExpenses = async function() {
+
+    if (selectedExpenses.size === 0) return;
+
+    if (!confirm(`Delete ${selectedExpenses.size} selected expenses?`)) {
+        return;
+    }
+
+    try {
+        const batch = writeBatch(db);
+
+        selectedExpenses.forEach(id => {
+            batch.delete(doc(db, 'expenses', id));
+        });
+
+        await batch.commit();
+
+        showToast(`${selectedExpenses.size} expenses deleted`, 'success');
+
+        selectedExpenses.clear();
+
+        loadExpenses();
+
+    } catch (e) {
+        showToast('Delete failed: ' + e.message, 'error');
+    }
+};
 
         // ===================== GMAIL SYNC =====================
         window.syncGmail = async function() {
@@ -1438,9 +1475,10 @@ return result;
             }
 
             let html = '<table role="table" aria-label="Expenses"><thead><tr role="row">' +
-                '<th scope="col">Date</th><th scope="col">Merchant</th><th scope="col">Category</th>' +
-                '<th scope="col">Amount</th><th scope="col">Source</th><th scope="col">Actions</th>' +
-                '</tr></thead><tbody>';
+    '<th scope="col"><input type="checkbox" id="selectAllExpenses" onchange="toggleSelectAllExpenses(this)"></th>' +
+    '<th scope="col">Date</th><th scope="col">Merchant</th><th scope="col">Category</th>' +
+    '<th scope="col">Amount</th><th scope="col">Source</th><th scope="col">Actions</th>' +
+    '</tr></thead><tbody>';
 
             expenses.forEach(expense => {
                 const catClass = 'cat-' + (expense.category || 'uncategorized').toLowerCase();
@@ -1451,7 +1489,15 @@ return result;
 
                 const safeMerchantLabel = escapeHtml(expense.merchant || 'expense');
                 html += `<tr role="row">
-                    <td>${formatDate(expense.date)}</td>
+    <td>
+        <input 
+            type="checkbox" 
+            class="expense-checkbox"
+            data-id="${expense.id}"
+            onchange="toggleExpenseSelection('${expense.id}')"
+        >
+    </td>
+    <td>${formatDate(expense.date)}</td>
                     <td><div style="font-weight: 500;">${escapeHtml(expense.merchant || '')}</div>${descHtml}</td>
                     <td><span class="category-badge ${catClass}">${expense.category || 'Uncategorized'}</span></td>
                     <td class="amount">LKR ${(expense.amount || 0).toFixed(2)}</td>
@@ -1465,6 +1511,47 @@ return result;
             html += '</tbody></table>';
             container.innerHTML = html;
         }
+
+        function toggleExpenseSelection(id) {
+    if (selectedExpenses.has(id)) {
+        selectedExpenses.delete(id);
+    } else {
+        selectedExpenses.add(id);
+    }
+
+    updateBulkDeleteButton();
+}
+
+
+window.toggleSelectAllExpenses = function(checkbox) {
+    const checkboxes = document.querySelectorAll('.expense-checkbox');
+
+    checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+
+        if (checkbox.checked) {
+            selectedExpenses.add(cb.dataset.id);
+        } else {
+            selectedExpenses.delete(cb.dataset.id);
+        }
+    });
+
+    updateBulkDeleteButton();
+}
+
+
+function updateBulkDeleteButton() {
+    const btn = document.getElementById('bulkDeleteBtn');
+
+    if (!btn) return;
+
+    if (selectedExpenses.size > 0) {
+        btn.style.display = 'inline-block';
+        btn.textContent = `🗑 Delete Selected (${selectedExpenses.size})`;
+    } else {
+        btn.style.display = 'none';
+    }
+}
 
         function updateStats() {
             const now = new Date();
