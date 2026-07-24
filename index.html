@@ -568,7 +568,7 @@
   .landing {
         position: relative;
         min-height: 100vh;
-        background: #000000;
+        background: #08090b;
         overflow: hidden;
         display: flex;
         align-items: flex-end;
@@ -584,6 +584,44 @@
         z-index: 5;
         padding: 10px 22px;
     }
+    
+/* Animated gradient layer */
+.landing-login::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        #2563EB,
+    #7C3AED,
+    #06B6D4,
+    #3B82F6
+    );
+    background-size: 300% 300%;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    animation: gradientMove 3s ease infinite;
+    border-radius: inherit;   /* <-- Add this */
+    z-index: -1;
+}
+
+.landing-login:hover::before {
+    opacity: 1;
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
 
     .landing .debug-box {
         position: fixed;
