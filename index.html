@@ -1235,50 +1235,20 @@
         }
 
 function parsePickMeEmail(subject, body, date) {
-const subjectLower = (subject || '').toLowerCase();
-    
-const htmlLower = (body || '').toLowerCase();
+    const subjectLower = (subject || '').toLowerCase();
 
-const cleanBody = (body || '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .toLowerCase();
+    console.log("========== PICKME EMAIL ==========");
+    console.log("Subject:", subject);
+    console.log("Date:", date);
+    console.log("Body length:", body.length);
+    console.log("Body preview:", body.substring(0, 1000));
 
-let category = 'Uncategorized';
-
-// ✅ FOOD detection (strong signals)
-if (
-    subjectLower.includes('delivery email receipt') ||
-    htmlLower.includes('food') ||
-    htmlLower.includes('restaurant-details-div') ||
-    htmlLower.includes('order-details-topic-div') ||
-    cleanBody.includes('order details') ||
-    cleanBody.includes('delivered to') ||
-    cleanBody.includes('picked up from')
-) {
-    category = 'Food';
-}
-
-// ✅ RIDES detection
-else if (
-    htmlLower.includes('rides') ||
-    cleanBody.includes('trip') ||
-    cleanBody.includes('driver') ||
-    cleanBody.includes('distance') ||
-    cleanBody.includes('fare')
-) {
-    category = 'Travel';
-}
-
-// ✅ MARKETPLACE detection
-else if (
-    htmlLower.includes('marketplace') ||
-    cleanBody.includes('item') ||
-    cleanBody.includes('product')
-) {
-    category = 'Groceries';
+    return {
+        category: 'PickMe',
+        subject: subject,
+        date: date,
+        body: body
+    };
 }
             
             // Amount extraction
