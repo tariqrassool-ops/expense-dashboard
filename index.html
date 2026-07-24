@@ -1235,11 +1235,9 @@
         }
 
 function parsePickMeEmail(subject, body, date) {
+
     const subjectLower = (subject || '').toLowerCase();
-
     const htmlLower = (body || '').toLowerCase();
-
-    const bodyLower = (body || '').toLowerCase();
 
     const cleanBody = (body || '')
         .replace(/<style[\s\S]*?<\/style>/gi, '')
@@ -1248,65 +1246,115 @@ function parsePickMeEmail(subject, body, date) {
         .replace(/\s+/g, ' ')
         .toLowerCase();
 
-
-    // DEBUG - temporary
-    console.log('SUBJECT:', subjectLower);
-    console.log('HTML contains food:', htmlLower.includes('food'));
-    console.log('HTML contains restaurant:', htmlLower.includes('restaurant-details-div'));
-    console.log('BODY:', cleanBody.substring(0,500));
-
-
-    
-     const serviceMatch = body.match(/service-code-span[^>]*>(.*?)<\/span>/is);
-
-    const serviceType = serviceMatch 
-        ? serviceMatch[1].trim().toLowerCase()
-        : '';
-
-    console.log("SERVICE TYPE:", serviceType);
-
-    
+    // -----------------------------
+    // Category Detection
+    // -----------------------------
     let category = 'Uncategorized';
 
-// ---------------------------
-// RIDES (Most Unique)
-// ---------------------------
-if (
-    subjectLower.includes('trip id') ||
-    cleanBody.includes('trip id') ||
-    cleanBody.includes('driver partner') ||
-    cleanBody.includes('total trip fare') ||
-    cleanBody.includes('estimated fare') ||
-    cleanBody.includes('actual fare') ||
-    cleanBody.includes('estimated distance') ||
-    cleanBody.includes('actual distance') ||
-    cleanBody.includes('rides')
-) {
-    category = 'Travel';
-}
+    // RIDES
+    if (
+        subjectLower.includes('trip id') ||
+        cleanBody.includes('trip id') ||
+        cleanBody.includes('driver partner') ||
+        cleanBody.includes('total trip fare') ||
+        cleanBody.includes('estimated fare') ||
+        cleanBody.includes('actual fare') ||
+        cleanBody.includes('estimated distance') ||
+        cleanBody.includes('actual distance') ||
+        cleanBody.includes('thanks for using pickme')
+    ) {
+        category = 'Travel';
+    }
 
-// ---------------------------
-// MARKETPLACE
-// ---------------------------
-else if (
-    cleanBody.includes('marketplace') ||
-    cleanBody.includes('merchant price amendment') ||
-    cleanBody.includes('packaging charge') ||
-    cleanBody.includes('market@pickme.lk') ||
-    htmlLower.includes('marketplace_image')
-) {
-    category = 'Groceries';
-}
+    // MARKETPLACE
+    else if (
+        cleanBody.includes('marketplace') ||
+        cleanBody.includes('merchant price amendment') ||
+        cleanBody.includes('packaging charge') ||
+        cleanBody.includes('market@pickme.lk') ||
+        htmlLower.includes('marketplace_image')
+    ) {
+        category = 'Groceries';
+    }
 
-// ---------------------------
-// FOOD
-// ---------------------------
-else if (
-    cleanBody.includes('food') ||
-    cleanBody.includes('food@pickme.lk') ||
-    htmlLower.includes('food_image')
-) {
-    category = 'Food';
+    // FOOD
+    else if (
+        cleanBody.includes('food') ||
+        cleanBody.includes('food@pickme.lk') ||
+        htmlLower.includes('food_image')
+    ) {
+        category = 'Food';
+    }
+
+    // -----------------------------
+    // Amount Extraction
+    // -----------------------------
+    const amountMatch =
+        body.match(/(?:LKR|Rs\.?|RS)\s*([0-9,]+(?:\.\d{1,2})?)/i) ||
+        body.match(/([0-9,]+(?:\.\d{1,2})?)\s*(?:LKR|Rs)/i) ||
+        body.match(/Total\s*[:\-]?\s*(?:LKR|Rs\.?)?\s*([0-9,]+(?:\.\d{1,2})?)/i);
+
+    const amount = amountMatch
+        ? parseFloat(amountMatch[1].replace(/,/g, ''))
+        : 0;
+
+    // -----------------------------
+    // Merchant Extraction
+    // -----------------------------
+    let merchant = 'PickMe';
+
+    if (category === 'Travel') {
+
+        merchant = 'PickMe Rides';
+
+    } else {
+
+        const merchantPatterns = [
+
+            /restaurant-details-div[^>]*>\s*([^<]+)/i,
+
+            /merchant\s*[:\-]?\s*([A-Za-z0-9&',(). -]+)/i,
+
+            /from\s+([A-Za-z0-9&',(). -]+?)(?:\s+on|\s*\n|$)/i,
+
+            /at\s+([A-Za-z0-9&',(). -]+?)(?:\s+on|\s*\n|$)/i
+
+        ];
+
+        for (const pattern of merchantPatterns) {
+
+            const match = body.match(pattern);
+
+            if (match) {
+                merchant = match[1].trim();
+                break;
+            }
+
+        }
+
+        if (category === 'Food') {
+            merchant = merchant === 'PickMe'
+                ? 'PickMe Food'
+                : `PickMe Food - ${merchant}`;
+        }
+
+        if (category === 'Groceries') {
+            merchant = merchant === 'PickMe'
+                ? 'PickMe Marketplace'
+                : `PickMe Marketplace - ${merchant}`;
+        }
+    }
+
+    // -----------------------------
+    // Return
+    // -----------------------------
+    return {
+        date: date.toISOString().split('T')[0],
+        merchant,
+        amount,
+        category,
+        description: subject
+    };
 }
 
         // ===================== UI =====================
