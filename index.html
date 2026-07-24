@@ -1244,26 +1244,36 @@ function parsePickMeEmail(subject, body, date) {
         .replace(/\s+/g, ' ')
         .toLowerCase();
 
-    let category = 'Uncategorized';
+let category = 'Uncategorized';
 
-    if (
-        subjectLower.includes('delivery') ||
-        cleanBody.includes('food')
-    ) {
-        category = 'Food';
-    }
-    else if (
-        subjectLower.includes('rides') ||
-        cleanBody.includes('rides')
-    ) {
-        category = 'Travel';
-    }
-    else if (
-        subjectLower.includes('marketplace') ||
-        cleanBody.includes('marketplace')
-    ) {
-        category = 'Groceries';
-    }
+// ✅ FOOD detection (strong signals)
+if (
+    subjectLower.includes('delivery email receipt') ||
+    cleanBody.includes('order details') ||
+    cleanBody.includes('delivered to') ||
+    cleanBody.includes('picked up from')
+) {
+    category = 'Food';
+}
+
+// ✅ RIDES detection
+else if (
+    cleanBody.includes('trip') ||
+    cleanBody.includes('driver') ||
+    cleanBody.includes('distance') ||
+    cleanBody.includes('fare')
+) {
+    category = 'Travel';
+}
+
+// ✅ MARKETPLACE detection
+else if (
+    cleanBody.includes('marketplace') ||
+    cleanBody.includes('item') ||
+    cleanBody.includes('product')
+) {
+    category = 'Groceries';
+}
             
             // Amount extraction
             const amountMatch = body.match(/(?:LKR|Rs\.?|RS)\s*([0-9,]+\.?\d{0,2})/i) || 
