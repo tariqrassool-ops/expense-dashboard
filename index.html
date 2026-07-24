@@ -1253,10 +1253,10 @@ if (
     subjectLower.includes('delivery email receipt') ||
     htmlLower.includes('food') ||
     htmlLower.includes('restaurant-details-div') ||
-    htmlLower.includes('order-details-topic-div')
+    htmlLower.includes('order-details-topic-div') ||
     cleanBody.includes('order details') ||
     cleanBody.includes('delivered to') ||
-    cleanBody.includes('picked up from') ||
+    cleanBody.includes('picked up from')
 ) {
     category = 'Food';
 }
