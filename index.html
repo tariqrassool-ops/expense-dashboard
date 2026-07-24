@@ -1235,6 +1235,8 @@
         }
 
 function parsePickMeEmail(subject, body, date) {
+const subjectLower = (subject || '').toLowerCase();
+    
 const htmlLower = (body || '').toLowerCase();
 
 const cleanBody = (body || '')
