@@ -1235,29 +1235,33 @@
         }
 
 function parsePickMeEmail(subject, body, date) {
-    const subjectLower = (subject || '').toLowerCase();
+const htmlLower = (body || '').toLowerCase();
 
-    const cleanBody = (body || '')
-        .replace(/<style[\s\S]*?<\/style>/gi, '')
-        .replace(/<script[\s\S]*?<\/script>/gi, '')
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .toLowerCase();
+const cleanBody = (body || '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
 
 let category = 'Uncategorized';
 
 // ✅ FOOD detection (strong signals)
 if (
     subjectLower.includes('delivery email receipt') ||
+    htmlLower.includes('Food') ||
     cleanBody.includes('order details') ||
     cleanBody.includes('delivered to') ||
-    cleanBody.includes('picked up from')
+    cleanBody.includes('picked up from') ||
+    htmlLower.includes('restaurant-details-div') ||
+    htmlLower.includes('order-details-topic-div')
 ) {
     category = 'Food';
 }
 
 // ✅ RIDES detection
 else if (
+    htmlLower.includes('RIDES') ||
     cleanBody.includes('trip') ||
     cleanBody.includes('driver') ||
     cleanBody.includes('distance') ||
@@ -1268,7 +1272,7 @@ else if (
 
 // ✅ MARKETPLACE detection
 else if (
-    cleanBody.includes('marketplace') ||
+    htmlLower.includes('Marketplace') ||
     cleanBody.includes('item') ||
     cleanBody.includes('product')
 ) {
