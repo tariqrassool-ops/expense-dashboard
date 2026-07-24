@@ -1251,19 +1251,19 @@ let category = 'Uncategorized';
 // ✅ FOOD detection (strong signals)
 if (
     subjectLower.includes('delivery email receipt') ||
-    htmlLower.includes('Food') ||
+    htmlLower.includes('food') ||
+    htmlLower.includes('restaurant-details-div') ||
+    htmlLower.includes('order-details-topic-div')
     cleanBody.includes('order details') ||
     cleanBody.includes('delivered to') ||
     cleanBody.includes('picked up from') ||
-    htmlLower.includes('restaurant-details-div') ||
-    htmlLower.includes('order-details-topic-div')
 ) {
     category = 'Food';
 }
 
 // ✅ RIDES detection
 else if (
-    htmlLower.includes('RIDES') ||
+    htmlLower.includes('rides') ||
     cleanBody.includes('trip') ||
     cleanBody.includes('driver') ||
     cleanBody.includes('distance') ||
@@ -1274,7 +1274,7 @@ else if (
 
 // ✅ MARKETPLACE detection
 else if (
-    htmlLower.includes('Marketplace') ||
+    htmlLower.includes('marketplace') ||
     cleanBody.includes('item') ||
     cleanBody.includes('product')
 ) {
