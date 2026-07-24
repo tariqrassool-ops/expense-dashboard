@@ -1478,7 +1478,7 @@ return result;
     <td>${formatDate(expense.date)}</td>
                     <td><div style="font-weight: 500;">${escapeHtml(expense.merchant || '')}</div>${descHtml}</td>
                     <td><span class="category-badge ${catClass}">${expense.category || 'Uncategorized'}</span></td>
-                    <td class="amount">LKR ${(expense.amount || 0).toFixed(2)}</td>
+                    <td class="amount">LKR ${(expense.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td>${sourceBadge}</td>
                     <td><div class="action-btns">
                     <button class="btn" style="padding: 5px 10px; font-size: 0.75rem; background: var(--light-gray);" onclick="editExpense('${expense.id}')" aria-label="Edit ${safeMerchantLabel}">Edit</button>
