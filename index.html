@@ -1240,30 +1240,25 @@
             
             // Detect category from email body and subject
             let category = 'Uncategorized';
-            
-            // Check for Food service indicators
-                 if (
-                    subjectLower.includes('delivery email receipt') ||
-                     /order id|order details|delivered to|picked up from/i.test(bodyLower)
+
+if (
+    subjectLower.includes('delivery') ||
+    cleanBody.includes('food')
 ) {
-                    category = 'Food';
-            }
-             else if (
-                     /trip|ride completed|driver|pickup|drop-off|captain/i.test(bodyLower)
+    category = 'Food';
+}
+else if (
+    subjectLower.includes('rides') ||
+    cleanBody.includes('rides')
 ) {
-                     category = 'Travel';
-            }
-            // Check for Marketplace/Shopping indicators
-            else if (bodyLower.includes('marketplace') ||
-                     bodyLower.includes('shop') ||
-                     bodyLower.includes('store') ||
-                     bodyLower.includes('item') ||
-                     bodyLower.includes('product') ||
-                     bodyLower.includes('delivered') ||
-                     bodyLower.includes('package') ||
-                     /order delivered|out for delivery|shopping/.test(bodyLower)) {
-                category = 'Groceries';
-            }
+    category = 'Travel';
+}
+else if (
+    subjectLower.includes('marketplace') ||
+    cleanBody.includes('marketplace')
+) {
+    category = 'Groceries';
+}
             
             // Amount extraction
             const amountMatch = body.match(/(?:LKR|Rs\.?|RS)\s*([0-9,]+\.?\d{0,2})/i) || 
