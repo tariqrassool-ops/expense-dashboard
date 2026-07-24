@@ -1251,40 +1251,40 @@ function parsePickMeEmail(subject, body, date) {
     // -----------------------------
     let category = 'Uncategorized';
 
-    // RIDES
-    if (
-        subjectLower.includes('trip id') ||
-        cleanBody.includes('trip id') ||
-        cleanBody.includes('driver partner') ||
-        cleanBody.includes('total trip fare') ||
-        cleanBody.includes('estimated fare') ||
-        cleanBody.includes('actual fare') ||
-        cleanBody.includes('estimated distance') ||
-        cleanBody.includes('actual distance') ||
-        cleanBody.includes('thanks for using pickme')
-    ) {
-        category = 'Travel';
-    }
+// RIDES
+if (
+    subjectLower.includes('trip id') ||
+    cleanBody.includes('trip id') ||
+    cleanBody.includes('driver partner') ||
+    cleanBody.includes('total trip fare') ||
+    cleanBody.includes('estimated fare') ||
+    cleanBody.includes('actual fare') ||
+    cleanBody.includes('estimated distance') ||
+    cleanBody.includes('actual distance') ||
+    cleanBody.includes('thanks for using pickme')
+) {
+    category = 'Travel';
+}
 
-    // MARKETPLACE
-    else if (
-        cleanBody.includes('marketplace') ||
-        cleanBody.includes('merchant price amendment') ||
-        cleanBody.includes('packaging charge') ||
-        cleanBody.includes('market@pickme.lk') ||
-        htmlLower.includes('marketplace_image')
-    ) {
-        category = 'Groceries';
-    }
+// MARKETPLACE
+else if (
+    cleanBody.includes('merchant price amendment') ||
+    cleanBody.includes('packaging charge') ||
+    cleanBody.includes('market@pickme.lk') ||
+    cleanBody.includes('glomark') ||
+    cleanBody.includes('marketplace')
+) {
+    category = 'Groceries';
+}
 
-    // FOOD
-    else if (
-        cleanBody.includes('food') ||
-        cleanBody.includes('food@pickme.lk') ||
-        htmlLower.includes('food_image')
-    ) {
-        category = 'Food';
-    }
+// FOOD
+else if (
+    subjectLower.includes('delivery email receipt')
+) {
+    // If it is a delivery receipt and it wasn't Marketplace,
+    // then it is Food.
+    category = 'Food';
+}
 
     // -----------------------------
     // Amount Extraction
