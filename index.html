@@ -1234,30 +1234,40 @@
             return body;
         }
 
-         function parsePickMeEmail(subject, body, date) {
-            const subjectLower = (subject || '').toLowerCase();
-            const bodyLower = (body || '').toLowerCase();
-            
-            // Detect category from email body and subject
-            let category = 'Uncategorized';
+function parsePickMeEmail(subject, body, date) {
+    const subjectLower = (subject || '').toLowerCase();
 
-if (
-    subjectLower.includes('delivery') ||
-    cleanBody.includes('food')
-) {
-    category = 'Food';
-}
-else if (
-    subjectLower.includes('rides') ||
-    cleanBody.includes('rides')
-) {
-    category = 'Travel';
-}
-else if (
-    subjectLower.includes('marketplace') ||
-    cleanBody.includes('marketplace')
-) {
-    category = 'Groceries';
+    // ✅ DEFINE cleanBody FIRST
+    const cleanBody = (body || '')
+        .replace(/<style[\s\S]*?<\/style>/gi, '')
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .toLowerCase();
+
+    let category = 'Uncategorized';
+
+    // ✅ NOW you can use cleanBody
+    if (
+        subjectLower.includes('delivery') ||
+        cleanBody.includes('food')
+    ) {
+        category = 'Food';
+    }
+    else if (
+        subjectLower.includes('rides') ||
+        cleanBody.includes('rides')
+    ) {
+        category = 'Travel';
+    }
+    else if (
+        subjectLower.includes('marketplace') ||
+        cleanBody.includes('marketplace')
+    ) {
+        category = 'Groceries';
+    }
+
+    return { category };
 }
             
             // Amount extraction
