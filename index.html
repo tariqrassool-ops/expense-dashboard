@@ -1547,8 +1547,12 @@ function updateBulkDeleteButton() {
                 categoryTotals[e.category] = (categoryTotals[e.category] || 0) + (e.amount || 0);
             });
 
-            document.getElementById('totalExpenses').textContent = 'LKR ' + total30Days.toFixed(2);
-            document.getElementById('thisMonth').textContent = 'LKR ' + totalThisMonth.toFixed(2);
+            document.getElementById('totalExpenses').textContent = 
+    'LKR ' + total30Days.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+document.getElementById('thisMonth').textContent = 
+    'LKR ' + totalThisMonth.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            
             document.getElementById('transactionCount').textContent = allExpenses.length;
 
             let topCat = '--', topAmount = 0;
@@ -1573,7 +1577,7 @@ function updateBulkDeleteButton() {
                     '<div class="chart-bar-label">' + cat + '</div>' +
                     '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
                     '<div class="chart-bar-fill" style="width: ' + pct + '%; background: ' + (colors[cat] || '#667eea') + ';"></div></div>' +
-                    '<div class="chart-bar-value">LKR ' + amount.toFixed(0) + '</div></div>';
+                    '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
             }
             document.getElementById('categoryChart').innerHTML = catHtml || '<p style="color: var(--gray);">No data yet</p>';
 
@@ -1594,7 +1598,7 @@ function updateBulkDeleteButton() {
                     '<div class="chart-bar-label">' + dayName + '</div>' +
                     '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
                     '<div class="chart-bar-fill" style="width: ' + pct + '%; background: var(--primary);"></div></div>' +
-                    '<div class="chart-bar-value">LKR ' + amount.toFixed(0) + '</div></div>';
+                    '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
             }
             document.getElementById('weeklyChart').innerHTML = weekHtml;
         }
