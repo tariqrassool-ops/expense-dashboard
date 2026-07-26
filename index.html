@@ -876,6 +876,7 @@
         .cat-groceries { background: rgba(62,232,137,0.14); color: #6ff5ac; }
         .cat-banking { background: rgba(168,133,230,0.14); color: #bda6ef; }
         .cat-transfer { background: rgba(134,140,150,0.16); color: #a8adb6; }
+        .cat-loan-payment { background: rgba(255,45,120,0.14); color: #ff7fa8; }
         .cat-uncategorized { background: rgba(134,140,150,0.1); color: var(--gray); }
         .amount { font-family: var(--font-mono); font-weight: 600; color: var(--danger); font-variant-numeric: tabular-nums; }
         .sync-badge {
@@ -1140,6 +1141,117 @@
 
         .hidden { display: none !important; }
 
+        /* ===================== SPLIT EXPENSE FIELDS ===================== */
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 18px;
+            cursor: pointer;
+        }
+        .checkbox-row input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .checkbox-row label {
+            color: var(--dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 0;
+        }
+        .split-fields {
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 18px;
+            background: rgba(255,255,255,0.015);
+        }
+        .split-fields .form-group:last-of-type { margin-bottom: 12px; }
+
+        .split-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 999px;
+            margin-top: 4px;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-body);
+            transition: filter 0.15s;
+        }
+        .split-badge:hover { filter: brightness(1.25); }
+        .split-badge.unsettled { background: rgba(255,187,85,0.16); color: #ffca7a; }
+        .split-badge.settled { background: rgba(62,232,137,0.16); color: #6ff5ac; }
+
+        /* ===================== LOANS ===================== */
+        .loans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .loan-card {
+            position: relative;
+            background: linear-gradient(160deg, rgba(255,255,255,0.035), rgba(255,255,255,0.005)), var(--white);
+            border: 1px solid var(--border);
+            padding: 22px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        .loan-card:hover { border-color: rgba(62,232,137,0.28); transform: translateY(-2px); box-shadow: var(--glow); }
+        .loan-card.paid-off { opacity: 0.7; }
+        .loan-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+        .loan-card-name { font-family: var(--font-display); font-weight: 600; font-size: 1.02rem; color: var(--dark); }
+        .loan-type-badge {
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(161,0,255,0.14);
+            color: #cf8bff;
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .loan-status-badge {
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(62,232,137,0.16);
+            color: #6ff5ac;
+            white-space: nowrap;
+        }
+        .loan-balance-row { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 0 6px; }
+        .loan-balance-value { font-family: var(--font-mono); font-weight: 700; font-size: 1.3rem; color: var(--dark); }
+        .loan-balance-label { font-size: 0.72rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; }
+        .loan-progress-track {
+            height: 9px;
+            background: var(--light-gray);
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.35);
+            margin-bottom: 12px;
+        }
+        .loan-progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #a100ff, #e18bff);
+            box-shadow: 0 0 10px rgba(161,0,255,0.4);
+            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .loan-meta-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--gray); margin-bottom: 4px; }
+        .loan-meta-row span:last-child { color: var(--dark); font-weight: 500; font-family: var(--font-mono); }
+        .loan-card-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+        .loan-card-actions .btn { padding: 7px 14px; font-size: 0.78rem; }
+
         /* ===================== LANDING PAGE ===================== */
   .landing {
         position: relative;
@@ -1319,6 +1431,7 @@
             <nav class="tabs" role="tablist" aria-label="Dashboard sections">
                 <button class="tab-btn active" id="tabBtnDashboard" role="tab" aria-selected="true" onclick="switchTab('dashboard')">Dashboard</button>
                 <button class="tab-btn" id="tabBtnTransactions" role="tab" aria-selected="false" onclick="switchTab('transactions')">Manage Expenses</button>
+                <button class="tab-btn" id="tabBtnLoans" role="tab" aria-selected="false" onclick="switchTab('loans')">Loans</button>
             </nav>
 
             <section id="panelDashboard" class="tab-panel" role="tabpanel" aria-labelledby="tabBtnDashboard">
@@ -1347,6 +1460,11 @@
                         <h3>Top Category</h3>
                         <div class="value" id="topCategory">--</div>
                         <div class="change" id="topCategoryDetail">--</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Owed to You</h3>
+                        <div class="value" id="owedToYou">LKR 0.00</div>
+                        <div class="change" id="owedToYouDetail">--</div>
                     </article>
                 </div>
 
@@ -1450,6 +1568,7 @@
                             <option value="Groceries">Groceries</option>
                             <option value="Banking">Banking</option>
                             <option value="Transfer">Transfer</option>
+                            <option value="Loan Payment">Loan Payment</option>
                             <option value="Uncategorized">Uncategorized</option>
                         </select>
                     </div>
@@ -1467,6 +1586,7 @@
                             <option value="">All Sources</option>
                             <option value="manual">Manual</option>
                             <option value="gmail">Gmail</option>
+                            <option value="loan_payment">Loan Payment</option>
                         </select>
                     </div>
                 </div>
@@ -1484,6 +1604,21 @@
                                 <p>Add expenses manually or sync with Gmail to get started</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="panelLoans" class="tab-panel hidden" role="tabpanel" aria-labelledby="tabBtnLoans">
+                <div class="action-bar" role="region" aria-label="Loan actions">
+                    <button class="btn btn-primary" onclick="openAddLoanModal()">
+                        <span aria-hidden="true">+</span> Add Loan
+                    </button>
+                </div>
+                <div id="loansGrid" class="loans-grid">
+                    <div class="empty-state">
+                        <div class="empty-state-icon" aria-hidden="true">&#x1F3E6;</div>
+                        <h3>No loans tracked yet</h3>
+                        <p>Add a bank loan or lease to start tracking what you owe</p>
                     </div>
                 </div>
             </section>
@@ -1520,8 +1655,27 @@
                             <option value="Groceries">Groceries</option>
                             <option value="Banking">Banking</option>
                             <option value="Transfer">Transfer</option>
+                            <option value="Loan Payment">Loan Payment</option>
                             <option value="Uncategorized">Uncategorized</option>
                         </select>
+                    </div>
+                    <div class="checkbox-row" onclick="document.getElementById('expenseSplitEnabled').click()">
+                        <input type="checkbox" id="expenseSplitEnabled" onclick="event.stopPropagation(); toggleSplitFields();">
+                        <label for="expenseSplitEnabled" onclick="event.stopPropagation();">Split this cost with someone</label>
+                    </div>
+                    <div class="split-fields hidden" id="splitFieldsWrap">
+                        <div class="form-group">
+                            <label for="splitWithName">Split with</label>
+                            <input type="text" id="splitWithName" placeholder="e.g., Kasun">
+                        </div>
+                        <div class="form-group">
+                            <label for="splitOwedAmount">Amount owed to you (LKR)</label>
+                            <input type="number" id="splitOwedAmount" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="checkbox-row" style="margin-bottom: 0;" onclick="document.getElementById('splitSettled').click()">
+                            <input type="checkbox" id="splitSettled" onclick="event.stopPropagation();">
+                            <label for="splitSettled" onclick="event.stopPropagation();">Already settled / paid back to you</label>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="expenseDescription">Description</label>
@@ -1532,6 +1686,89 @@
             <div class="modal-footer">
                 <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="saveExpense()">Save Expense</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="loanModal" role="dialog" aria-modal="true" aria-labelledby="loanModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="loanModalTitle">Add Loan</h2>
+                <button class="modal-close" onclick="closeLoanModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="loanForm" onsubmit="event.preventDefault(); saveLoan();">
+                    <input type="hidden" id="loanId" aria-hidden="true">
+                    <div class="form-group">
+                        <label for="loanName">Lender / Loan Name <span aria-label="required">*</span></label>
+                        <input type="text" id="loanName" placeholder="e.g., HNB Personal Loan" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanType">Type <span aria-label="required">*</span></label>
+                        <select id="loanType" required>
+                            <option value="Bank Loan">Bank Loan</option>
+                            <option value="Leasing">Leasing</option>
+                            <option value="Personal Loan">Personal Loan</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanPrincipal">Original Amount (LKR) <span aria-label="required">*</span></label>
+                        <input type="number" id="loanPrincipal" step="0.01" min="0" placeholder="0.00" required oninput="syncLoanRemainingDefault()">
+                    </div>
+                    <div class="form-group">
+                        <label for="loanRemaining">Remaining Balance (LKR) <span aria-label="required">*</span></label>
+                        <input type="number" id="loanRemaining" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanInstallment">Monthly Installment (LKR)</label>
+                        <input type="number" id="loanInstallment" step="0.01" min="0" placeholder="Optional">
+                    </div>
+                    <div class="form-group">
+                        <label for="loanInterestRate">Interest Rate (% p.a.)</label>
+                        <input type="number" id="loanInterestRate" step="0.01" min="0" placeholder="Optional">
+                    </div>
+                    <div class="form-group">
+                        <label for="loanDueDate">Next Due Date</label>
+                        <input type="date" id="loanDueDate">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeLoanModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveLoan()">Save Loan</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="loanPaymentModal" role="dialog" aria-modal="true" aria-labelledby="loanPaymentModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="loanPaymentModalTitle">Log Payment</h2>
+                <button class="modal-close" onclick="closeLoanPaymentModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="loanPaymentForm" onsubmit="event.preventDefault(); saveLoanPayment();">
+                    <input type="hidden" id="loanPaymentLoanId" aria-hidden="true">
+                    <div class="form-group">
+                        <label for="loanPaymentDate">Date <span aria-label="required">*</span></label>
+                        <input type="date" id="loanPaymentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanPaymentAmount">Amount Paid (LKR) <span aria-label="required">*</span></label>
+                        <input type="number" id="loanPaymentAmount" step="0.01" min="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanPaymentNote">Note</label>
+                        <input type="text" id="loanPaymentNote" placeholder="Optional">
+                    </div>
+                </form>
+                <p style="font-size: 0.8rem; color: var(--gray);">This will also be added to your expenses as a "Loan Payment" so it's reflected in your totals.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeLoanPaymentModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveLoanPayment()">Log Payment</button>
             </div>
         </div>
     </div>
@@ -1571,6 +1808,7 @@
         let app, auth, db;
         let currentUser = null;
         let allExpenses = [];
+        let allLoans = [];
         let gmailAccessToken = null;
         let selectedExpenses = new Set();
         let currentBudget = 60000; // in-memory cache, synced from Firestore
@@ -1683,6 +1921,7 @@ async function showDashboard() {
 
     await loadBudget();
     loadExpenses();
+    loadLoans();
 }
 
 // ===================== TOPBAR ACTIONS =====================
@@ -1735,14 +1974,36 @@ window.showNotifications = function() {
 
         window.saveExpense = async function() {
             const id = document.getElementById('expenseId').value;
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const splitEnabled = document.getElementById('expenseSplitEnabled').checked;
+            const splitWithName = document.getElementById('splitWithName').value.trim();
+            const splitOwed = parseFloat(document.getElementById('splitOwedAmount').value);
+
+            if (splitEnabled) {
+                if (!splitWithName || isNaN(splitOwed) || splitOwed <= 0) {
+                    showToast('Please enter who you split with and a valid amount owed to you', 'error');
+                    return;
+                }
+                if (splitOwed >= amount) {
+                    showToast('Amount owed to you must be less than the total expense amount', 'error');
+                    return;
+                }
+            }
+
             const data = {
                 userId: currentUser.uid,
                 date: document.getElementById('expenseDate').value,
                 merchant: document.getElementById('expenseMerchant').value.trim(),
-                amount: parseFloat(document.getElementById('expenseAmount').value),
+                amount: amount,
                 category: document.getElementById('expenseCategory').value,
                 description: document.getElementById('expenseDescription').value.trim(),
                 source: 'manual',
+                split: splitEnabled ? {
+                    enabled: true,
+                    withName: splitWithName,
+                    owedToYou: splitOwed,
+                    settled: document.getElementById('splitSettled').checked
+                } : null,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             };
@@ -2147,11 +2408,23 @@ return result;
     '</tr></thead><tbody>';
 
             expenses.forEach(expense => {
-                const catClass = 'cat-' + (expense.category || 'uncategorized').toLowerCase();
-                const sourceBadge = expense.source === 'gmail' 
-                    ? '<span class="sync-badge">&#x2713; Gmail</span>' 
-                    : '<span style="font-size: 0.75rem; color: var(--gray);">Manual</span>';
+                const catClass = 'cat-' + (expense.category || 'uncategorized').toLowerCase().replace(/\s+/g, '-');
+                let sourceBadge;
+                if (expense.source === 'gmail') sourceBadge = '<span class="sync-badge">&#x2713; Gmail</span>';
+                else if (expense.source === 'loan_payment') sourceBadge = '<span style="font-size: 0.75rem; color: #ff7fa8;">&#x1F3E6; Loan Payment</span>';
+                else sourceBadge = '<span style="font-size: 0.75rem; color: var(--gray);">Manual</span>';
                 const descHtml = expense.description ? '<div style="font-size: 0.8rem; color: var(--gray);">' + escapeHtml(expense.description) + '</div>' : '';
+
+                let splitHtml = '';
+                if (expense.split && expense.split.enabled) {
+                    const settled = !!expense.split.settled;
+                    const withName = escapeHtml(expense.split.withName || 'someone');
+                    const owed = (expense.split.owedToYou || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    splitHtml = '<div><button type="button" class="split-badge ' + (settled ? 'settled' : 'unsettled') + '" ' +
+                        'onclick="toggleSplitSettled(\'' + expense.id + '\')" title="Click to mark as ' + (settled ? 'unsettled' : 'settled') + '">' +
+                        (settled ? '&#x2713; Settled — ' : '&#x23F3; Owed by ') + withName + ' · LKR ' + owed +
+                        '</button></div>';
+                }
 
                 const safeMerchantLabel = escapeHtml(expense.merchant || 'expense');
                 html += `<tr role="row">
@@ -2164,7 +2437,7 @@ return result;
         >
     </td>
     <td>${formatDate(expense.date)}</td>
-                    <td><div style="font-weight: 500;">${escapeHtml(expense.merchant || '')}</div>${descHtml}</td>
+                    <td><div style="font-weight: 500;">${escapeHtml(expense.merchant || '')}</div>${descHtml}${splitHtml}</td>
                     <td><span class="category-badge ${catClass}">${expense.category || 'Uncategorized'}</span></td>
                     <td class="amount">LKR ${(expense.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td>${sourceBadge}</td>
@@ -2177,6 +2450,24 @@ return result;
             html += '</tbody></table>';
             container.innerHTML = html;
         }
+
+        window.toggleSplitSettled = async function(id) {
+            const expense = allExpenses.find(e => e.id === id);
+            if (!expense || !expense.split) return;
+            showLoading('Updating...');
+            try {
+                await updateDoc(doc(db, 'expenses', id), {
+                    split: { ...expense.split, settled: !expense.split.settled },
+                    updatedAt: serverTimestamp()
+                });
+                showToast(expense.split.settled ? 'Marked as unsettled' : 'Marked as settled!', 'success');
+                loadExpenses();
+            } catch (e) {
+                showToast('Failed to update: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        };
 
         function toggleExpenseSelection(id) {
     if (selectedExpenses.has(id)) {
@@ -2219,6 +2510,245 @@ function updateBulkDeleteButton() {
     }
 }
 
+        // ===================== LOANS =====================
+        async function loadLoans() {
+            try {
+                const q = query(
+                    collection(db, 'loans'),
+                    where('userId', '==', currentUser.uid)
+                );
+                const snapshot = await getDocs(q);
+                allLoans = [];
+                snapshot.forEach(d => allLoans.push({ id: d.id, ...d.data() }));
+                allLoans.sort((a, b) => (a.status === 'paid_off') - (b.status === 'paid_off') || (a.name || '').localeCompare(b.name || ''));
+                renderLoans();
+            } catch (e) {
+                showToast('Failed to load loans: ' + e.message, 'error');
+            }
+        }
+
+        function renderLoans() {
+            const container = document.getElementById('loansGrid');
+            if (!allLoans.length) {
+                container.innerHTML = '<div class="empty-state">' +
+                    '<div class="empty-state-icon" aria-hidden="true">&#x1F3E6;</div>' +
+                    '<h3>No loans tracked yet</h3>' +
+                    '<p>Add a bank loan or lease to start tracking what you owe</p></div>';
+                return;
+            }
+
+            let html = '';
+            allLoans.forEach(loan => {
+                const principal = loan.principal || 0;
+                const remaining = Math.max(loan.remainingBalance || 0, 0);
+                const paidOff = remaining <= 0;
+                const paidFrac = principal > 0 ? Math.min(((principal - remaining) / principal) * 100, 100) : 0;
+                const safeName = escapeHtml(loan.name || 'Loan');
+
+                html += '<div class="loan-card' + (paidOff ? ' paid-off' : '') + '">' +
+                    '<div class="loan-card-head">' +
+                        '<div class="loan-card-name">' + safeName + '</div>' +
+                        '<span class="loan-type-badge">' + escapeHtml(loan.type || 'Other') + '</span>' +
+                    '</div>' +
+                    (paidOff ? '<span class="loan-status-badge">&#x2713; Paid Off</span>' : '') +
+                    '<div class="loan-balance-row">' +
+                        '<div>' +
+                            '<div class="loan-balance-label">Remaining Balance</div>' +
+                            '<div class="loan-balance-value">LKR ' + remaining.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</div>' +
+                        '</div>' +
+                        '<div style="text-align:right;">' +
+                            '<div class="loan-balance-label">Paid Off</div>' +
+                            '<div class="loan-balance-value" style="font-size:1.05rem;">' + paidFrac.toFixed(0) + '%</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="loan-progress-track"><div class="loan-progress-fill" style="width:' + paidFrac.toFixed(1) + '%;"></div></div>' +
+                    '<div class="loan-meta-row"><span>Original Amount</span><span>LKR ' + principal.toLocaleString('en-US') + '</span></div>' +
+                    (loan.installmentAmount ? '<div class="loan-meta-row"><span>Installment</span><span>LKR ' + (loan.installmentAmount || 0).toLocaleString('en-US') + '/mo</span></div>' : '') +
+                    (loan.interestRate ? '<div class="loan-meta-row"><span>Interest Rate</span><span>' + loan.interestRate + '% p.a.</span></div>' : '') +
+                    (loan.dueDate && !paidOff ? '<div class="loan-meta-row"><span>Next Due</span><span>' + formatDate(loan.dueDate) + '</span></div>' : '') +
+                    '<div class="loan-card-actions">' +
+                        (paidOff ? '' : '<button class="btn btn-primary" onclick="openLoanPaymentModal(\'' + loan.id + '\')">Log Payment</button>') +
+                        '<button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="editLoan(\'' + loan.id + '\')">Edit</button>' +
+                        '<button class="btn btn-danger" onclick="deleteLoan(\'' + loan.id + '\')">Delete</button>' +
+                    '</div>' +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        window.openAddLoanModal = function() {
+            document.getElementById('loanId').value = '';
+            document.getElementById('loanName').value = '';
+            document.getElementById('loanType').value = 'Bank Loan';
+            document.getElementById('loanPrincipal').value = '';
+            document.getElementById('loanRemaining').value = '';
+            document.getElementById('loanInstallment').value = '';
+            document.getElementById('loanInterestRate').value = '';
+            document.getElementById('loanDueDate').value = '';
+            document.getElementById('loanModalTitle').textContent = 'Add Loan';
+            document.getElementById('loanModal').classList.add('active');
+            document.getElementById('loanName').focus();
+        };
+
+        window.editLoan = function(id) {
+            const loan = allLoans.find(l => l.id === id);
+            if (!loan) return;
+            document.getElementById('loanId').value = loan.id;
+            document.getElementById('loanName').value = loan.name || '';
+            document.getElementById('loanType').value = loan.type || 'Bank Loan';
+            document.getElementById('loanPrincipal').value = loan.principal || '';
+            document.getElementById('loanRemaining').value = loan.remainingBalance != null ? loan.remainingBalance : '';
+            document.getElementById('loanInstallment').value = loan.installmentAmount || '';
+            document.getElementById('loanInterestRate').value = loan.interestRate || '';
+            document.getElementById('loanDueDate').value = loan.dueDate || '';
+            document.getElementById('loanModalTitle').textContent = 'Edit Loan';
+            document.getElementById('loanModal').classList.add('active');
+            document.getElementById('loanName').focus();
+        };
+
+        // When adding a new loan, default the remaining balance to the principal (only if remaining is still empty)
+        window.syncLoanRemainingDefault = function() {
+            const remainingInput = document.getElementById('loanRemaining');
+            if (!document.getElementById('loanId').value && !remainingInput.value) {
+                remainingInput.value = document.getElementById('loanPrincipal').value;
+            }
+        };
+
+        window.closeLoanModal = function() {
+            document.getElementById('loanModal').classList.remove('active');
+        };
+
+        window.saveLoan = async function() {
+            const id = document.getElementById('loanId').value;
+            const principal = parseFloat(document.getElementById('loanPrincipal').value);
+            const remaining = parseFloat(document.getElementById('loanRemaining').value);
+            const installmentRaw = document.getElementById('loanInstallment').value;
+            const interestRaw = document.getElementById('loanInterestRate').value;
+
+            const data = {
+                userId: currentUser.uid,
+                name: document.getElementById('loanName').value.trim(),
+                type: document.getElementById('loanType').value,
+                principal: principal,
+                remainingBalance: remaining,
+                installmentAmount: installmentRaw ? parseFloat(installmentRaw) : null,
+                interestRate: interestRaw ? parseFloat(interestRaw) : null,
+                dueDate: document.getElementById('loanDueDate').value || null,
+                status: remaining <= 0 ? 'paid_off' : 'active',
+                updatedAt: serverTimestamp()
+            };
+
+            if (!data.name || isNaN(data.principal) || data.principal < 0 || isNaN(data.remainingBalance) || data.remainingBalance < 0) {
+                showToast('Please fill all required fields correctly', 'error');
+                return;
+            }
+
+            showLoading(id ? 'Updating...' : 'Saving...');
+            try {
+                if (id) {
+                    await updateDoc(doc(db, 'loans', id), data);
+                    showToast('Loan updated!', 'success');
+                } else {
+                    data.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'loans'), data);
+                    showToast('Loan added!', 'success');
+                }
+                closeLoanModal();
+                loadLoans();
+            } catch (e) {
+                showToast('Failed to save loan: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+
+        window.deleteLoan = async function(id) {
+            if (!confirm('Delete this loan? Any expense entries already logged for its payments will stay in your expense history.')) return;
+            showLoading('Deleting...');
+            try {
+                await deleteDoc(doc(db, 'loans', id));
+                showToast('Loan deleted', 'success');
+                loadLoans();
+            } catch (e) {
+                showToast('Failed to delete: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+
+        window.openLoanPaymentModal = function(id) {
+            const loan = allLoans.find(l => l.id === id);
+            if (!loan) return;
+            document.getElementById('loanPaymentLoanId').value = loan.id;
+            document.getElementById('loanPaymentDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('loanPaymentAmount').value = loan.installmentAmount || '';
+            document.getElementById('loanPaymentNote').value = '';
+            document.getElementById('loanPaymentModalTitle').textContent = 'Log Payment — ' + (loan.name || 'Loan');
+            document.getElementById('loanPaymentModal').classList.add('active');
+            document.getElementById('loanPaymentAmount').focus();
+        };
+
+        window.closeLoanPaymentModal = function() {
+            document.getElementById('loanPaymentModal').classList.remove('active');
+        };
+
+        window.saveLoanPayment = async function() {
+            const loanId = document.getElementById('loanPaymentLoanId').value;
+            const loan = allLoans.find(l => l.id === loanId);
+            if (!loan) { showToast('Loan not found', 'error'); return; }
+
+            const amount = parseFloat(document.getElementById('loanPaymentAmount').value);
+            const date = document.getElementById('loanPaymentDate').value;
+            const note = document.getElementById('loanPaymentNote').value.trim();
+
+            if (!date || isNaN(amount) || amount <= 0) {
+                showToast('Please enter a valid date and amount', 'error');
+                return;
+            }
+
+            showLoading('Logging payment...');
+            try {
+                // 1. Record the payment as an expense so it flows into your totals/charts
+                await addDoc(collection(db, 'expenses'), {
+                    userId: currentUser.uid,
+                    date: date,
+                    merchant: loan.name || 'Loan Payment',
+                    amount: amount,
+                    category: 'Loan Payment',
+                    description: note || ('Loan payment — ' + (loan.name || '')),
+                    source: 'loan_payment',
+                    loanId: loan.id,
+                    split: null,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+
+                // 2. Reduce the loan's remaining balance and push the due date forward a month if still active
+                const newRemaining = Math.max((loan.remainingBalance || 0) - amount, 0);
+                const isPaidOff = newRemaining <= 0;
+                const update = {
+                    remainingBalance: newRemaining,
+                    status: isPaidOff ? 'paid_off' : 'active',
+                    updatedAt: serverTimestamp()
+                };
+                if (loan.dueDate && !isPaidOff) {
+                    const d = new Date(loan.dueDate);
+                    d.setMonth(d.getMonth() + 1);
+                    update.dueDate = d.toISOString().split('T')[0];
+                }
+                await updateDoc(doc(db, 'loans', loan.id), update);
+
+                showToast(isPaidOff ? 'Payment logged — loan paid off! 🎉' : 'Payment logged!', 'success');
+                closeLoanPaymentModal();
+                loadLoans();
+                loadExpenses();
+            } catch (e) {
+                showToast('Failed to log payment: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+
         // ===================== BUDGET (synced via Firestore: settings/{uid}) =====================
         function getBudget() {
             return currentBudget;
@@ -2253,7 +2783,18 @@ function updateBulkDeleteButton() {
             }
         };
 
-        const CATEGORY_COLORS = { 'Food': '#ff9500', 'Travel': '#0090ff', 'Groceries': '#00e676', 'Banking': '#a100ff', 'Transfer': '#00d9ff', 'Uncategorized': '#5f6b62' };
+        const CATEGORY_COLORS = { 'Food': '#ff9500', 'Travel': '#0090ff', 'Groceries': '#00e676', 'Banking': '#a100ff', 'Transfer': '#00d9ff', 'Loan Payment': '#ff2d78', 'Uncategorized': '#5f6b62' };
+
+        // An expense that's split shows the full amount you logged (e.g. the whole bill),
+        // but only your actual share should count toward totals/averages/charts.
+        function netAmount(e) {
+            const amt = e.amount || 0;
+            if (e.split && e.split.enabled) {
+                const owed = e.split.owedToYou || 0;
+                return Math.max(amt - owed, 0);
+            }
+            return amt;
+        }
 
         // Compact number formatting — abbreviates large amounts with K/M so values stay on one line
         function formatCompactAmount(value, smallDecimals) {
@@ -2286,7 +2827,7 @@ function updateBulkDeleteButton() {
 
             allExpenses.forEach(e => {
                 const d = new Date(e.date);
-                const amt = e.amount || 0;
+                const amt = netAmount(e);
                 if (d >= thirtyDaysAgo) total30Days += amt;
                 else if (d >= sixtyDaysAgo) totalPrev30Days += amt;
                 if (d.getMonth() === thisMonth && d.getFullYear() === thisYear) totalThisMonth += amt;
@@ -2324,11 +2865,11 @@ function updateBulkDeleteButton() {
             let recentExpenses = allExpenses.filter(e => new Date(e.date) >= thirtyDaysAgo);
             let pool = recentExpenses.length ? recentExpenses : allExpenses;
             let largest = null;
-            pool.forEach(e => { if (!largest || (e.amount || 0) > (largest.amount || 0)) largest = e; });
+            pool.forEach(e => { if (!largest || netAmount(e) > netAmount(largest)) largest = e; });
             if (largest) {
                 document.getElementById('largestMerchant').textContent = largest.merchant || '--';
                 document.getElementById('largestDetail').textContent =
-                    'LKR ' + (largest.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' · ' + formatDate(largest.date);
+                    'LKR ' + netAmount(largest).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' · ' + formatDate(largest.date);
             } else {
                 document.getElementById('largestMerchant').textContent = '--';
                 document.getElementById('largestDetail').textContent = '--';
@@ -2359,7 +2900,7 @@ function updateBulkDeleteButton() {
             allExpenses.forEach(e => {
                 const d = new Date(e.date);
                 if (d.getMonth() === thisMonth && d.getFullYear() === thisYear) {
-                    catThisMonth[e.category] = (catThisMonth[e.category] || 0) + (e.amount || 0);
+                    catThisMonth[e.category] = (catThisMonth[e.category] || 0) + netAmount(e);
                 }
             });
             const topCatEntry = Object.entries(catThisMonth).sort((a, b) => b[1] - a[1])[0];
@@ -2370,11 +2911,20 @@ function updateBulkDeleteButton() {
                 document.getElementById('topCategory').textContent = '--';
                 document.getElementById('topCategoryDetail').textContent = '--';
             }
+
+            // Owed to You — sum of unsettled split shares, across all split expenses
+            const unsettled = allExpenses.filter(e => e.split && e.split.enabled && !e.split.settled);
+            const owedTotal = unsettled.reduce((sum, e) => sum + (e.split.owedToYou || 0), 0);
+            const owedPeople = new Set(unsettled.map(e => (e.split.withName || 'Unknown').trim().toLowerCase())).size;
+            animateCounter(document.getElementById('owedToYou'), owedTotal, v => 'LKR ' + formatCompactAmount(v));
+            document.getElementById('owedToYouDetail').textContent = unsettled.length > 0
+                ? unsettled.length + ' unsettled split' + (unsettled.length === 1 ? '' : 's') + ' · ' + owedPeople + ' ' + (owedPeople === 1 ? 'person' : 'people')
+                : 'All settled up';
         }
 
         function updateCharts() {
             const categoryTotals = {};
-            allExpenses.forEach(e => categoryTotals[e.category] = (categoryTotals[e.category] || 0) + (e.amount || 0));
+            allExpenses.forEach(e => categoryTotals[e.category] = (categoryTotals[e.category] || 0) + netAmount(e));
             const total = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
             const sortedCats = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
 
@@ -2404,7 +2954,7 @@ function updateBulkDeleteButton() {
                 const d = new Date(today); d.setDate(d.getDate() - i);
                 dailyTotals[d.toISOString().split('T')[0]] = 0;
             }
-            allExpenses.forEach(e => { if (dailyTotals.hasOwnProperty(e.date)) dailyTotals[e.date] += (e.amount || 0); });
+            allExpenses.forEach(e => { if (dailyTotals.hasOwnProperty(e.date)) dailyTotals[e.date] += netAmount(e); });
 
             let weekHtml = '';
             for (const [date, amount] of Object.entries(dailyTotals)) {
@@ -2426,7 +2976,7 @@ function updateBulkDeleteButton() {
             allExpenses.forEach(e => {
                 const d = new Date(e.date);
                 const key = d.getFullYear() + '-' + d.getMonth();
-                if (monthTotals.hasOwnProperty(key)) monthTotals[key] += (e.amount || 0);
+                if (monthTotals.hasOwnProperty(key)) monthTotals[key] += netAmount(e);
             });
             renderMonthlyTrendChart(monthOrder, monthTotals);
 
@@ -2443,7 +2993,7 @@ function updateBulkDeleteButton() {
             const merchantTotals = {};
             allExpenses.forEach(e => {
                 const key = groupMerchantName(e.merchant || 'Unknown');
-                merchantTotals[key] = (merchantTotals[key] || 0) + (e.amount || 0);
+                merchantTotals[key] = (merchantTotals[key] || 0) + netAmount(e);
             });
             const topMerchants = Object.entries(merchantTotals).sort((a, b) => b[1] - a[1]).slice(0, 5);
             const maxMerchant = Math.max(...topMerchants.map(m => m[1]), 1);
@@ -2761,7 +3311,7 @@ function updateBulkDeleteButton() {
             allExpenses.forEach(e => {
                 const d = new Date(e.date);
                 if (d.getFullYear() === year && d.getMonth() === month) {
-                    dailyTotals[d.getDate()] = (dailyTotals[d.getDate()] || 0) + (e.amount || 0);
+                    dailyTotals[d.getDate()] = (dailyTotals[d.getDate()] || 0) + netAmount(e);
                 }
             });
 
@@ -2800,12 +3350,17 @@ function updateBulkDeleteButton() {
         // ===================== TABS =====================
         window.switchTab = function(tab) {
             const isDashboard = tab === 'dashboard';
+            const isTransactions = tab === 'transactions';
+            const isLoans = tab === 'loans';
             document.getElementById('panelDashboard').classList.toggle('hidden', !isDashboard);
-            document.getElementById('panelTransactions').classList.toggle('hidden', isDashboard);
+            document.getElementById('panelTransactions').classList.toggle('hidden', !isTransactions);
+            document.getElementById('panelLoans').classList.toggle('hidden', !isLoans);
             document.getElementById('tabBtnDashboard').classList.toggle('active', isDashboard);
-            document.getElementById('tabBtnTransactions').classList.toggle('active', !isDashboard);
+            document.getElementById('tabBtnTransactions').classList.toggle('active', isTransactions);
+            document.getElementById('tabBtnLoans').classList.toggle('active', isLoans);
             document.getElementById('tabBtnDashboard').setAttribute('aria-selected', isDashboard);
-            document.getElementById('tabBtnTransactions').setAttribute('aria-selected', !isDashboard);
+            document.getElementById('tabBtnTransactions').setAttribute('aria-selected', isTransactions);
+            document.getElementById('tabBtnLoans').setAttribute('aria-selected', isLoans);
         };
 
         // ===================== MODAL =====================
@@ -2816,6 +3371,11 @@ function updateBulkDeleteButton() {
             document.getElementById('expenseAmount').value = '';
             document.getElementById('expenseCategory').value = '';
             document.getElementById('expenseDescription').value = '';
+            document.getElementById('expenseSplitEnabled').checked = false;
+            document.getElementById('splitWithName').value = '';
+            document.getElementById('splitOwedAmount').value = '';
+            document.getElementById('splitSettled').checked = false;
+            toggleSplitFields();
             document.getElementById('modalTitle').textContent = 'Add Expense';
             document.getElementById('expenseModal').classList.add('active');
             document.getElementById('expenseDate').focus();
@@ -2831,9 +3391,19 @@ function updateBulkDeleteButton() {
             document.getElementById('expenseAmount').value = expense.amount || '';
             document.getElementById('expenseCategory').value = expense.category || '';
             document.getElementById('expenseDescription').value = expense.description || '';
+            const split = expense.split;
+            document.getElementById('expenseSplitEnabled').checked = !!(split && split.enabled);
+            document.getElementById('splitWithName').value = split ? (split.withName || '') : '';
+            document.getElementById('splitOwedAmount').value = split ? (split.owedToYou || '') : '';
+            document.getElementById('splitSettled').checked = !!(split && split.settled);
+            toggleSplitFields();
             document.getElementById('modalTitle').textContent = 'Edit Expense';
             document.getElementById('expenseModal').classList.add('active');
             document.getElementById('expenseDate').focus();
+        };
+
+        window.toggleSplitFields = function() {
+            document.getElementById('splitFieldsWrap').classList.toggle('hidden', !document.getElementById('expenseSplitEnabled').checked);
         };
 
         window.closeModal = function() {
@@ -2845,9 +3415,11 @@ function updateBulkDeleteButton() {
             const filtered = getFilteredExpenses();
             if (filtered.length === 0) { showToast('No data to export', 'error'); return; }
 
-            let csv = 'Date,Merchant,Category,Amount,Description,Source\n';
+            let csv = 'Date,Merchant,Category,Amount,Description,Source,Split With,Owed To You,Settled\n';
             filtered.forEach(e => {
-                csv += e.date + ',' + escapeCsv(e.merchant || '') + ',' + (e.category || '') + ',' + (e.amount || 0) + ',' + escapeCsv(e.description || '') + ',' + (e.source || '') + '\n';
+                const split = e.split && e.split.enabled ? e.split : null;
+                csv += e.date + ',' + escapeCsv(e.merchant || '') + ',' + (e.category || '') + ',' + (e.amount || 0) + ',' + escapeCsv(e.description || '') + ',' + (e.source || '') + ',' +
+                    escapeCsv(split ? split.withName || '' : '') + ',' + (split ? (split.owedToYou || 0) : '') + ',' + (split ? (split.settled ? 'Yes' : 'No') : '') + '\n';
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
