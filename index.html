@@ -121,7 +121,6 @@
         .stats-grid .stat-card:nth-child(3) { animation-delay: 0.14s; }
         .stats-grid .stat-card:nth-child(4) { animation-delay: 0.20s; }
         .stats-grid .stat-card:nth-child(5) { animation-delay: 0.26s; }
-        .stats-grid .stat-card:nth-child(6) { animation-delay: 0.32s; }
 
         .dashboard-row-featured .chart-card,
         .charts-grid .chart-card {
@@ -545,11 +544,14 @@
         .stat-card .value {
             font-family: var(--font-mono);
             font-variant-numeric: tabular-nums;
-            font-size: clamp(1.2rem, 2.6vw, 1.6rem);
+            font-size: clamp(1.05rem, 1.9vw, 1.4rem);
             font-weight: 600;
             color: var(--dark);
             letter-spacing: -0.01em;
             position: relative;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .stat-card .change {
             font-size: 0.78rem;
@@ -1345,11 +1347,6 @@
                         <h3>Top Category</h3>
                         <div class="value" id="topCategory">--</div>
                         <div class="change" id="topCategoryDetail">--</div>
-                    </article>
-                    <article class="stat-card">
-                        <h3>Days Left in Month</h3>
-                        <div class="value" id="daysLeft">--</div>
-                        <div class="change" id="daysLeftDetail">--</div>
                     </article>
                 </div>
 
@@ -2256,7 +2253,16 @@ function updateBulkDeleteButton() {
             }
         };
 
-        const CATEGORY_COLORS = { 'Food': '#ffbb55', 'Travel': '#5aa9e6', 'Groceries': '#3ee889', 'Banking': '#b389f0', 'Transfer': '#8b968e', 'Uncategorized': '#5f6b62' };
+        const CATEGORY_COLORS = { 'Food': '#ff9500', 'Travel': '#0090ff', 'Groceries': '#00e676', 'Banking': '#a100ff', 'Transfer': '#00d9ff', 'Uncategorized': '#5f6b62' };
+
+        // Compact number formatting — abbreviates large amounts with K/M so values stay on one line
+        function formatCompactAmount(value, smallDecimals) {
+            smallDecimals = smallDecimals === undefined ? 2 : smallDecimals;
+            const abs = Math.abs(value);
+            if (abs >= 1000000) return (value / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            if (abs >= 1000) return (value / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+            return value.toLocaleString('en-US', { minimumFractionDigits: smallDecimals, maximumFractionDigits: smallDecimals });
+        }
 
         function relativeDate(dateStr) {
             const d = new Date(dateStr);
@@ -2287,7 +2293,7 @@ function updateBulkDeleteButton() {
             });
 
             // Total Expenses + trend vs previous 30 days
-            animateCounter(document.getElementById('totalExpenses'), total30Days, v => 'LKR ' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            animateCounter(document.getElementById('totalExpenses'), total30Days, v => 'LKR ' + formatCompactAmount(v));
 
             const changeEl = document.getElementById('expenseChange');
             if (totalPrev30Days > 0) {
@@ -2312,7 +2318,7 @@ function updateBulkDeleteButton() {
             document.getElementById('gaugeRemainingBox').classList.toggle('over', remaining < 0);
 
             // Average Spend (last 30 days)
-            animateCounter(document.getElementById('avgSpend'), total30Days / 30, v => 'LKR ' + Math.round(v).toLocaleString('en-US') + '/day');
+            animateCounter(document.getElementById('avgSpend'), total30Days / 30, v => 'LKR ' + formatCompactAmount(v, 0) + '/day');
 
             // Largest Purchase (last 30 days, fallback to all-time)
             let recentExpenses = allExpenses.filter(e => new Date(e.date) >= thirtyDaysAgo);
@@ -2364,12 +2370,6 @@ function updateBulkDeleteButton() {
                 document.getElementById('topCategory').textContent = '--';
                 document.getElementById('topCategoryDetail').textContent = '--';
             }
-
-            // Days left in month
-            const daysInThisMonth = new Date(thisYear, thisMonth + 1, 0).getDate();
-            const daysRemaining = daysInThisMonth - now.getDate();
-            document.getElementById('daysLeft').textContent = daysRemaining.toString();
-            document.getElementById('daysLeftDetail').textContent = daysRemaining === 0 ? 'Last day of the month' : 'Until ' + new Date(thisYear, thisMonth + 1, 0).toLocaleDateString('en', { month: 'short', day: 'numeric' });
         }
 
         function updateCharts() {
@@ -2382,7 +2382,7 @@ function updateBulkDeleteButton() {
             let catHtml = '';
             sortedCats.forEach(([cat, amount], i) => {
                 const pct = total > 0 ? (amount / total * 100).toFixed(1) : 0;
-                const color = CATEGORY_COLORS[cat] || '#667eea';
+                const color = CATEGORY_COLORS[cat] || '#7c3aed';
                 const grad = 'linear-gradient(90deg, ' + color + ', ' + lightenColor(color, 0.4) + ')';
                 catHtml += '<div class="chart-bar">' +
                     '<div class="chart-bar-label">' + cat + '</div>' +
@@ -2433,10 +2433,16 @@ function updateBulkDeleteButton() {
             // Spending heatmap calendar (current month)
             renderSpendingHeatmap();
 
-            // Top merchants
+            // Top merchants — group PickMe Food / PickMe Marketplace variants under one umbrella name,
+            // since the sync creates entries like "PickMe Food - McDonald's" or "PickMe Marketplace - Keells"
+            function groupMerchantName(name) {
+                if (/^pickme food\b/i.test(name)) return 'PickMe Food';
+                if (/^pickme marketplace\b/i.test(name)) return 'PickMe Marketplace';
+                return name;
+            }
             const merchantTotals = {};
             allExpenses.forEach(e => {
-                const key = e.merchant || 'Unknown';
+                const key = groupMerchantName(e.merchant || 'Unknown');
                 merchantTotals[key] = (merchantTotals[key] || 0) + (e.amount || 0);
             });
             const topMerchants = Object.entries(merchantTotals).sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -2470,7 +2476,7 @@ function updateBulkDeleteButton() {
 
         // ===================== SHARED: COLOR HELPERS & BAR ANIMATION =====================
         function lightenColor(hex, amt) {
-            hex = (hex || '#667eea').replace('#', '');
+            hex = (hex || '#7c3aed').replace('#', '');
             if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
             const num = parseInt(hex, 16);
             let r = (num >> 16) & 255, g = (num >> 8) & 255, b = num & 255;
@@ -2480,7 +2486,7 @@ function updateBulkDeleteButton() {
             return 'rgb(' + r + ',' + g + ',' + b + ')';
         }
         function hexToRgba(hex, alpha) {
-            hex = (hex || '#667eea').replace('#', '');
+            hex = (hex || '#7c3aed').replace('#', '');
             if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
             const num = parseInt(hex, 16);
             const r = (num >> 16) & 255, g = (num >> 8) & 255, b = num & 255;
@@ -2513,7 +2519,7 @@ function updateBulkDeleteButton() {
             let defs = '<filter id="donutGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
             let segments = '';
             sortedCats.forEach(([cat, amount], i) => {
-                const color = CATEGORY_COLORS[cat] || '#667eea';
+                const color = CATEGORY_COLORS[cat] || '#7c3aed';
                 const gid = 'donutGrad' + i;
                 const fracDeg = (amount / total) * 360;
                 const segDeg = Math.max(fracDeg - gapDeg, 0.001);
@@ -2532,7 +2538,7 @@ function updateBulkDeleteButton() {
             let legend = '';
             sortedCats.forEach(([cat, amount]) => {
                 const pct = (amount / total * 100).toFixed(0);
-                const color = CATEGORY_COLORS[cat] || '#667eea';
+                const color = CATEGORY_COLORS[cat] || '#7c3aed';
                 legend += '<div class="donut-legend-item" data-cat="' + escapeHtml(cat) + '"><span class="donut-legend-dot" style="background:' + color + '; box-shadow: 0 0 6px ' + hexToRgba(color, 0.6) + ';"></span>' +
                     cat + '<span class="donut-legend-pct">' + pct + '%</span></div>';
             });
@@ -2615,8 +2621,8 @@ function updateBulkDeleteButton() {
                             '<stop offset="100%" stop-color="#3ee889"/>' +
                         '</linearGradient>' +
                         '<linearGradient id="' + gaugeGradId + '_over" x1="0%" y1="0%" x2="100%" y2="100%">' +
-                            '<stop offset="0%" stop-color="#ffb3b3"/>' +
-                            '<stop offset="100%" stop-color="#ff6f6f"/>' +
+                            '<stop offset="0%" stop-color="#ff4d4d"/>' +
+                            '<stop offset="100%" stop-color="#ff0033"/>' +
                         '</linearGradient>' +
                         '<filter id="' + gaugeGradId + '_glow" x="-60%" y="-60%" width="220%" height="220%">' +
                             '<feGaussianBlur stdDeviation="4.5" result="blur"/>' +
