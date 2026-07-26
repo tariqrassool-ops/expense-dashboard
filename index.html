@@ -65,6 +65,226 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
 
+        /* ===================== TOPBAR ACTIONS ===================== */
+        .app-topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .topbar-search-wrap {
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            max-width: 220px;
+            transition: max-width 0.25s ease, opacity 0.2s ease;
+        }
+        .topbar-search-wrap.hidden { max-width: 0; opacity: 0; pointer-events: none; }
+        .topbar-search-wrap input {
+            width: 100%;
+            padding: 9px 14px;
+            border: 1px solid var(--border);
+            background: var(--light-gray);
+            color: var(--dark);
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-family: var(--font-body);
+        }
+        .topbar-search-wrap input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(62,232,137,0.15);
+        }
+        .icon-btn {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--white);
+            color: var(--gray);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: border-color 0.15s, color 0.15s, background 0.15s;
+            flex-shrink: 0;
+        }
+        .icon-btn svg { width: 17px; height: 17px; }
+        .icon-btn:hover { color: var(--primary); border-color: rgba(62,232,137,0.35); background: rgba(62,232,137,0.06); }
+        .icon-badge {
+            position: absolute;
+            top: 7px;
+            right: 8px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 0 2px var(--white), 0 0 6px rgba(62,232,137,0.7);
+        }
+        .icon-badge.hidden { display: none; }
+        .topbar-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #06120a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            cursor: default;
+            border: 1px solid rgba(62,232,137,0.4);
+        }
+
+        /* ===================== FEATURED DASHBOARD ROW ===================== */
+        .dashboard-row-featured {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 980px) {
+            .dashboard-row-featured { grid-template-columns: 1fr; }
+        }
+
+        /* ===================== RADIAL GAUGE ===================== */
+        .gauge-card { display: flex; flex-direction: column; align-items: center; }
+        .gauge-wrap {
+            position: relative;
+            width: 168px;
+            height: 168px;
+            margin: 4px auto 6px;
+        }
+        .gauge-ring {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 16px), #000 calc(100% - 16px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 16px), #000 calc(100% - 16px));
+            transition: background 0.6s ease;
+        }
+        .gauge-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .gauge-pct {
+            font-family: var(--font-display);
+            font-size: 1.9rem;
+            font-weight: 600;
+            color: var(--dark);
+            letter-spacing: -0.02em;
+        }
+        .gauge-label {
+            font-size: 0.7rem;
+            color: var(--gray);
+            margin-top: 2px;
+            max-width: 100px;
+        }
+        .gauge-substats {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .gauge-substat {
+            flex: 1;
+            background: var(--light-gray);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .gauge-substat .label {
+            display: block;
+            font-size: 0.68rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+        .gauge-substat .value {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .gauge-substat.over .value { color: var(--danger); }
+
+        /* ===================== HEATMAP CALENDAR ===================== */
+        .heatmap-cal { display: flex; flex-direction: column; gap: 6px; }
+        .heatmap-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .heatmap-weekdays span {
+            text-align: center;
+            font-size: 0.62rem;
+            color: var(--gray-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 5px;
+            background: var(--light-gray);
+            position: relative;
+            cursor: default;
+            transition: transform 0.15s;
+        }
+        .heatmap-cell:hover { transform: scale(1.12); z-index: 2; }
+        .heatmap-cell.empty { background: transparent; cursor: default; }
+        .heatmap-cell.today { box-shadow: 0 0 0 1.5px var(--primary); }
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            margin-top: 4px;
+            font-size: 0.65rem;
+            color: var(--gray-dim);
+        }
+        .heatmap-legend .heatmap-cell { width: 10px; height: 10px; aspect-ratio: unset; }
+
+        /* ===================== TREND LINE CHART ===================== */
+        .trend-chart-wrap { position: relative; }
+        .trend-svg { width: 100%; height: auto; display: block; overflow: visible; }
+        .trend-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            padding: 0 2px;
+        }
+        .trend-labels span { font-size: 0.68rem; color: var(--gray-dim); }
+        .trend-callout {
+            position: absolute;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 4px 9px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--dark);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .trend-callout.avg { color: var(--gray); font-family: var(--font-body); font-weight: 500; }
+
         .header {
             position: relative;
             background: var(--white);
@@ -550,6 +770,13 @@
             border-radius: var(--radius);
             overflow: hidden;
         }
+        .charts-grid-3 { grid-template-columns: repeat(3, 1fr); }
+        @media (max-width: 980px) {
+            .charts-grid-3 { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 640px) {
+            .charts-grid-3 { grid-template-columns: 1fr; }
+        }
         .chart-card::after {
             content: '';
             position: absolute;
@@ -930,9 +1157,22 @@
         <main id="dashboardContent" class="hidden" role="main">
             <div class="app-topbar">
                 <div class="app-topbar-brand"><span class="dot" aria-hidden="true"></span> ExpenseTrack</div>
-                <button class="btn auth-btn logout" onclick="signOut()">
-                    <span aria-hidden="true">&#x1F6AA;</span> Sign Out
-                </button>
+                <div class="app-topbar-actions">
+                    <div class="topbar-search-wrap hidden" id="topbarSearchWrap">
+                        <input type="text" id="topbarSearchInput" placeholder="Search expenses..." aria-label="Search expenses" oninput="topbarSearch(this.value)">
+                    </div>
+                    <button class="icon-btn" id="topbarSearchBtn" aria-label="Search" onclick="toggleTopbarSearch()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                    <button class="icon-btn" id="notifBtn" aria-label="Notifications" onclick="showNotifications()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        <span class="icon-badge" id="notifBadge"></span>
+                    </button>
+                    <div class="topbar-avatar" id="topbarAvatar" title="Account">A</div>
+                    <button class="btn auth-btn logout" onclick="signOut()">
+                        <span aria-hidden="true">&#x1F6AA;</span> Sign Out
+                    </button>
+                </div>
             </div>
 
             <nav class="tabs" role="tablist" aria-label="Dashboard sections">
@@ -948,14 +1188,6 @@
                         <div class="change" id="expenseChange">--</div>
                     </article>
                     <article class="stat-card">
-                        <h3>Monthly Budget <button class="edit-budget-btn" onclick="editBudget()" aria-label="Edit budget" title="Edit budget">&#9998;</button></h3>
-                        <div class="value" id="budgetValue">LKR 0 / LKR 0</div>
-                        <div class="budget-bar-track" role="progressbar" id="budgetBarTrack" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                            <div class="budget-bar-fill" id="budgetBarFill" style="width: 0%;"></div>
-                        </div>
-                        <div class="change" id="budgetPct">0%</div>
-                    </article>
-                    <article class="stat-card">
                         <h3>Average Spend</h3>
                         <div class="value" id="avgSpend">LKR 0/day</div>
                         <div class="change">Based on last 30 days</div>
@@ -965,6 +1197,42 @@
                         <div class="value" id="largestMerchant">--</div>
                         <div class="change" id="largestDetail">--</div>
                     </article>
+                    <article class="stat-card">
+                        <h3>Transactions This Month</h3>
+                        <div class="value" id="txnCount">0</div>
+                        <div class="change" id="txnChange">--</div>
+                    </article>
+                </div>
+
+                <div class="dashboard-row-featured" role="region" aria-label="Monthly trend, budget and spending heatmap">
+                    <div class="chart-card">
+                        <h3>Monthly Trend</h3>
+                        <div class="trend-chart-wrap" id="monthlyTrendChart"></div>
+                    </div>
+                    <div class="chart-card gauge-card">
+                        <h3 style="align-self: flex-start;">Monthly Budget <button class="edit-budget-btn" onclick="editBudget()" aria-label="Edit budget" title="Edit budget">&#9998;</button></h3>
+                        <div class="gauge-wrap">
+                            <div class="gauge-ring" id="gaugeRing"></div>
+                            <div class="gauge-center">
+                                <div class="gauge-pct" id="gaugePct">0%</div>
+                                <div class="gauge-label" id="gaugeSubLabel">of budget used</div>
+                            </div>
+                        </div>
+                        <div class="gauge-substats">
+                            <div class="gauge-substat">
+                                <span class="label">Spent</span>
+                                <span class="value" id="gaugeSpent">LKR 0</span>
+                            </div>
+                            <div class="gauge-substat" id="gaugeRemainingBox">
+                                <span class="label">Remaining</span>
+                                <span class="value" id="gaugeRemaining">LKR 0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Spending Heatmap</h3>
+                        <div id="spendingHeatmap" class="heatmap-cal"></div>
+                    </div>
                 </div>
 
                 <div class="charts-grid" role="region" aria-label="Charts">
@@ -978,18 +1246,11 @@
                     </div>
                 </div>
 
-                <div class="charts-grid" role="region" aria-label="More charts">
+                <div class="charts-grid charts-grid-3" role="region" aria-label="More charts and activity">
                     <div class="chart-card">
                         <h3>Spend — Last 7 Days</h3>
                         <div id="weeklyChart"></div>
                     </div>
-                    <div class="chart-card">
-                        <h3>Monthly Trend</h3>
-                        <div id="monthlyTrendChart"></div>
-                    </div>
-                </div>
-
-                <div class="charts-grid" role="region" aria-label="Merchants and activity">
                     <div class="chart-card">
                         <h3>Top Merchants</h3>
                         <div id="merchantChart"></div>
@@ -1268,9 +1529,40 @@ async function showDashboard() {
     document.getElementById('landingSection').classList.add('hidden');
     document.getElementById('dashboardContent').classList.remove('hidden');
 
+    const avatarEl = document.getElementById('topbarAvatar');
+    if (avatarEl && currentUser) {
+        const label = currentUser.displayName || currentUser.email || 'A';
+        avatarEl.textContent = label.trim().charAt(0).toUpperCase();
+        avatarEl.title = currentUser.displayName || currentUser.email || 'Account';
+    }
+
     await loadBudget();
     loadExpenses();
 }
+
+// ===================== TOPBAR ACTIONS =====================
+window.toggleTopbarSearch = function() {
+    const wrap = document.getElementById('topbarSearchWrap');
+    wrap.classList.toggle('hidden');
+    if (!wrap.classList.contains('hidden')) {
+        document.getElementById('topbarSearchInput').focus();
+    }
+};
+
+window.topbarSearch = function(value) {
+    // Mirrors the transactions search filter and jumps there if there's a query
+    const searchInput = document.getElementById('searchFilter');
+    if (searchInput) searchInput.value = value;
+    if (value.trim().length > 0) {
+        switchTab('transactions');
+        applyFilters();
+    }
+};
+
+window.showNotifications = function() {
+    document.getElementById('notifBadge').classList.add('hidden');
+    showToast("You're all caught up — no new notifications", 'info');
+};
 
         // ===================== DATA =====================
         async function loadExpenses() {
@@ -1861,16 +2153,25 @@ function updateBulkDeleteButton() {
                 changeEl.className = 'change';
             }
 
-            // Monthly Budget
+            // Monthly Budget — radial arc gauge
             const budget = getBudget();
             const budgetPct = budget > 0 ? Math.min((totalThisMonth / budget) * 100, 999) : 0;
-            document.getElementById('budgetValue').textContent =
-                'LKR ' + totalThisMonth.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' / LKR ' + budget.toLocaleString('en-US', { maximumFractionDigits: 0 });
-            document.getElementById('budgetPct').textContent = budgetPct.toFixed(0) + '%' + (budgetPct > 100 ? ' — over budget' : '');
-            const fillEl = document.getElementById('budgetBarFill');
-            fillEl.style.width = Math.min(budgetPct, 100) + '%';
-            fillEl.classList.toggle('over', budgetPct > 100);
-            document.getElementById('budgetBarTrack').setAttribute('aria-valuenow', budgetPct.toFixed(0));
+            const isOver = budgetPct > 100;
+            const sweep = 320; // degrees of visible ring, rest is the gap at the bottom
+            const startAngle = 200; // conic-gradient 'from' angle, positions the gap at the bottom
+            const fillDeg = Math.min(budgetPct, 100) / 100 * sweep;
+            const ringColor = isOver ? 'var(--danger)' : 'var(--primary)';
+            const ringColorSoft = isOver ? '#ff9a9a' : 'var(--primary-soft)';
+            document.getElementById('gaugeRing').style.background =
+                'conic-gradient(from ' + startAngle + 'deg, ' + ringColorSoft + ' 0deg, ' + ringColor + ' ' + fillDeg + 'deg, rgba(255,255,255,0.06) ' + fillDeg + 'deg ' + sweep + 'deg, transparent ' + sweep + 'deg 360deg)';
+            document.getElementById('gaugePct').textContent = budgetPct.toFixed(0) + '%';
+            document.getElementById('gaugePct').style.color = isOver ? 'var(--danger)' : 'var(--dark)';
+            document.getElementById('gaugeSubLabel').textContent = isOver ? 'over budget' : 'of budget used';
+            document.getElementById('gaugeSpent').textContent = 'LKR ' + totalThisMonth.toLocaleString('en-US', { maximumFractionDigits: 0 });
+            const remaining = budget - totalThisMonth;
+            document.getElementById('gaugeRemaining').textContent =
+                (remaining < 0 ? '-' : '') + 'LKR ' + Math.abs(remaining).toLocaleString('en-US', { maximumFractionDigits: 0 });
+            document.getElementById('gaugeRemainingBox').classList.toggle('over', remaining < 0);
 
             // Average Spend (last 30 days)
             document.getElementById('avgSpend').textContent = 'LKR ' + Math.round(total30Days / 30).toLocaleString('en-US') + '/day';
@@ -1887,6 +2188,26 @@ function updateBulkDeleteButton() {
             } else {
                 document.getElementById('largestMerchant').textContent = '--';
                 document.getElementById('largestDetail').textContent = '--';
+            }
+
+            // Transactions this month vs previous month
+            let txnThisMonth = 0, txnPrevMonth = 0;
+            const prevMonthDate = new Date(thisYear, thisMonth - 1, 1);
+            allExpenses.forEach(e => {
+                const d = new Date(e.date);
+                if (d.getMonth() === thisMonth && d.getFullYear() === thisYear) txnThisMonth++;
+                else if (d.getMonth() === prevMonthDate.getMonth() && d.getFullYear() === prevMonthDate.getFullYear()) txnPrevMonth++;
+            });
+            document.getElementById('txnCount').textContent = txnThisMonth.toString();
+            const txnChangeEl = document.getElementById('txnChange');
+            if (txnPrevMonth > 0) {
+                const diff = txnThisMonth - txnPrevMonth;
+                const arrow = diff >= 0 ? '▲' : '▼';
+                txnChangeEl.textContent = arrow + ' ' + Math.abs(diff) + ' vs last month';
+                txnChangeEl.className = 'change ' + (diff >= 0 ? 'up' : 'down');
+            } else {
+                txnChangeEl.textContent = 'Based on current month';
+                txnChangeEl.className = 'change';
             }
         }
 
@@ -1965,18 +2286,10 @@ function updateBulkDeleteButton() {
                 const key = d.getFullYear() + '-' + d.getMonth();
                 if (monthTotals.hasOwnProperty(key)) monthTotals[key] += (e.amount || 0);
             });
-            const maxMonth = Math.max(...Object.values(monthTotals), 1);
-            let trendHtml = '';
-            monthOrder.forEach(m => {
-                const amount = monthTotals[m.key];
-                const pct = (amount / maxMonth * 100).toFixed(1);
-                trendHtml += '<div class="chart-bar">' +
-                    '<div class="chart-bar-label">' + m.label + '</div>' +
-                    '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
-                    '<div class="chart-bar-fill" style="width: ' + pct + '%; background: var(--primary);"></div></div>' +
-                    '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
-            });
-            document.getElementById('monthlyTrendChart').innerHTML = trendHtml;
+            renderMonthlyTrendChart(monthOrder, monthTotals);
+
+            // Spending heatmap calendar (current month)
+            renderSpendingHeatmap();
 
             // Top merchants
             const merchantTotals = {};
@@ -2010,6 +2323,117 @@ function updateBulkDeleteButton() {
                     '</div>';
             });
             document.getElementById('recentActivity').innerHTML = activityHtml || '<p style="color: var(--gray);">No activity yet</p>';
+        }
+
+        // ===================== MONTHLY TREND (smooth line/area chart) =====================
+        function catmullRomToBezierPath(points) {
+            if (points.length < 2) return '';
+            let d = 'M ' + points[0].x + ' ' + points[0].y;
+            for (let i = 0; i < points.length - 1; i++) {
+                const p0 = points[i === 0 ? 0 : i - 1];
+                const p1 = points[i];
+                const p2 = points[i + 1];
+                const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
+                const cp1x = p1.x + (p2.x - p0.x) / 6;
+                const cp1y = p1.y + (p2.y - p0.y) / 6;
+                const cp2x = p2.x - (p3.x - p1.x) / 6;
+                const cp2y = p2.y - (p3.y - p1.y) / 6;
+                d += ' C ' + cp1x + ' ' + cp1y + ', ' + cp2x + ' ' + cp2y + ', ' + p2.x + ' ' + p2.y;
+            }
+            return d;
+        }
+
+        function renderMonthlyTrendChart(monthOrder, monthTotals) {
+            const wrap = document.getElementById('monthlyTrendChart');
+            const values = monthOrder.map(m => monthTotals[m.key] || 0);
+            const maxVal = Math.max(...values, 1);
+            const minVal = 0;
+            const avg = values.reduce((a, b) => a + b, 0) / (values.length || 1);
+
+            const W = 560, H = 200, padX = 8, padTop = 34, padBottom = 26;
+            const plotW = W - padX * 2, plotH = H - padTop - padBottom;
+
+            const points = values.map((v, i) => ({
+                x: padX + (i / (values.length - 1 || 1)) * plotW,
+                y: padTop + plotH - ((v - minVal) / (maxVal - minVal || 1)) * plotH
+            }));
+
+            const linePath = catmullRomToBezierPath(points);
+            const areaPath = linePath + ' L ' + points[points.length - 1].x + ' ' + (padTop + plotH) +
+                ' L ' + points[0].x + ' ' + (padTop + plotH) + ' Z';
+
+            const avgY = padTop + plotH - ((avg - minVal) / (maxVal - minVal || 1)) * plotH;
+
+            const firstVal = values[0], lastVal = values[values.length - 1];
+            const firstPt = points[0], lastPt = points[points.length - 1];
+
+            let svg = '<svg class="trend-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Monthly spending trend">';
+            svg += '<defs><linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset="0%" stop-color="#3ee889" stop-opacity="0.35"/>' +
+                '<stop offset="100%" stop-color="#3ee889" stop-opacity="0"/></linearGradient></defs>';
+            svg += '<line x1="' + padX + '" y1="' + avgY + '" x2="' + (W - padX) + '" y2="' + avgY + '" stroke="#575f59" stroke-width="1.5" stroke-dasharray="5 5"/>';
+            svg += '<path d="' + areaPath + '" fill="url(#trendFill)" stroke="none"/>';
+            svg += '<path d="' + linePath + '" fill="none" stroke="#3ee889" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+            points.forEach((p, i) => {
+                const isEnd = i === 0 || i === points.length - 1;
+                svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + (isEnd ? 4 : 2.5) + '" fill="' + (isEnd ? '#3ee889' : '#101210') + '" stroke="#3ee889" stroke-width="' + (isEnd ? 0 : 1.5) + '"/>';
+            });
+            svg += '</svg>';
+
+            wrap.innerHTML = svg +
+                '<div class="trend-callout" style="left:' + Math.max(firstPt.x - 4, 0) + 'px; top:' + (firstPt.y - 30) + 'px;">LKR ' + Math.round(firstVal).toLocaleString('en-US') + '</div>' +
+                '<div class="trend-callout" style="left:' + Math.min(lastPt.x - 60, W - 100) + 'px; top:' + (lastPt.y - 30) + 'px;">LKR ' + Math.round(lastVal).toLocaleString('en-US') + '</div>' +
+                '<div class="trend-callout avg" style="left:' + (W - 120) + 'px; top:' + (avgY - 34) + 'px;">Average</div>' +
+                '<div class="trend-labels">' + monthOrder.map(m => '<span>' + m.label + '</span>').join('') + '</div>';
+        }
+
+        // ===================== SPENDING HEATMAP (current-month calendar) =====================
+        function renderSpendingHeatmap() {
+            const el = document.getElementById('spendingHeatmap');
+            const today = new Date();
+            const year = today.getFullYear(), month = today.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const startOffset = firstDay.getDay(); // 0=Sun
+
+            const dailyTotals = {};
+            for (let d = 1; d <= daysInMonth; d++) dailyTotals[d] = 0;
+            allExpenses.forEach(e => {
+                const d = new Date(e.date);
+                if (d.getFullYear() === year && d.getMonth() === month) {
+                    dailyTotals[d.getDate()] = (dailyTotals[d.getDate()] || 0) + (e.amount || 0);
+                }
+            });
+
+            const maxDay = Math.max(...Object.values(dailyTotals), 1);
+            const todayDate = today.getDate();
+
+            function intensityColor(amount) {
+                if (amount <= 0) return 'var(--light-gray)';
+                const frac = Math.min(amount / maxDay, 1);
+                const alpha = 0.15 + frac * 0.75;
+                return 'rgba(62,232,137,' + alpha.toFixed(2) + ')';
+            }
+
+            let weekdaysHtml = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => '<span>' + d + '</span>').join('');
+            let cellsHtml = '';
+            for (let i = 0; i < startOffset; i++) cellsHtml += '<div class="heatmap-cell empty"></div>';
+            for (let d = 1; d <= daysInMonth; d++) {
+                const amount = dailyTotals[d];
+                const isToday = d === todayDate;
+                cellsHtml += '<div class="heatmap-cell' + (isToday ? ' today' : '') + '" style="background:' + intensityColor(amount) + ';" title="' +
+                    new Date(year, month, d).toLocaleDateString('en', { month: 'short', day: 'numeric' }) +
+                    (amount > 0 ? ' — LKR ' + amount.toLocaleString('en-US', { maximumFractionDigits: 0 }) : ' — no spend') + '"></div>';
+            }
+
+            const legendSwatches = [0, 0.25, 0.5, 0.75, 1].map(f =>
+                '<div class="heatmap-cell" style="background:' + (f === 0 ? 'var(--light-gray)' : 'rgba(62,232,137,' + (0.15 + f * 0.75).toFixed(2) + ')') + ';"></div>'
+            ).join('');
+
+            el.innerHTML =
+                '<div class="heatmap-weekdays">' + weekdaysHtml + '</div>' +
+                '<div class="heatmap-grid">' + cellsHtml + '</div>' +
+                '<div class="heatmap-legend">Less ' + legendSwatches + ' More</div>';
         }
 
         // ===================== TABS =====================
