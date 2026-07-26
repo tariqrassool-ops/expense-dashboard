@@ -63,7 +63,103 @@
             background-attachment: fixed;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+        .container { max-width: 1360px; margin: 0 auto; padding: 24px; position: relative; }
+
+        /* ===================== AMBIENT BACKGROUND ORBS ===================== */
+        .ambient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.55;
+            will-change: transform;
+        }
+        .ambient-orb.orb-1 {
+            width: 480px; height: 480px;
+            top: -180px; left: -120px;
+            background: radial-gradient(circle, rgba(62,232,137,0.35), transparent 70%);
+            animation: orbFloat1 22s ease-in-out infinite;
+        }
+        .ambient-orb.orb-2 {
+            width: 560px; height: 560px;
+            top: 20%; right: -220px;
+            background: radial-gradient(circle, rgba(62,232,137,0.22), transparent 70%);
+            animation: orbFloat2 26s ease-in-out infinite;
+        }
+        .ambient-orb.orb-3 {
+            width: 420px; height: 420px;
+            bottom: -160px; left: 30%;
+            background: radial-gradient(circle, rgba(184,255,217,0.16), transparent 70%);
+            animation: orbFloat3 30s ease-in-out infinite;
+        }
+        @keyframes orbFloat1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 50px) scale(1.12); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-50px, 60px) scale(1.08); }
+        }
+        @keyframes orbFloat3 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, -40px) scale(1.15); }
+        }
+        .container > * { position: relative; z-index: 1; }
+
+        /* ===================== ENTRANCE / MICRO ANIMATIONS ===================== */
+        @keyframes cardRise {
+            from { opacity: 0; transform: translateY(18px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .stats-grid .stat-card {
+            opacity: 0;
+            animation: cardRise 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .stats-grid .stat-card:nth-child(1) { animation-delay: 0.02s; }
+        .stats-grid .stat-card:nth-child(2) { animation-delay: 0.08s; }
+        .stats-grid .stat-card:nth-child(3) { animation-delay: 0.14s; }
+        .stats-grid .stat-card:nth-child(4) { animation-delay: 0.20s; }
+        .stats-grid .stat-card:nth-child(5) { animation-delay: 0.26s; }
+        .stats-grid .stat-card:nth-child(6) { animation-delay: 0.32s; }
+
+        .dashboard-row-featured .chart-card,
+        .charts-grid .chart-card {
+            opacity: 0;
+            animation: cardRise 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .dashboard-row-featured .chart-card:nth-child(1) { animation-delay: 0.10s; }
+        .dashboard-row-featured .chart-card:nth-child(2) { animation-delay: 0.18s; }
+        .dashboard-row-featured .chart-card:nth-child(3) { animation-delay: 0.26s; }
+        .charts-grid .chart-card:nth-child(1) { animation-delay: 0.32s; }
+        .charts-grid .chart-card:nth-child(2) { animation-delay: 0.38s; }
+        .charts-grid .chart-card:nth-child(3) { animation-delay: 0.44s; }
+
+        .chart-card {
+            transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+        }
+        .chart-card:hover {
+            border-color: rgba(62,232,137,0.28);
+            transform: translateY(-3px);
+            box-shadow: var(--glow);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 3px rgba(62,232,137,0.9)); }
+            50% { opacity: 0.55; filter: drop-shadow(0 0 8px rgba(62,232,137,0.4)); }
+        }
+        @keyframes fillIn {
+            from { stroke-dashoffset: var(--dash-len); }
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes fadeScaleIn {
+            from { opacity: 0; transform: scale(0.85); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes shimmerBar {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
 
         /* ===================== TOPBAR ACTIONS ===================== */
         .app-topbar-actions {
@@ -154,17 +250,17 @@
         .gauge-card { display: flex; flex-direction: column; align-items: center; }
         .gauge-wrap {
             position: relative;
-            width: 168px;
-            height: 168px;
+            width: 190px;
+            height: 190px;
             margin: 4px auto 6px;
         }
-        .gauge-ring {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 16px), #000 calc(100% - 16px));
-            mask: radial-gradient(farthest-side, transparent calc(100% - 16px), #000 calc(100% - 16px));
-            transition: background 0.6s ease;
+        .gauge-svg { width: 100%; height: 100%; overflow: visible; }
+        .gauge-track { transition: stroke 0.4s ease; }
+        .gauge-value-arc {
+            transition: stroke-dashoffset 1.1s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.4s ease;
+        }
+        .gauge-tick {
+            opacity: 0.5;
         }
         .gauge-center {
             position: absolute;
@@ -177,11 +273,16 @@
         }
         .gauge-pct {
             font-family: var(--font-display);
-            font-size: 1.9rem;
+            font-size: 2.1rem;
             font-weight: 600;
             color: var(--dark);
             letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--dark), var(--primary-soft));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
+        .gauge-pct.over { background: linear-gradient(135deg, #ffb3b3, var(--danger)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         .gauge-label {
             font-size: 0.7rem;
             color: var(--gray);
@@ -201,7 +302,9 @@
             border-radius: var(--radius-sm);
             padding: 10px 12px;
             text-align: center;
+            transition: border-color 0.2s, transform 0.2s;
         }
+        .gauge-substat:hover { border-color: rgba(62,232,137,0.3); transform: translateY(-1px); }
         .gauge-substat .label {
             display: block;
             font-size: 0.68rem;
@@ -273,7 +376,7 @@
         .trend-callout {
             position: absolute;
             background: var(--surface-2);
-            border: 1px solid var(--border);
+            border: 1px solid rgba(62,232,137,0.25);
             padding: 4px 9px;
             border-radius: 8px;
             font-family: var(--font-mono);
@@ -282,8 +385,11 @@
             color: var(--dark);
             white-space: nowrap;
             pointer-events: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35), 0 0 12px rgba(62,232,137,0.08);
+            opacity: 0;
+            animation: cardRise 0.5s ease 0.9s forwards;
         }
-        .trend-callout.avg { color: var(--gray); font-family: var(--font-body); font-weight: 500; }
+        .trend-callout.avg { color: var(--gray); font-family: var(--font-body); font-weight: 500; border-color: var(--border); box-shadow: none; }
 
         .header {
             position: relative;
@@ -1152,6 +1258,10 @@
 
     </section>
 
+    <div class="ambient-orb orb-1" aria-hidden="true"></div>
+    <div class="ambient-orb orb-2" aria-hidden="true"></div>
+    <div class="ambient-orb orb-3" aria-hidden="true"></div>
+
     <div class="container">
 
         <main id="dashboardContent" class="hidden" role="main">
@@ -1202,6 +1312,16 @@
                         <div class="value" id="txnCount">0</div>
                         <div class="change" id="txnChange">--</div>
                     </article>
+                    <article class="stat-card">
+                        <h3>Top Category</h3>
+                        <div class="value" id="topCategory">--</div>
+                        <div class="change" id="topCategoryDetail">--</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Days Left in Month</h3>
+                        <div class="value" id="daysLeft">--</div>
+                        <div class="change" id="daysLeftDetail">--</div>
+                    </article>
                 </div>
 
                 <div class="dashboard-row-featured" role="region" aria-label="Monthly trend, budget and spending heatmap">
@@ -1211,8 +1331,7 @@
                     </div>
                     <div class="chart-card gauge-card">
                         <h3 style="align-self: flex-start;">Monthly Budget <button class="edit-budget-btn" onclick="editBudget()" aria-label="Edit budget" title="Edit budget">&#9998;</button></h3>
-                        <div class="gauge-wrap">
-                            <div class="gauge-ring" id="gaugeRing"></div>
+                        <div class="gauge-wrap" id="gaugeWrap">
                             <div class="gauge-center">
                                 <div class="gauge-pct" id="gaugePct">0%</div>
                                 <div class="gauge-label" id="gaugeSubLabel">of budget used</div>
@@ -2139,8 +2258,7 @@ function updateBulkDeleteButton() {
             });
 
             // Total Expenses + trend vs previous 30 days
-            document.getElementById('totalExpenses').textContent =
-                'LKR ' + total30Days.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            animateCounter(document.getElementById('totalExpenses'), total30Days, v => 'LKR ' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
             const changeEl = document.getElementById('expenseChange');
             if (totalPrev30Days > 0) {
@@ -2153,28 +2271,19 @@ function updateBulkDeleteButton() {
                 changeEl.className = 'change';
             }
 
-            // Monthly Budget — radial arc gauge
+            // Monthly Budget — radial arc gauge (crisp SVG, glow, animated draw-in)
             const budget = getBudget();
             const budgetPct = budget > 0 ? Math.min((totalThisMonth / budget) * 100, 999) : 0;
             const isOver = budgetPct > 100;
-            const sweep = 320; // degrees of visible ring, rest is the gap at the bottom
-            const startAngle = 200; // conic-gradient 'from' angle, positions the gap at the bottom
-            const fillDeg = Math.min(budgetPct, 100) / 100 * sweep;
-            const ringColor = isOver ? 'var(--danger)' : 'var(--primary)';
-            const ringColorSoft = isOver ? '#ff9a9a' : 'var(--primary-soft)';
-            document.getElementById('gaugeRing').style.background =
-                'conic-gradient(from ' + startAngle + 'deg, ' + ringColorSoft + ' 0deg, ' + ringColor + ' ' + fillDeg + 'deg, rgba(255,255,255,0.06) ' + fillDeg + 'deg ' + sweep + 'deg, transparent ' + sweep + 'deg 360deg)';
-            document.getElementById('gaugePct').textContent = budgetPct.toFixed(0) + '%';
-            document.getElementById('gaugePct').style.color = isOver ? 'var(--danger)' : 'var(--dark)';
+            renderBudgetGauge(budgetPct, isOver);
             document.getElementById('gaugeSubLabel').textContent = isOver ? 'over budget' : 'of budget used';
-            document.getElementById('gaugeSpent').textContent = 'LKR ' + totalThisMonth.toLocaleString('en-US', { maximumFractionDigits: 0 });
+            animateCounter(document.getElementById('gaugeSpent'), totalThisMonth, v => 'LKR ' + Math.round(v).toLocaleString('en-US'));
             const remaining = budget - totalThisMonth;
-            document.getElementById('gaugeRemaining').textContent =
-                (remaining < 0 ? '-' : '') + 'LKR ' + Math.abs(remaining).toLocaleString('en-US', { maximumFractionDigits: 0 });
+            animateCounter(document.getElementById('gaugeRemaining'), Math.abs(remaining), v => (remaining < 0 ? '-' : '') + 'LKR ' + Math.round(v).toLocaleString('en-US'));
             document.getElementById('gaugeRemainingBox').classList.toggle('over', remaining < 0);
 
             // Average Spend (last 30 days)
-            document.getElementById('avgSpend').textContent = 'LKR ' + Math.round(total30Days / 30).toLocaleString('en-US') + '/day';
+            animateCounter(document.getElementById('avgSpend'), total30Days / 30, v => 'LKR ' + Math.round(v).toLocaleString('en-US') + '/day');
 
             // Largest Purchase (last 30 days, fallback to all-time)
             let recentExpenses = allExpenses.filter(e => new Date(e.date) >= thirtyDaysAgo);
@@ -2198,7 +2307,7 @@ function updateBulkDeleteButton() {
                 if (d.getMonth() === thisMonth && d.getFullYear() === thisYear) txnThisMonth++;
                 else if (d.getMonth() === prevMonthDate.getMonth() && d.getFullYear() === prevMonthDate.getFullYear()) txnPrevMonth++;
             });
-            document.getElementById('txnCount').textContent = txnThisMonth.toString();
+            animateCounter(document.getElementById('txnCount'), txnThisMonth, v => Math.round(v).toString());
             const txnChangeEl = document.getElementById('txnChange');
             if (txnPrevMonth > 0) {
                 const diff = txnThisMonth - txnPrevMonth;
@@ -2209,6 +2318,29 @@ function updateBulkDeleteButton() {
                 txnChangeEl.textContent = 'Based on current month';
                 txnChangeEl.className = 'change';
             }
+
+            // Top category (this month)
+            const catThisMonth = {};
+            allExpenses.forEach(e => {
+                const d = new Date(e.date);
+                if (d.getMonth() === thisMonth && d.getFullYear() === thisYear) {
+                    catThisMonth[e.category] = (catThisMonth[e.category] || 0) + (e.amount || 0);
+                }
+            });
+            const topCatEntry = Object.entries(catThisMonth).sort((a, b) => b[1] - a[1])[0];
+            if (topCatEntry) {
+                document.getElementById('topCategory').textContent = topCatEntry[0];
+                document.getElementById('topCategoryDetail').textContent = 'LKR ' + topCatEntry[1].toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' this month';
+            } else {
+                document.getElementById('topCategory').textContent = '--';
+                document.getElementById('topCategoryDetail').textContent = '--';
+            }
+
+            // Days left in month
+            const daysInThisMonth = new Date(thisYear, thisMonth + 1, 0).getDate();
+            const daysRemaining = daysInThisMonth - now.getDate();
+            document.getElementById('daysLeft').textContent = daysRemaining.toString();
+            document.getElementById('daysLeftDetail').textContent = daysRemaining === 0 ? 'Last day of the month' : 'Until ' + new Date(thisYear, thisMonth + 1, 0).toLocaleDateString('en', { month: 'short', day: 'numeric' });
         }
 
         function updateCharts() {
@@ -2325,6 +2457,83 @@ function updateBulkDeleteButton() {
             document.getElementById('recentActivity').innerHTML = activityHtml || '<p style="color: var(--gray);">No activity yet</p>';
         }
 
+        // ===================== SHARED: COUNT-UP ANIMATION =====================
+        const animCache = new WeakMap();
+        function animateCounter(el, endVal, formatFn, duration) {
+            if (!el) return;
+            duration = duration || 900;
+            const startVal = animCache.has(el) ? animCache.get(el) : 0;
+            const startTime = performance.now();
+            const prevRaf = el._animRaf;
+            if (prevRaf) cancelAnimationFrame(prevRaf);
+            function tick(now) {
+                const t = Math.min((now - startTime) / duration, 1);
+                const eased = 1 - Math.pow(1 - t, 3);
+                const current = startVal + (endVal - startVal) * eased;
+                el.textContent = formatFn(current);
+                if (t < 1) {
+                    el._animRaf = requestAnimationFrame(tick);
+                } else {
+                    animCache.set(el, endVal);
+                }
+            }
+            el._animRaf = requestAnimationFrame(tick);
+        }
+
+        // ===================== MONTHLY BUDGET (crisp SVG radial gauge) =====================
+        function renderBudgetGauge(pct, isOver) {
+            const wrap = document.getElementById('gaugeWrap');
+            let svg = document.getElementById('gaugeSvgEl');
+
+            const size = 190, r = 78, cx = size / 2, cy = size / 2, strokeW = 13;
+            const circumference = 2 * Math.PI * r;
+            const sweep = 300, gap = 360 - sweep, rotate = -90 - gap / 2;
+            const trackLen = circumference * (sweep / 360);
+            const valueFrac = Math.min(pct, 100) / 100;
+            const valueLen = trackLen * valueFrac;
+
+            if (!svg) {
+                const gaugeGradId = 'gaugeGrad_' + Math.random().toString(36).slice(2, 8);
+                const html =
+                    '<svg id="gaugeSvgEl" class="gauge-svg" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="Monthly budget gauge">' +
+                    '<defs>' +
+                        '<linearGradient id="' + gaugeGradId + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
+                            '<stop offset="0%" stop-color="#b8ffd9"/>' +
+                            '<stop offset="100%" stop-color="#3ee889"/>' +
+                        '</linearGradient>' +
+                        '<linearGradient id="' + gaugeGradId + '_over" x1="0%" y1="0%" x2="100%" y2="100%">' +
+                            '<stop offset="0%" stop-color="#ffb3b3"/>' +
+                            '<stop offset="100%" stop-color="#ff6f6f"/>' +
+                        '</linearGradient>' +
+                        '<filter id="' + gaugeGradId + '_glow" x="-60%" y="-60%" width="220%" height="220%">' +
+                            '<feGaussianBlur stdDeviation="4.5" result="blur"/>' +
+                            '<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>' +
+                        '</filter>' +
+                    '</defs>' +
+                    '<circle class="gauge-track" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="' + strokeW + '" stroke-linecap="round" ' +
+                        'stroke-dasharray="' + trackLen + ' ' + circumference + '" transform="rotate(' + rotate + ' ' + cx + ' ' + cy + ')"></circle>' +
+                    '<circle id="gaugeValueArc" class="gauge-value-arc" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="url(#' + gaugeGradId + ')" stroke-width="' + strokeW + '" stroke-linecap="round" ' +
+                        'stroke-dasharray="' + valueLen + ' ' + circumference + '" stroke-dashoffset="' + valueLen + '" transform="rotate(' + rotate + ' ' + cx + ' ' + cy + ')" filter="url(#' + gaugeGradId + '_glow)" data-grad="' + gaugeGradId + '"></circle>' +
+                    '</svg>';
+                wrap.insertAdjacentHTML('afterbegin', html);
+                svg = document.getElementById('gaugeSvgEl');
+                // Force reflow then animate the draw-in
+                const arcEl = document.getElementById('gaugeValueArc');
+                arcEl.getBoundingClientRect();
+                requestAnimationFrame(() => { arcEl.style.strokeDashoffset = '0'; });
+            }
+
+            const arcEl = document.getElementById('gaugeValueArc');
+            const gradId = arcEl.getAttribute('data-grad');
+            arcEl.setAttribute('stroke', 'url(#' + gradId + (isOver ? '_over' : '') + ')');
+            arcEl.setAttribute('stroke-dasharray', valueLen + ' ' + circumference);
+            arcEl.style.strokeDashoffset = '0';
+
+            const pctEl = document.getElementById('gaugePct');
+            pctEl.classList.toggle('over', isOver);
+            animateCounter(pctEl, pct, v => Math.round(v) + '%');
+        }
+
         // ===================== MONTHLY TREND (smooth line/area chart) =====================
         function catmullRomToBezierPath(points) {
             if (points.length < 2) return '';
@@ -2366,25 +2575,57 @@ function updateBulkDeleteButton() {
 
             const firstVal = values[0], lastVal = values[values.length - 1];
             const firstPt = points[0], lastPt = points[points.length - 1];
+            const gid = 'trend_' + Math.random().toString(36).slice(2, 8);
 
             let svg = '<svg class="trend-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Monthly spending trend">';
-            svg += '<defs><linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">' +
-                '<stop offset="0%" stop-color="#3ee889" stop-opacity="0.35"/>' +
-                '<stop offset="100%" stop-color="#3ee889" stop-opacity="0"/></linearGradient></defs>';
+            svg += '<defs>' +
+                '<linearGradient id="' + gid + '_fill" x1="0" y1="0" x2="0" y2="1">' +
+                    '<stop offset="0%" stop-color="#3ee889" stop-opacity="0.4"/>' +
+                    '<stop offset="55%" stop-color="#3ee889" stop-opacity="0.12"/>' +
+                    '<stop offset="100%" stop-color="#3ee889" stop-opacity="0"/>' +
+                '</linearGradient>' +
+                '<linearGradient id="' + gid + '_line" x1="0" y1="0" x2="1" y2="0">' +
+                    '<stop offset="0%" stop-color="#b8ffd9"/>' +
+                    '<stop offset="100%" stop-color="#3ee889"/>' +
+                '</linearGradient>' +
+                '<filter id="' + gid + '_glow" x="-30%" y="-80%" width="160%" height="260%">' +
+                    '<feGaussianBlur stdDeviation="3.2" result="b"/>' +
+                    '<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>' +
+                '</filter>' +
+            '</defs>';
             svg += '<line x1="' + padX + '" y1="' + avgY + '" x2="' + (W - padX) + '" y2="' + avgY + '" stroke="#575f59" stroke-width="1.5" stroke-dasharray="5 5"/>';
-            svg += '<path d="' + areaPath + '" fill="url(#trendFill)" stroke="none"/>';
-            svg += '<path d="' + linePath + '" fill="none" stroke="#3ee889" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+            svg += '<path class="trend-area" d="' + areaPath + '" fill="url(#' + gid + '_fill)" stroke="none" style="opacity:0;transition:opacity 0.9s ease 0.35s;"/>';
+            svg += '<path id="trendLinePath" d="' + linePath + '" fill="none" stroke="url(#' + gid + '_line)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" filter="url(#' + gid + '_glow)"/>';
             points.forEach((p, i) => {
-                const isEnd = i === 0 || i === points.length - 1;
-                svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + (isEnd ? 4 : 2.5) + '" fill="' + (isEnd ? '#3ee889' : '#101210') + '" stroke="#3ee889" stroke-width="' + (isEnd ? 0 : 1.5) + '"/>';
+                const isEnd = i === points.length - 1;
+                const isStart = i === 0;
+                const r = isEnd ? 4.5 : (isStart ? 3.5 : 2.5);
+                svg += '<circle class="trend-pt" cx="' + p.x + '" cy="' + p.y + '" r="' + r + '" fill="' + (isEnd || isStart ? '#3ee889' : '#101210') + '" stroke="#3ee889" stroke-width="' + (isEnd || isStart ? 0 : 1.5) + '" style="opacity:0;transition:opacity 0.4s ease ' + (0.5 + i * 0.06) + 's;"' + (isEnd ? ' class="trend-pt pulseGlow"' : '') + '/>';
             });
             svg += '</svg>';
 
+            const leftPct = pt => (pt.x / W * 100).toFixed(2) + '%';
+            const topPct = px => (px / H * 100).toFixed(2) + '%';
+
             wrap.innerHTML = svg +
-                '<div class="trend-callout" style="left:' + Math.max(firstPt.x - 4, 0) + 'px; top:' + (firstPt.y - 30) + 'px;">LKR ' + Math.round(firstVal).toLocaleString('en-US') + '</div>' +
-                '<div class="trend-callout" style="left:' + Math.min(lastPt.x - 60, W - 100) + 'px; top:' + (lastPt.y - 30) + 'px;">LKR ' + Math.round(lastVal).toLocaleString('en-US') + '</div>' +
-                '<div class="trend-callout avg" style="left:' + (W - 120) + 'px; top:' + (avgY - 34) + 'px;">Average</div>' +
+                '<div class="trend-callout" style="left:' + leftPct(firstPt) + '; top:' + topPct(firstPt.y - 30) + '; transform: translateX(-4px);">LKR ' + Math.round(firstVal).toLocaleString('en-US') + '</div>' +
+                '<div class="trend-callout" style="left:' + leftPct(lastPt) + '; top:' + topPct(lastPt.y - 30) + '; transform: translateX(-88%);">LKR ' + Math.round(lastVal).toLocaleString('en-US') + '</div>' +
+                '<div class="trend-callout avg" style="left:88%; top:' + topPct(avgY - 34) + ';">Average</div>' +
                 '<div class="trend-labels">' + monthOrder.map(m => '<span>' + m.label + '</span>').join('') + '</div>';
+
+            // Animate the line drawing in, then reveal area + points
+            const lineEl = document.getElementById('trendLinePath');
+            const len = lineEl.getTotalLength();
+            lineEl.style.strokeDasharray = len + ' ' + len;
+            lineEl.style.strokeDashoffset = len;
+            lineEl.style.transition = 'none';
+            lineEl.getBoundingClientRect();
+            requestAnimationFrame(() => {
+                lineEl.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
+                lineEl.style.strokeDashoffset = '0';
+            });
+            wrap.querySelectorAll('.trend-area').forEach(a => { a.getBoundingClientRect(); requestAnimationFrame(() => { a.style.opacity = '1'; }); });
+            wrap.querySelectorAll('.trend-pt').forEach(p => { p.getBoundingClientRect(); requestAnimationFrame(() => { p.style.opacity = '1'; }); });
         }
 
         // ===================== SPENDING HEATMAP (current-month calendar) =====================
