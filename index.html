@@ -234,6 +234,34 @@
             gap: 10px;
             margin-bottom: 24px;
             flex-wrap: wrap;
+            align-items: center;
+        }
+        .sync-date-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            justify-content: center;
+        }
+        .sync-date-group label {
+            font-size: 0.7rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+        }
+        .sync-date-group input[type="date"] {
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            background: var(--light-gray);
+            color: var(--dark);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-family: var(--font-body);
+            color-scheme: dark;
+        }
+        .sync-date-group input[type="date"]:focus {
+            outline: none;
+            border-color: var(--primary);
         }
         .btn {
             padding: 11px 20px;
@@ -257,9 +285,8 @@
             color: #06120a;
             border-color: transparent;
             font-weight: 600;
-            box-shadow: 0 4px 18px rgba(62,232,137,0.28);
         }
-        .btn-primary:hover { filter: brightness(1.08); box-shadow: 0 6px 24px rgba(62,232,137,0.4); }
+        .btn-primary:hover { filter: brightness(1.08); }
         .btn-success { background: transparent; color: var(--success); border-color: rgba(62,232,137,0.35); }
         .btn-success:hover { background: rgba(62,232,137,0.1); }
         .btn-warning { background: transparent; color: var(--warning); border-color: rgba(255,187,85,0.35); }
@@ -802,8 +829,8 @@
                 
 <div style="display:flex;align-items:end;gap:12px;flex-wrap:wrap;">
 
-    <div>
-        <label style="font-size:12px;">Sync From</label><br>
+    <div class="sync-date-group">
+        <label for="syncFromDate">Sync From</label>
         <input type="date" id="syncFromDate">
     </div>
 
