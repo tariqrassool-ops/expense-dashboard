@@ -228,6 +228,147 @@
             color: var(--gray-dim);
             position: relative;
         }
+        .stat-card .change.up { color: var(--danger); }
+        .stat-card .change.down { color: var(--success); }
+
+        .edit-budget-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .edit-budget-btn:hover { color: var(--primary); }
+
+        .budget-bar-track {
+            position: relative;
+            height: 9px;
+            background: var(--light-gray);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .budget-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .budget-bar-fill.over { background: linear-gradient(90deg, var(--danger), #ff4d4d); }
+
+        /* Donut chart */
+        .donut-wrap {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .donut-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            min-width: 140px;
+        }
+        .donut-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--dark);
+        }
+        .donut-legend-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .donut-legend-pct {
+            margin-left: auto;
+            font-family: var(--font-mono);
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        /* Activity list */
+        .activity-list { display: flex; flex-direction: column; }
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 0;
+            border-bottom: 1px solid var(--border-soft);
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-left { display: flex; flex-direction: column; gap: 2px; }
+        .activity-merchant { font-size: 0.88rem; color: var(--dark); font-weight: 500; }
+        .activity-date { font-size: 0.74rem; color: var(--gray-dim); }
+        .activity-amount { font-family: var(--font-mono); font-weight: 600; color: var(--dark); font-size: 0.88rem; }
+
+        /* Category chart with percentage */
+        .chart-bar-pct {
+            width: 42px;
+            text-align: right;
+            font-size: 0.74rem;
+            color: var(--gray);
+            flex-shrink: 0;
+        }
+
+        .app-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .app-topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.15rem;
+            color: var(--dark);
+        }
+        .app-topbar-brand .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 0 8px rgba(62,232,137,0.5);
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 5px;
+            border-radius: 999px;
+            width: fit-content;
+        }
+        .tab-btn {
+            padding: 9px 20px;
+            border-radius: 999px;
+            border: none;
+            background: transparent;
+            color: var(--gray);
+            font-family: var(--font-body);
+            font-size: 0.86rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+        .tab-btn:hover { color: var(--dark); }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #06120a;
+        }
 
         .action-bar {
             display: flex;
@@ -238,16 +379,15 @@
         }
         .sync-date-group {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
-            justify-content: center;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
         }
         .sync-date-group label {
-            font-size: 0.7rem;
+            font-size: 0.78rem;
             color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
             font-weight: 600;
+            white-space: nowrap;
         }
         .sync-date-group input[type="date"] {
             padding: 9px 12px;
@@ -383,11 +523,6 @@
         .cat-banking { background: rgba(168,133,230,0.14); color: #bda6ef; }
         .cat-transfer { background: rgba(134,140,150,0.16); color: #a8adb6; }
         .cat-uncategorized { background: rgba(134,140,150,0.1); color: var(--gray); }
-        .split-badge { padding: 4px 11px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; display: inline-block; letter-spacing: 0.01em; }
-        .split-badge.pending { background: rgba(255,187,85,0.14); color: #ffca7a; }
-        .split-badge.settled { background: rgba(62,232,137,0.14); color: #6ff5ac; }
-        .split-row { background: rgba(255,187,85,0.04) !important; }
-        .split-row.settled { background: rgba(62,232,137,0.04) !important; }
         .amount { font-family: var(--font-mono); font-weight: 600; color: var(--danger); font-variant-numeric: tabular-nums; }
         .sync-badge {
             display: inline-flex;
@@ -793,133 +928,159 @@
     <div class="container">
 
         <main id="dashboardContent" class="hidden" role="main">
-            <div class="stats-grid" role="region" aria-label="Statistics">
-                <article class="stat-card">
-                    <h3>Total Expenses (30 days)</h3>
-                    <div class="value" id="totalExpenses">LKR 0.00</div>
-                    <div class="change" id="expenseChange">--</div>
-                </article>
-                <article class="stat-card">
-                    <h3>This Month</h3>
-                    <div class="value" id="thisMonth">LKR 0.00</div>
-                    <div class="change" id="monthChange">--</div>
-                </article>
-                <article class="stat-card">
-                    <h3>Transactions</h3>
-                    <div class="value" id="transactionCount">0</div>
-                    <div class="change">Total synced</div>
-                </article>
-                <article class="stat-card">
-                    <h3>Top Category</h3>
-                    <div class="value" id="topCategory">--</div>
-                    <div class="change" id="topCategoryAmount">--</div>
-                </article>
-                <article class="stat-card">
-                    <h3>Owed to You</h3>
-                    <div class="value" id="owedToYou">LKR 0.00</div>
-                    <div class="change" id="owedCount">0 pending splits</div>
-                </article>
-                <article class="stat-card">
-                    <h3>Your Share (30 days)</h3>
-                    <div class="value" id="yourShare30">LKR 0.00</div>
-                    <div class="change">After splits</div>
-                </article>
-            </div>
-
-            <div class="charts-grid" role="region" aria-label="Charts">
-                <div class="chart-card">
-                    <h3>Spending by Category</h3>
-                    <div id="categoryChart"></div>
-                </div>
-                <div class="chart-card">
-                    <h3>Last 7 Days</h3>
-                    <div id="weeklyChart"></div>
-                </div>
-            </div>
-
-            <div class="action-bar" role="region" aria-label="Actions">
-                <button class="btn btn-primary" onclick="openAddModal()">
-                    <span aria-hidden="true">+</span> Add Expense
-    </button>
-                
-<div style="display:flex;align-items:end;gap:12px;flex-wrap:wrap;">
-
-    <div class="sync-date-group">
-        <label for="syncFromDate">Sync From</label>
-        <input type="date" id="syncFromDate">
-    </div>
-
-    <button class="btn btn-success" id="syncBtn" onclick="syncGmail()">
-        <span aria-hidden="true">&#x1F504;</span> Sync Gmail
-    </button>
-
-    <button 
-    class="btn btn-danger" 
-    id="bulkDeleteBtn"
-    onclick="deleteSelectedExpenses()"
-    style="display:none;">
-    🗑 Delete Selected
-</button>
-
-</div>
-                <button class="btn btn-warning" onclick="exportData()">
-                    <span aria-hidden="true">&#x1F4E5;</span> Export CSV
-                </button>
+            <div class="app-topbar">
+                <div class="app-topbar-brand"><span class="dot" aria-hidden="true"></span> ExpenseTrack</div>
                 <button class="btn auth-btn logout" onclick="signOut()">
                     <span aria-hidden="true">&#x1F6AA;</span> Sign Out
                 </button>
             </div>
 
-            <div class="filters" role="search" aria-label="Filter expenses">
-                <div class="filter-group">
-                    <label for="searchFilter">Search</label>
-                    <input type="text" id="searchFilter" placeholder="Search expenses..." oninput="applyFilters()">
-                </div>
-                <div class="filter-group">
-                    <label for="categoryFilter">Category</label>
-                    <select id="categoryFilter" onchange="applyFilters()">
-                        <option value="">All Categories</option>
-                        <option value="Food">Food</option>
-                        <option value="Travel">Travel</option>
-                        <option value="Groceries">Groceries</option>
-                        <option value="Banking">Banking</option>
-                        <option value="Transfer">Transfer</option>
-                        <option value="Uncategorized">Uncategorized</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="fromDate">From Date</label>
-                    <input type="date" id="fromDate" onchange="applyFilters()">
-                </div>
-                <div class="filter-group">
-                    <label for="toDate">To Date</label>
-                    <input type="date" id="toDate" onchange="applyFilters()">
-                </div>
-                <div class="filter-group">
-                    <label for="sourceFilter">Source</label>
-                    <select id="sourceFilter" onchange="applyFilters()">
-                        <option value="">All Sources</option>
-                        <option value="manual">Manual</option>
-                        <option value="gmail">Gmail</option>
-                    </select>
-                </div>
-            </div>
+            <nav class="tabs" role="tablist" aria-label="Dashboard sections">
+                <button class="tab-btn active" id="tabBtnDashboard" role="tab" aria-selected="true" onclick="switchTab('dashboard')">Dashboard</button>
+                <button class="tab-btn" id="tabBtnTransactions" role="tab" aria-selected="false" onclick="switchTab('transactions')">Manage Expenses</button>
+            </nav>
 
-            <div class="table-container">
-                <div class="table-header">
-                    <h2>Recent Expenses</h2>
-                    <span id="recordCount" style="color: var(--gray); font-size: 0.9rem;">0 records</span>
+            <section id="panelDashboard" class="tab-panel" role="tabpanel" aria-labelledby="tabBtnDashboard">
+                <div class="stats-grid" role="region" aria-label="Statistics">
+                    <article class="stat-card">
+                        <h3>Total Expenses (30 days)</h3>
+                        <div class="value" id="totalExpenses">LKR 0.00</div>
+                        <div class="change" id="expenseChange">--</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Monthly Budget <button class="edit-budget-btn" onclick="editBudget()" aria-label="Edit budget" title="Edit budget">&#9998;</button></h3>
+                        <div class="value" id="budgetValue">LKR 0 / LKR 0</div>
+                        <div class="budget-bar-track" role="progressbar" id="budgetBarTrack" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <div class="budget-bar-fill" id="budgetBarFill" style="width: 0%;"></div>
+                        </div>
+                        <div class="change" id="budgetPct">0%</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Average Spend</h3>
+                        <div class="value" id="avgSpend">LKR 0/day</div>
+                        <div class="change">Based on last 30 days</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Largest Purchase</h3>
+                        <div class="value" id="largestMerchant">--</div>
+                        <div class="change" id="largestDetail">--</div>
+                    </article>
                 </div>
-                <div class="table-scroll">
-                    <div id="expensesTable">
-                        <div class="empty-state">
-                            <div class="empty-state-icon" aria-hidden="true">&#x1F4ED;</div>
-                            <h3>No expenses yet</h3>
-                            <p>Add expenses manually or sync with Gmail to get started</p>
+
+                <div class="charts-grid" role="region" aria-label="Charts">
+                    <div class="chart-card">
+                        <h3>Spending by Category</h3>
+                        <div id="categoryChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Category Breakdown</h3>
+                        <div id="categoryDonut" class="donut-wrap"></div>
+                    </div>
+                </div>
+
+                <div class="charts-grid" role="region" aria-label="More charts">
+                    <div class="chart-card">
+                        <h3>Spend — Last 7 Days</h3>
+                        <div id="weeklyChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Monthly Trend</h3>
+                        <div id="monthlyTrendChart"></div>
+                    </div>
+                </div>
+
+                <div class="charts-grid" role="region" aria-label="Merchants and activity">
+                    <div class="chart-card">
+                        <h3>Top Merchants</h3>
+                        <div id="merchantChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Recent Activity</h3>
+                        <div id="recentActivity" class="activity-list"></div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section id="panelTransactions" class="tab-panel hidden" role="tabpanel" aria-labelledby="tabBtnTransactions">
+                <div class="action-bar" role="region" aria-label="Actions">
+                    <button class="btn btn-primary" onclick="openAddModal()">
+                        <span aria-hidden="true">+</span> Add Expense
+                    </button>
+
+                    <div class="sync-date-group">
+                        <label for="syncFromDate">Sync From</label>
+                        <input type="date" id="syncFromDate">
+                    </div>
+
+                    <button class="btn btn-success" id="syncBtn" onclick="syncGmail()">
+                        <span aria-hidden="true">&#x1F504;</span> Sync Gmail
+                    </button>
+
+                    <button class="btn btn-warning" onclick="exportData()">
+                        <span aria-hidden="true">&#x1F4E5;</span> Export CSV
+                    </button>
+
+                    <button
+                        class="btn btn-danger"
+                        id="bulkDeleteBtn"
+                        onclick="deleteSelectedExpenses()"
+                        style="display:none;">
+                        🗑 Delete Selected
+                    </button>
+                </div>
+
+                <div class="filters" role="search" aria-label="Filter expenses">
+                    <div class="filter-group">
+                        <label for="searchFilter">Search</label>
+                        <input type="text" id="searchFilter" placeholder="Search expenses..." oninput="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="categoryFilter">Category</label>
+                        <select id="categoryFilter" onchange="applyFilters()">
+                            <option value="">All Categories</option>
+                            <option value="Food">Food</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Groceries">Groceries</option>
+                            <option value="Banking">Banking</option>
+                            <option value="Transfer">Transfer</option>
+                            <option value="Uncategorized">Uncategorized</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="fromDate">From Date</label>
+                        <input type="date" id="fromDate" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="toDate">To Date</label>
+                        <input type="date" id="toDate" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="sourceFilter">Source</label>
+                        <select id="sourceFilter" onchange="applyFilters()">
+                            <option value="">All Sources</option>
+                            <option value="manual">Manual</option>
+                            <option value="gmail">Gmail</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Recent Expenses</h2>
+                        <span id="recordCount" style="color: var(--gray); font-size: 0.9rem;">0 records</span>
+                    </div>
+                    <div class="table-scroll">
+                        <div id="expensesTable">
+                            <div class="empty-state">
+                                <div class="empty-state-icon" aria-hidden="true">&#x1F4ED;</div>
+                                <h3>No expenses yet</h3>
+                                <p>Add expenses manually or sync with Gmail to get started</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </main>
     </div>
 
@@ -960,34 +1121,6 @@
                         <label for="expenseDescription">Description</label>
                         <textarea id="expenseDescription" rows="3" placeholder="Optional notes..."></textarea>
                     </div>
-                    <div style="border-top: 1px solid var(--border); margin: 20px 0; padding-top: 20px;">
-                        <div class="form-group">
-                            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:600;color:var(--dark);">
-                                <input type="checkbox" id="expenseSplitEnabled" onchange="toggleSplitFields()" style="width:18px;height:18px;accent-color:var(--primary);">
-                                <span>Split this expense with someone</span>
-                            </label>
-                        </div>
-                        <div id="splitFields" style="display:none;">
-                            <div class="form-group">
-                                <label for="expenseSplitWith">Split with (name or email)</label>
-                                <input type="text" id="expenseSplitWith" placeholder="e.g., john@example.com">
-                            </div>
-                            <div class="form-group">
-                                <label for="expenseSplitPercentage">Their share (%)</label>
-                                <input type="number" id="expenseSplitPercentage" min="0" max="100" value="50" oninput="updateSplitAmount()">
-                            </div>
-                            <div class="form-group">
-                                <label>They owe</label>
-                                <div id="splitAmountDisplay" style="font-family:var(--font-mono);font-size:1.15rem;color:var(--primary);font-weight:600;">LKR 0.00</div>
-                            </div>
-                            <div class="form-group" id="splitSettledGroup" style="display:none;">
-                                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-                                    <input type="checkbox" id="expenseSplitSettled" style="width:18px;height:18px;accent-color:var(--primary);">
-                                    <span>Mark as settled (they paid me back)</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -1008,7 +1141,7 @@
         // ===================== FIREBASE IMPORTS (Modern v12 Module System) =====================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as firebaseSignOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
         // ===================== CONFIGURATION =====================
         const firebaseConfig = {
@@ -1034,6 +1167,8 @@
         let allExpenses = [];
         let gmailAccessToken = null;
         let selectedExpenses = new Set();
+        let currentBudget = 60000; // in-memory cache, synced from Firestore
+        const DEFAULT_BUDGET = 60000;
 
         // ===================== DEBUG =====================
         function showDebug(msg) {
@@ -1129,10 +1264,11 @@ function showAuth() {
     document.getElementById('dashboardContent').classList.add('hidden');
 }
 
-function showDashboard() {
+async function showDashboard() {
     document.getElementById('landingSection').classList.add('hidden');
     document.getElementById('dashboardContent').classList.remove('hidden');
 
+    await loadBudget();
     loadExpenses();
 }
 
@@ -1162,57 +1298,17 @@ function showDashboard() {
 
         window.saveExpense = async function() {
             const id = document.getElementById('expenseId').value;
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
             const data = {
                 userId: currentUser.uid,
                 date: document.getElementById('expenseDate').value,
                 merchant: document.getElementById('expenseMerchant').value.trim(),
-                amount: amount,
+                amount: parseFloat(document.getElementById('expenseAmount').value),
                 category: document.getElementById('expenseCategory').value,
                 description: document.getElementById('expenseDescription').value.trim(),
                 source: 'manual',
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             };
-
-            if (!data.date || !data.merchant || isNaN(amount) || amount < 0 || !data.category) {
-                showToast('Please fill all required fields correctly', 'error');
-                return;
-            }
-
-            const splitEnabled = document.getElementById('expenseSplitEnabled').checked;
-            if (splitEnabled) {
-                const splitPct = parseFloat(document.getElementById('expenseSplitPercentage').value) || 0;
-                const splitAmount = parseFloat((amount * splitPct / 100).toFixed(2));
-                data.split = {
-                    enabled: true,
-                    with: document.getElementById('expenseSplitWith').value.trim(),
-                    percentage: splitPct,
-                    amount: splitAmount,
-                    settled: document.getElementById('expenseSplitSettled').checked,
-                    settledAt: document.getElementById('expenseSplitSettled').checked ? serverTimestamp() : null
-                };
-            } else {
-                data.split = { enabled: false };
-            }
-
-            showLoading(id ? 'Updating...' : 'Saving...');
-            try {
-                if (id) {
-                    await updateDoc(doc(db, 'expenses', id), data);
-                    showToast('Expense updated!', 'success');
-                } else {
-                    await addDoc(collection(db, 'expenses'), data);
-                    showToast('Expense added!', 'success');
-                }
-                closeModal();
-                loadExpenses();
-            } catch (e) {
-                showToast('Failed to save: ' + e.message, 'error');
-            } finally {
-                hideLoading();
-            }
-        };
 
             if (!data.date || !data.merchant || isNaN(data.amount) || data.amount < 0 || !data.category) {
                 showToast('Please fill all required fields correctly', 'error');
@@ -1615,24 +1711,13 @@ return result;
 
             expenses.forEach(expense => {
                 const catClass = 'cat-' + (expense.category || 'uncategorized').toLowerCase();
-                const isSplit = expense.split && expense.split.enabled;
                 const sourceBadge = expense.source === 'gmail' 
                     ? '<span class="sync-badge">&#x2713; Gmail</span>' 
                     : '<span style="font-size: 0.75rem; color: var(--gray);">Manual</span>';
                 const descHtml = expense.description ? '<div style="font-size: 0.8rem; color: var(--gray);">' + escapeHtml(expense.description) + '</div>' : '';
 
-                let splitHtml = '';
-                let rowClass = '';
-                if (isSplit) {
-                    rowClass = expense.split.settled ? 'split-row settled' : 'split-row';
-                    const splitBadge = expense.split.settled 
-                        ? '<span class="split-badge settled">&#x2713; Settled</span>' 
-                        : `<span class="split-badge pending">Owes LKR ${(expense.split.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>`;
-                    splitHtml = `<div style="margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${splitBadge}<span style="font-size:0.72rem;color:var(--gray);">with ${escapeHtml(expense.split.with || 'someone')}</span></div>`;
-                }
-
                 const safeMerchantLabel = escapeHtml(expense.merchant || 'expense');
-                html += `<tr role="row" class="${rowClass}">
+                html += `<tr role="row">
     <td>
         <input 
             type="checkbox" 
@@ -1642,13 +1727,12 @@ return result;
         >
     </td>
     <td>${formatDate(expense.date)}</td>
-                    <td><div style="font-weight: 500;">${escapeHtml(expense.merchant || '')}</div>${descHtml}${splitHtml}</td>
+                    <td><div style="font-weight: 500;">${escapeHtml(expense.merchant || '')}</div>${descHtml}</td>
                     <td><span class="category-badge ${catClass}">${expense.category || 'Uncategorized'}</span></td>
                     <td class="amount">LKR ${(expense.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td>${sourceBadge}</td>
                     <td><div class="action-btns">
                     <button class="btn" style="padding: 5px 10px; font-size: 0.75rem; background: var(--light-gray);" onclick="editExpense('${expense.id}')" aria-label="Edit ${safeMerchantLabel}">Edit</button>
-                    ${isSplit ? `<button class="btn ${expense.split.settled ? 'btn-warning' : 'btn-success'}" style="padding: 5px 10px; font-size: 0.75rem;" onclick="toggleSettled('${expense.id}')" aria-label="${expense.split.settled ? 'Mark pending' : 'Mark settled'} ${safeMerchantLabel}">${expense.split.settled ? 'Un-settle' : 'Settle'}</button>` : ''}
                     <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.75rem;" onclick="deleteExpense('${expense.id}')" aria-label="Delete ${safeMerchantLabel}">Delete</button>
                     </div></td></tr>`;
             });
@@ -1698,77 +1782,159 @@ function updateBulkDeleteButton() {
     }
 }
 
+        // ===================== BUDGET (synced via Firestore: settings/{uid}) =====================
+        function getBudget() {
+            return currentBudget;
+        }
+        async function loadBudget() {
+            try {
+                const snap = await getDoc(doc(db, 'settings', currentUser.uid));
+                currentBudget = (snap.exists() && typeof snap.data().monthlyBudget === 'number')
+                    ? snap.data().monthlyBudget
+                    : DEFAULT_BUDGET;
+            } catch (e) {
+                currentBudget = DEFAULT_BUDGET;
+                showToast('Could not load budget: ' + e.message, 'error');
+            }
+        }
+        window.editBudget = async function() {
+            const input = prompt('Set your monthly budget (LKR):', currentBudget);
+            if (input === null) return;
+            const val = parseFloat(input);
+            if (isNaN(val) || val <= 0) { showToast('Please enter a valid budget amount', 'error'); return; }
+
+            showLoading('Saving budget...');
+            try {
+                await setDoc(doc(db, 'settings', currentUser.uid), { monthlyBudget: val }, { merge: true });
+                currentBudget = val;
+                updateStats();
+                showToast('Budget updated!', 'success');
+            } catch (e) {
+                showToast('Failed to save budget: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+
+        const CATEGORY_COLORS = { 'Food': '#ffbb55', 'Travel': '#5aa9e6', 'Groceries': '#3ee889', 'Banking': '#b389f0', 'Transfer': '#8b968e', 'Uncategorized': '#5f6b62' };
+
+        function relativeDate(dateStr) {
+            const d = new Date(dateStr);
+            const today = new Date();
+            d.setHours(0,0,0,0); today.setHours(0,0,0,0);
+            const diffDays = Math.round((today - d) / (1000 * 60 * 60 * 24));
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Yesterday';
+            if (diffDays > 1 && diffDays < 7) return diffDays + ' days ago';
+            return d.toLocaleDateString('en', { day: 'numeric', month: 'short' });
+        }
+
         function updateStats() {
             const now = new Date();
             const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
             const thisMonth = now.getMonth();
             const thisYear = now.getFullYear();
 
-            let total30Days = 0, totalThisMonth = 0, yourShare30 = 0, yourShareMonth = 0;
-            let owedToYou = 0;
-            let pendingSplits = 0;
-            const categoryTotals = {};
+            let total30Days = 0, totalPrev30Days = 0, totalThisMonth = 0;
 
             allExpenses.forEach(e => {
                 const d = new Date(e.date);
-                const amount = e.amount || 0;
-                const isSplit = e.split && e.split.enabled;
-                const theirShare = isSplit ? (e.split.amount || 0) : 0;
-                const yourShare = amount - theirShare;
-
-                if (d >= thirtyDaysAgo) {
-                    total30Days += amount;
-                    yourShare30 += yourShare;
-                }
-                if (d.getMonth() === thisMonth && d.getFullYear() === thisYear) {
-                    totalThisMonth += amount;
-                    yourShareMonth += yourShare;
-                }
-                categoryTotals[e.category] = (categoryTotals[e.category] || 0) + amount;
-
-                if (isSplit && !e.split.settled) {
-                    owedToYou += theirShare;
-                    pendingSplits++;
-                }
+                const amt = e.amount || 0;
+                if (d >= thirtyDaysAgo) total30Days += amt;
+                else if (d >= sixtyDaysAgo) totalPrev30Days += amt;
+                if (d.getMonth() === thisMonth && d.getFullYear() === thisYear) totalThisMonth += amt;
             });
 
-            document.getElementById('totalExpenses').textContent = 
+            // Total Expenses + trend vs previous 30 days
+            document.getElementById('totalExpenses').textContent =
                 'LKR ' + total30Days.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('thisMonth').textContent = 
-                'LKR ' + totalThisMonth.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('transactionCount').textContent = allExpenses.length;
-            document.getElementById('yourShare30').textContent = 
-                'LKR ' + yourShare30.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('owedToYou').textContent = 
-                'LKR ' + owedToYou.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('owedCount').textContent = pendingSplits + ' pending split' + (pendingSplits !== 1 ? 's' : '');
 
-            let topCat = '--', topAmount = 0;
-            for (const [cat, amount] of Object.entries(categoryTotals)) {
-                if (amount > topAmount) { topCat = cat; topAmount = amount; }
+            const changeEl = document.getElementById('expenseChange');
+            if (totalPrev30Days > 0) {
+                const pctChange = ((total30Days - totalPrev30Days) / totalPrev30Days * 100);
+                const arrow = pctChange >= 0 ? '▲' : '▼';
+                changeEl.textContent = arrow + ' ' + Math.abs(pctChange).toFixed(0) + '% vs last month';
+                changeEl.className = 'change ' + (pctChange >= 0 ? 'up' : 'down');
+            } else {
+                changeEl.textContent = '--';
+                changeEl.className = 'change';
             }
-            document.getElementById('topCategory').textContent = topCat;
-            document.getElementById('topCategoryAmount').textContent = topAmount > 0 ? 'LKR ' + topAmount.toFixed(2) : '--';
+
+            // Monthly Budget
+            const budget = getBudget();
+            const budgetPct = budget > 0 ? Math.min((totalThisMonth / budget) * 100, 999) : 0;
+            document.getElementById('budgetValue').textContent =
+                'LKR ' + totalThisMonth.toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' / LKR ' + budget.toLocaleString('en-US', { maximumFractionDigits: 0 });
+            document.getElementById('budgetPct').textContent = budgetPct.toFixed(0) + '%' + (budgetPct > 100 ? ' — over budget' : '');
+            const fillEl = document.getElementById('budgetBarFill');
+            fillEl.style.width = Math.min(budgetPct, 100) + '%';
+            fillEl.classList.toggle('over', budgetPct > 100);
+            document.getElementById('budgetBarTrack').setAttribute('aria-valuenow', budgetPct.toFixed(0));
+
+            // Average Spend (last 30 days)
+            document.getElementById('avgSpend').textContent = 'LKR ' + Math.round(total30Days / 30).toLocaleString('en-US') + '/day';
+
+            // Largest Purchase (last 30 days, fallback to all-time)
+            let recentExpenses = allExpenses.filter(e => new Date(e.date) >= thirtyDaysAgo);
+            let pool = recentExpenses.length ? recentExpenses : allExpenses;
+            let largest = null;
+            pool.forEach(e => { if (!largest || (e.amount || 0) > (largest.amount || 0)) largest = e; });
+            if (largest) {
+                document.getElementById('largestMerchant').textContent = largest.merchant || '--';
+                document.getElementById('largestDetail').textContent =
+                    'LKR ' + (largest.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' · ' + formatDate(largest.date);
+            } else {
+                document.getElementById('largestMerchant').textContent = '--';
+                document.getElementById('largestDetail').textContent = '--';
+            }
         }
 
         function updateCharts() {
             const categoryTotals = {};
             allExpenses.forEach(e => categoryTotals[e.category] = (categoryTotals[e.category] || 0) + (e.amount || 0));
-
             const total = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
-            const colors = { 'Food': '#ffbb55', 'Travel': '#5aa9e6', 'Groceries': '#3ee889', 'Banking': '#b389f0', 'Transfer': '#8b968e', 'Uncategorized': '#5f6b62' };
+            const sortedCats = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
 
+            // Spending by category (bars with %)
             let catHtml = '';
-            for (const [cat, amount] of Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])) {
+            for (const [cat, amount] of sortedCats) {
                 const pct = total > 0 ? (amount / total * 100).toFixed(1) : 0;
                 catHtml += '<div class="chart-bar">' +
                     '<div class="chart-bar-label">' + cat + '</div>' +
                     '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
-                    '<div class="chart-bar-fill" style="width: ' + pct + '%; background: ' + (colors[cat] || '#667eea') + ';"></div></div>' +
+                    '<div class="chart-bar-fill" style="width: ' + pct + '%; background: ' + (CATEGORY_COLORS[cat] || '#667eea') + ';"></div></div>' +
+                    '<div class="chart-bar-pct">' + pct + '%</div>' +
                     '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
             }
             document.getElementById('categoryChart').innerHTML = catHtml || '<p style="color: var(--gray);">No data yet</p>';
 
+            // Category breakdown donut
+            const donutEl = document.getElementById('categoryDonut');
+            if (total > 0) {
+                const r = 52, cx = 60, cy = 60, circumference = 2 * Math.PI * r;
+                let offset = 0;
+                let circles = '';
+                for (const [cat, amount] of sortedCats) {
+                    const frac = amount / total;
+                    const dash = frac * circumference;
+                    circles += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + (CATEGORY_COLORS[cat] || '#667eea') +
+                        '" stroke-width="16" stroke-dasharray="' + dash + ' ' + (circumference - dash) + '" stroke-dashoffset="' + (-offset) + '" transform="rotate(-90 ' + cx + ' ' + cy + ')"></circle>';
+                    offset += dash;
+                }
+                let legend = '';
+                for (const [cat, amount] of sortedCats) {
+                    const pct = (amount / total * 100).toFixed(0);
+                    legend += '<div class="donut-legend-item"><span class="donut-legend-dot" style="background:' + (CATEGORY_COLORS[cat] || '#667eea') + ';"></span>' +
+                        cat + '<span class="donut-legend-pct">' + pct + '%</span></div>';
+                }
+                donutEl.innerHTML = '<svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="Category breakdown donut chart">' + circles + '</svg>' +
+                    '<div class="donut-legend">' + legend + '</div>';
+            } else {
+                donutEl.innerHTML = '<p style="color: var(--gray);">No data yet</p>';
+            }
+
+            // Spend — last 7 days (simple list, no bar)
             const dailyTotals = {};
             const today = new Date();
             for (let i = 6; i >= 0; i--) {
@@ -1778,52 +1944,83 @@ function updateBulkDeleteButton() {
             allExpenses.forEach(e => { if (dailyTotals.hasOwnProperty(e.date)) dailyTotals[e.date] += (e.amount || 0); });
 
             let weekHtml = '';
-            const maxDay = Math.max(...Object.values(dailyTotals), 1);
             for (const [date, amount] of Object.entries(dailyTotals)) {
                 const dayName = new Date(date).toLocaleDateString('en', { weekday: 'short' });
-                const pct = (amount / maxDay * 100).toFixed(1);
-                weekHtml += '<div class="chart-bar">' +
-                    '<div class="chart-bar-label">' + dayName + '</div>' +
+                weekHtml += '<div class="activity-item"><div class="activity-left"><div class="activity-merchant">' + dayName + '</div></div>' +
+                    '<div class="activity-amount">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
+            }
+            document.getElementById('weeklyChart').innerHTML = weekHtml || '<p style="color: var(--gray);">No data yet</p>';
+
+            // Monthly trend (last 7 calendar months)
+            const monthTotals = {};
+            const monthOrder = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                const key = d.getFullYear() + '-' + d.getMonth();
+                monthTotals[key] = 0;
+                monthOrder.push({ key: key, label: d.toLocaleDateString('en', { month: 'short' }) });
+            }
+            allExpenses.forEach(e => {
+                const d = new Date(e.date);
+                const key = d.getFullYear() + '-' + d.getMonth();
+                if (monthTotals.hasOwnProperty(key)) monthTotals[key] += (e.amount || 0);
+            });
+            const maxMonth = Math.max(...Object.values(monthTotals), 1);
+            let trendHtml = '';
+            monthOrder.forEach(m => {
+                const amount = monthTotals[m.key];
+                const pct = (amount / maxMonth * 100).toFixed(1);
+                trendHtml += '<div class="chart-bar">' +
+                    '<div class="chart-bar-label">' + m.label + '</div>' +
+                    '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
+                    '<div class="chart-bar-fill" style="width: ' + pct + '%; background: var(--primary);"></div></div>' +
+                    '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
+            });
+            document.getElementById('monthlyTrendChart').innerHTML = trendHtml;
+
+            // Top merchants
+            const merchantTotals = {};
+            allExpenses.forEach(e => {
+                const key = e.merchant || 'Unknown';
+                merchantTotals[key] = (merchantTotals[key] || 0) + (e.amount || 0);
+            });
+            const topMerchants = Object.entries(merchantTotals).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const maxMerchant = Math.max(...topMerchants.map(m => m[1]), 1);
+            let merchantHtml = '';
+            for (const [merchant, amount] of topMerchants) {
+                const pct = (amount / maxMerchant * 100).toFixed(1);
+                merchantHtml += '<div class="chart-bar">' +
+                    '<div class="chart-bar-label">' + escapeHtml(merchant) + '</div>' +
                     '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
                     '<div class="chart-bar-fill" style="width: ' + pct + '%; background: var(--primary);"></div></div>' +
                     '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
             }
-            document.getElementById('weeklyChart').innerHTML = weekHtml;
+            document.getElementById('merchantChart').innerHTML = merchantHtml || '<p style="color: var(--gray);">No data yet</p>';
+
+            // Recent activity feed
+            const recent = [...allExpenses].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 6);
+            let activityHtml = '';
+            recent.forEach(e => {
+                activityHtml += '<div class="activity-item">' +
+                    '<div class="activity-left">' +
+                    '<div class="activity-merchant">' + escapeHtml(e.merchant || 'Unknown') + '</div>' +
+                    '<div class="activity-date">' + relativeDate(e.date) + '</div>' +
+                    '</div>' +
+                    '<div class="activity-amount">LKR ' + (e.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</div>' +
+                    '</div>';
+            });
+            document.getElementById('recentActivity').innerHTML = activityHtml || '<p style="color: var(--gray);">No activity yet</p>';
         }
 
-        // ===================== SPLIT FUNCTIONS =====================
-        window.toggleSplitFields = function() {
-            const enabled = document.getElementById('expenseSplitEnabled').checked;
-            document.getElementById('splitFields').style.display = enabled ? 'block' : 'none';
-            if (enabled) updateSplitAmount();
-        };
-
-        window.updateSplitAmount = function() {
-            const amount = parseFloat(document.getElementById('expenseAmount').value) || 0;
-            const pct = parseFloat(document.getElementById('expenseSplitPercentage').value) || 0;
-            const splitAmount = parseFloat((amount * Math.min(100, Math.max(0, pct)) / 100).toFixed(2));
-            document.getElementById('splitAmountDisplay').textContent = 
-                'LKR ' + splitAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        };
-
-        window.toggleSettled = async function(expenseId) {
-            const expense = allExpenses.find(e => e.id === expenseId);
-            if (!expense || !expense.split || !expense.split.enabled) return;
-            const newStatus = !expense.split.settled;
-            showLoading(newStatus ? 'Marking settled...' : 'Marking pending...');
-            try {
-                await updateDoc(doc(db, 'expenses', expenseId), {
-                    'split.settled': newStatus,
-                    'split.settledAt': newStatus ? serverTimestamp() : null,
-                    updatedAt: serverTimestamp()
-                });
-                showToast(newStatus ? 'Marked as settled!' : 'Marked as pending', 'success');
-                loadExpenses();
-            } catch (e) {
-                showToast('Failed to update: ' + e.message, 'error');
-            } finally {
-                hideLoading();
-            }
+        // ===================== TABS =====================
+        window.switchTab = function(tab) {
+            const isDashboard = tab === 'dashboard';
+            document.getElementById('panelDashboard').classList.toggle('hidden', !isDashboard);
+            document.getElementById('panelTransactions').classList.toggle('hidden', isDashboard);
+            document.getElementById('tabBtnDashboard').classList.toggle('active', isDashboard);
+            document.getElementById('tabBtnTransactions').classList.toggle('active', !isDashboard);
+            document.getElementById('tabBtnDashboard').setAttribute('aria-selected', isDashboard);
+            document.getElementById('tabBtnTransactions').setAttribute('aria-selected', !isDashboard);
         };
 
         // ===================== MODAL =====================
@@ -1834,12 +2031,6 @@ function updateBulkDeleteButton() {
             document.getElementById('expenseAmount').value = '';
             document.getElementById('expenseCategory').value = '';
             document.getElementById('expenseDescription').value = '';
-            document.getElementById('expenseSplitEnabled').checked = false;
-            document.getElementById('expenseSplitWith').value = '';
-            document.getElementById('expenseSplitPercentage').value = 50;
-            document.getElementById('expenseSplitSettled').checked = false;
-            document.getElementById('splitSettledGroup').style.display = 'none';
-            toggleSplitFields();
             document.getElementById('modalTitle').textContent = 'Add Expense';
             document.getElementById('expenseModal').classList.add('active');
             document.getElementById('expenseDate').focus();
@@ -1856,24 +2047,6 @@ function updateBulkDeleteButton() {
             document.getElementById('expenseCategory').value = expense.category || '';
             document.getElementById('expenseDescription').value = expense.description || '';
             document.getElementById('modalTitle').textContent = 'Edit Expense';
-
-            if (expense.split && expense.split.enabled) {
-                document.getElementById('expenseSplitEnabled').checked = true;
-                document.getElementById('expenseSplitWith').value = expense.split.with || '';
-                document.getElementById('expenseSplitPercentage').value = expense.split.percentage || 50;
-                document.getElementById('expenseSplitSettled').checked = expense.split.settled || false;
-                document.getElementById('splitSettledGroup').style.display = 'block';
-                toggleSplitFields();
-                updateSplitAmount();
-            } else {
-                document.getElementById('expenseSplitEnabled').checked = false;
-                document.getElementById('expenseSplitWith').value = '';
-                document.getElementById('expenseSplitPercentage').value = 50;
-                document.getElementById('expenseSplitSettled').checked = false;
-                document.getElementById('splitSettledGroup').style.display = 'none';
-                toggleSplitFields();
-            }
-
             document.getElementById('expenseModal').classList.add('active');
             document.getElementById('expenseDate').focus();
         };
@@ -1887,11 +2060,9 @@ function updateBulkDeleteButton() {
             const filtered = getFilteredExpenses();
             if (filtered.length === 0) { showToast('No data to export', 'error'); return; }
 
-            let csv = 'Date,Merchant,Category,Amount,Description,Source,Split With,Split %,Split Amount,Split Settled\n';
+            let csv = 'Date,Merchant,Category,Amount,Description,Source\n';
             filtered.forEach(e => {
-                const s = e.split && e.split.enabled ? e.split : null;
-                csv += e.date + ',' + escapeCsv(e.merchant || '') + ',' + (e.category || '') + ',' + (e.amount || 0) + ',' + escapeCsv(e.description || '') + ',' + (e.source || '') + ',' +
-                    escapeCsv(s ? (s.with || '') : '') + ',' + (s ? (s.percentage || 0) : 0) + ',' + (s ? (s.amount || 0) : 0) + ',' + (s ? (s.settled ? 'Yes' : 'No') : 'No') + '\n';
+                csv += e.date + ',' + escapeCsv(e.merchant || '') + ',' + (e.category || '') + ',' + (e.amount || 0) + ',' + escapeCsv(e.description || '') + ',' + (e.source || '') + '\n';
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
