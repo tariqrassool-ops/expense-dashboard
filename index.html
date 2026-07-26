@@ -229,6 +229,59 @@
             position: relative;
         }
 
+        .app-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .app-topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.15rem;
+            color: var(--dark);
+        }
+        .app-topbar-brand .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 0 8px rgba(62,232,137,0.5);
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 5px;
+            border-radius: 999px;
+            width: fit-content;
+        }
+        .tab-btn {
+            padding: 9px 20px;
+            border-radius: 999px;
+            border: none;
+            background: transparent;
+            color: var(--gray);
+            font-family: var(--font-body);
+            font-size: 0.86rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+        .tab-btn:hover { color: var(--dark); }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #06120a;
+        }
+
         .action-bar {
             display: flex;
             gap: 10px;
@@ -238,16 +291,15 @@
         }
         .sync-date-group {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
-            justify-content: center;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
         }
         .sync-date-group label {
-            font-size: 0.7rem;
+            font-size: 0.78rem;
             color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
             font-weight: 600;
+            white-space: nowrap;
         }
         .sync-date-group input[type="date"] {
             padding: 9px 12px;
@@ -788,123 +840,133 @@
     <div class="container">
 
         <main id="dashboardContent" class="hidden" role="main">
-            <div class="stats-grid" role="region" aria-label="Statistics">
-                <article class="stat-card">
-                    <h3>Total Expenses (30 days)</h3>
-                    <div class="value" id="totalExpenses">LKR 0.00</div>
-                    <div class="change" id="expenseChange">--</div>
-                </article>
-                <article class="stat-card">
-                    <h3>This Month</h3>
-                    <div class="value" id="thisMonth">LKR 0.00</div>
-                    <div class="change" id="monthChange">--</div>
-                </article>
-                <article class="stat-card">
-                    <h3>Transactions</h3>
-                    <div class="value" id="transactionCount">0</div>
-                    <div class="change">Total synced</div>
-                </article>
-                <article class="stat-card">
-                    <h3>Top Category</h3>
-                    <div class="value" id="topCategory">--</div>
-                    <div class="change" id="topCategoryAmount">--</div>
-                </article>
-            </div>
-
-            <div class="charts-grid" role="region" aria-label="Charts">
-                <div class="chart-card">
-                    <h3>Spending by Category</h3>
-                    <div id="categoryChart"></div>
-                </div>
-                <div class="chart-card">
-                    <h3>Last 7 Days</h3>
-                    <div id="weeklyChart"></div>
-                </div>
-            </div>
-
-            <div class="action-bar" role="region" aria-label="Actions">
-                <button class="btn btn-primary" onclick="openAddModal()">
-                    <span aria-hidden="true">+</span> Add Expense
-    </button>
-                
-<div style="display:flex;align-items:end;gap:12px;flex-wrap:wrap;">
-
-    <div class="sync-date-group">
-        <label for="syncFromDate">Sync From</label>
-        <input type="date" id="syncFromDate">
-    </div>
-
-    <button class="btn btn-success" id="syncBtn" onclick="syncGmail()">
-        <span aria-hidden="true">&#x1F504;</span> Sync Gmail
-    </button>
-
-    <button 
-    class="btn btn-danger" 
-    id="bulkDeleteBtn"
-    onclick="deleteSelectedExpenses()"
-    style="display:none;">
-    🗑 Delete Selected
-</button>
-
-</div>
-                <button class="btn btn-warning" onclick="exportData()">
-                    <span aria-hidden="true">&#x1F4E5;</span> Export CSV
-                </button>
+            <div class="app-topbar">
+                <div class="app-topbar-brand"><span class="dot" aria-hidden="true"></span> ExpenseTrack</div>
                 <button class="btn auth-btn logout" onclick="signOut()">
                     <span aria-hidden="true">&#x1F6AA;</span> Sign Out
                 </button>
             </div>
 
-            <div class="filters" role="search" aria-label="Filter expenses">
-                <div class="filter-group">
-                    <label for="searchFilter">Search</label>
-                    <input type="text" id="searchFilter" placeholder="Search expenses..." oninput="applyFilters()">
-                </div>
-                <div class="filter-group">
-                    <label for="categoryFilter">Category</label>
-                    <select id="categoryFilter" onchange="applyFilters()">
-                        <option value="">All Categories</option>
-                        <option value="Food">Food</option>
-                        <option value="Travel">Travel</option>
-                        <option value="Groceries">Groceries</option>
-                        <option value="Banking">Banking</option>
-                        <option value="Transfer">Transfer</option>
-                        <option value="Uncategorized">Uncategorized</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="fromDate">From Date</label>
-                    <input type="date" id="fromDate" onchange="applyFilters()">
-                </div>
-                <div class="filter-group">
-                    <label for="toDate">To Date</label>
-                    <input type="date" id="toDate" onchange="applyFilters()">
-                </div>
-                <div class="filter-group">
-                    <label for="sourceFilter">Source</label>
-                    <select id="sourceFilter" onchange="applyFilters()">
-                        <option value="">All Sources</option>
-                        <option value="manual">Manual</option>
-                        <option value="gmail">Gmail</option>
-                    </select>
-                </div>
-            </div>
+            <nav class="tabs" role="tablist" aria-label="Dashboard sections">
+                <button class="tab-btn active" id="tabBtnDashboard" role="tab" aria-selected="true" onclick="switchTab('dashboard')">Dashboard</button>
+                <button class="tab-btn" id="tabBtnTransactions" role="tab" aria-selected="false" onclick="switchTab('transactions')">Manage Expenses</button>
+            </nav>
 
-            <div class="table-container">
-                <div class="table-header">
-                    <h2>Recent Expenses</h2>
-                    <span id="recordCount" style="color: var(--gray); font-size: 0.9rem;">0 records</span>
+            <section id="panelDashboard" class="tab-panel" role="tabpanel" aria-labelledby="tabBtnDashboard">
+                <div class="stats-grid" role="region" aria-label="Statistics">
+                    <article class="stat-card">
+                        <h3>Total Expenses (30 days)</h3>
+                        <div class="value" id="totalExpenses">LKR 0.00</div>
+                        <div class="change" id="expenseChange">--</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>This Month</h3>
+                        <div class="value" id="thisMonth">LKR 0.00</div>
+                        <div class="change" id="monthChange">--</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Transactions</h3>
+                        <div class="value" id="transactionCount">0</div>
+                        <div class="change">Total synced</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Top Category</h3>
+                        <div class="value" id="topCategory">--</div>
+                        <div class="change" id="topCategoryAmount">--</div>
+                    </article>
                 </div>
-                <div class="table-scroll">
-                    <div id="expensesTable">
-                        <div class="empty-state">
-                            <div class="empty-state-icon" aria-hidden="true">&#x1F4ED;</div>
-                            <h3>No expenses yet</h3>
-                            <p>Add expenses manually or sync with Gmail to get started</p>
+
+                <div class="charts-grid" role="region" aria-label="Charts">
+                    <div class="chart-card">
+                        <h3>Spending by Category</h3>
+                        <div id="categoryChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Last 7 Days</h3>
+                        <div id="weeklyChart"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="panelTransactions" class="tab-panel hidden" role="tabpanel" aria-labelledby="tabBtnTransactions">
+                <div class="action-bar" role="region" aria-label="Actions">
+                    <button class="btn btn-primary" onclick="openAddModal()">
+                        <span aria-hidden="true">+</span> Add Expense
+                    </button>
+
+                    <div class="sync-date-group">
+                        <label for="syncFromDate">Sync From</label>
+                        <input type="date" id="syncFromDate">
+                    </div>
+
+                    <button class="btn btn-success" id="syncBtn" onclick="syncGmail()">
+                        <span aria-hidden="true">&#x1F504;</span> Sync Gmail
+                    </button>
+
+                    <button class="btn btn-warning" onclick="exportData()">
+                        <span aria-hidden="true">&#x1F4E5;</span> Export CSV
+                    </button>
+
+                    <button
+                        class="btn btn-danger"
+                        id="bulkDeleteBtn"
+                        onclick="deleteSelectedExpenses()"
+                        style="display:none;">
+                        🗑 Delete Selected
+                    </button>
+                </div>
+
+                <div class="filters" role="search" aria-label="Filter expenses">
+                    <div class="filter-group">
+                        <label for="searchFilter">Search</label>
+                        <input type="text" id="searchFilter" placeholder="Search expenses..." oninput="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="categoryFilter">Category</label>
+                        <select id="categoryFilter" onchange="applyFilters()">
+                            <option value="">All Categories</option>
+                            <option value="Food">Food</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Groceries">Groceries</option>
+                            <option value="Banking">Banking</option>
+                            <option value="Transfer">Transfer</option>
+                            <option value="Uncategorized">Uncategorized</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="fromDate">From Date</label>
+                        <input type="date" id="fromDate" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="toDate">To Date</label>
+                        <input type="date" id="toDate" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="sourceFilter">Source</label>
+                        <select id="sourceFilter" onchange="applyFilters()">
+                            <option value="">All Sources</option>
+                            <option value="manual">Manual</option>
+                            <option value="gmail">Gmail</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Recent Expenses</h2>
+                        <span id="recordCount" style="color: var(--gray); font-size: 0.9rem;">0 records</span>
+                    </div>
+                    <div class="table-scroll">
+                        <div id="expensesTable">
+                            <div class="empty-state">
+                                <div class="empty-state-icon" aria-hidden="true">&#x1F4ED;</div>
+                                <h3>No expenses yet</h3>
+                                <p>Add expenses manually or sync with Gmail to get started</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </main>
     </div>
 
@@ -1674,6 +1736,17 @@ document.getElementById('thisMonth').textContent =
             }
             document.getElementById('weeklyChart').innerHTML = weekHtml;
         }
+
+        // ===================== TABS =====================
+        window.switchTab = function(tab) {
+            const isDashboard = tab === 'dashboard';
+            document.getElementById('panelDashboard').classList.toggle('hidden', !isDashboard);
+            document.getElementById('panelTransactions').classList.toggle('hidden', isDashboard);
+            document.getElementById('tabBtnDashboard').classList.toggle('active', isDashboard);
+            document.getElementById('tabBtnTransactions').classList.toggle('active', !isDashboard);
+            document.getElementById('tabBtnDashboard').setAttribute('aria-selected', isDashboard);
+            document.getElementById('tabBtnTransactions').setAttribute('aria-selected', !isDashboard);
+        };
 
         // ===================== MODAL =====================
         window.openAddModal = function() {
