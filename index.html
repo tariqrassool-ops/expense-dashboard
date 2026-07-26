@@ -347,11 +347,14 @@
             background: var(--light-gray);
             position: relative;
             cursor: default;
-            transition: transform 0.15s;
+            transition: transform 0.15s, box-shadow 0.15s;
+            opacity: 0;
+            animation: fadeScaleIn 0.4s ease forwards;
         }
-        .heatmap-cell:hover { transform: scale(1.12); z-index: 2; }
-        .heatmap-cell.empty { background: transparent; cursor: default; }
-        .heatmap-cell.today { box-shadow: 0 0 0 1.5px var(--primary); }
+        .heatmap-cell:hover { transform: scale(1.18); z-index: 2; box-shadow: 0 0 10px rgba(62,232,137,0.45); }
+        .heatmap-cell.empty { background: transparent !important; cursor: default; animation: none; opacity: 1; }
+        .heatmap-cell.has-spend:hover { box-shadow: 0 0 14px rgba(62,232,137,0.65); }
+        .heatmap-cell.today { box-shadow: 0 0 0 1.5px var(--primary), 0 0 8px rgba(62,232,137,0.5); }
         .heatmap-legend {
             display: flex;
             align-items: center;
@@ -589,9 +592,26 @@
         .donut-wrap {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 24px;
             flex-wrap: wrap;
         }
+        .donut-svg-wrap { position: relative; width: 150px; height: 150px; flex-shrink: 0; }
+        .donut-svg-wrap svg { width: 100%; height: 100%; overflow: visible; }
+        .donut-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            pointer-events: none;
+        }
+        .donut-center .total-label { font-size: 0.62rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; }
+        .donut-center .total-value { font-family: var(--font-mono); font-size: 1rem; font-weight: 700; color: var(--dark); margin-top: 2px; }
+        .donut-segment { transition: opacity 0.2s ease, filter 0.2s ease; cursor: pointer; }
+        .donut-wrap.has-hover .donut-segment { opacity: 0.35; }
+        .donut-wrap.has-hover .donut-segment.active { opacity: 1; filter: brightness(1.2); }
         .donut-legend {
             display: flex;
             flex-direction: column;
@@ -605,7 +625,13 @@
             gap: 8px;
             font-size: 0.82rem;
             color: var(--dark);
+            cursor: pointer;
+            padding: 4px 6px;
+            margin: -4px -6px;
+            border-radius: 8px;
+            transition: background 0.15s ease;
         }
+        .donut-legend-item:hover, .donut-legend-item.active { background: rgba(62,232,137,0.08); }
         .donut-legend-dot {
             width: 9px;
             height: 9px;
@@ -900,22 +926,25 @@
             font-weight: 600;
             position: relative;
         }
-        .chart-bar { display: flex; align-items: center; margin-bottom: 14px; gap: 10px; position: relative; }
+        .chart-bar { display: flex; align-items: center; margin-bottom: 14px; gap: 10px; position: relative; transition: transform 0.2s ease; }
+        .chart-bar:hover { transform: translateX(2px); }
         .chart-bar-label { width: 90px; font-size: 0.78rem; color: var(--gray); flex-shrink: 0; }
         .chart-bar-track {
             flex: 1;
-            height: 9px;
+            height: 10px;
             background: var(--light-gray);
             border-radius: 999px;
             overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.35);
         }
         .chart-bar-fill {
             height: 100%;
             border-radius: 999px;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: transform;
-            box-shadow: 0 0 10px rgba(62,232,137,0.35);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
         }
+        .chart-bar:hover .chart-bar-fill { filter: brightness(1.15); }
         .chart-bar-value {
             width: 84px;
             text-align: right;
@@ -2349,43 +2378,24 @@ function updateBulkDeleteButton() {
             const total = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
             const sortedCats = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
 
-            // Spending by category (bars with %)
+            // Spending by category (gradient bars, animated fill-in)
             let catHtml = '';
-            for (const [cat, amount] of sortedCats) {
+            sortedCats.forEach(([cat, amount], i) => {
                 const pct = total > 0 ? (amount / total * 100).toFixed(1) : 0;
+                const color = CATEGORY_COLORS[cat] || '#667eea';
+                const grad = 'linear-gradient(90deg, ' + color + ', ' + lightenColor(color, 0.4) + ')';
                 catHtml += '<div class="chart-bar">' +
                     '<div class="chart-bar-label">' + cat + '</div>' +
                     '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
-                    '<div class="chart-bar-fill" style="width: ' + pct + '%; background: ' + (CATEGORY_COLORS[cat] || '#667eea') + ';"></div></div>' +
+                    '<div class="chart-bar-fill" data-target="' + pct + '" style="background: ' + grad + '; box-shadow: 0 0 10px ' + hexToRgba(color, 0.45) + '; transition-delay: ' + (i * 0.06) + 's;"></div></div>' +
                     '<div class="chart-bar-pct">' + pct + '%</div>' +
                     '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
-            }
+            });
             document.getElementById('categoryChart').innerHTML = catHtml || '<p style="color: var(--gray);">No data yet</p>';
+            animateBarFills('categoryChart');
 
-            // Category breakdown donut
-            const donutEl = document.getElementById('categoryDonut');
-            if (total > 0) {
-                const r = 52, cx = 60, cy = 60, circumference = 2 * Math.PI * r;
-                let offset = 0;
-                let circles = '';
-                for (const [cat, amount] of sortedCats) {
-                    const frac = amount / total;
-                    const dash = frac * circumference;
-                    circles += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + (CATEGORY_COLORS[cat] || '#667eea') +
-                        '" stroke-width="16" stroke-dasharray="' + dash + ' ' + (circumference - dash) + '" stroke-dashoffset="' + (-offset) + '" transform="rotate(-90 ' + cx + ' ' + cy + ')"></circle>';
-                    offset += dash;
-                }
-                let legend = '';
-                for (const [cat, amount] of sortedCats) {
-                    const pct = (amount / total * 100).toFixed(0);
-                    legend += '<div class="donut-legend-item"><span class="donut-legend-dot" style="background:' + (CATEGORY_COLORS[cat] || '#667eea') + ';"></span>' +
-                        cat + '<span class="donut-legend-pct">' + pct + '%</span></div>';
-                }
-                donutEl.innerHTML = '<svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="Category breakdown donut chart">' + circles + '</svg>' +
-                    '<div class="donut-legend">' + legend + '</div>';
-            } else {
-                donutEl.innerHTML = '<p style="color: var(--gray);">No data yet</p>';
-            }
+            // Category breakdown donut — gradients, glow, animated draw-in, center total, legend hover
+            renderCategoryDonut(sortedCats, total);
 
             // Spend — last 7 days (simple list, no bar)
             const dailyTotals = {};
@@ -2432,15 +2442,16 @@ function updateBulkDeleteButton() {
             const topMerchants = Object.entries(merchantTotals).sort((a, b) => b[1] - a[1]).slice(0, 5);
             const maxMerchant = Math.max(...topMerchants.map(m => m[1]), 1);
             let merchantHtml = '';
-            for (const [merchant, amount] of topMerchants) {
+            topMerchants.forEach(([merchant, amount], i) => {
                 const pct = (amount / maxMerchant * 100).toFixed(1);
                 merchantHtml += '<div class="chart-bar">' +
                     '<div class="chart-bar-label">' + escapeHtml(merchant) + '</div>' +
                     '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
-                    '<div class="chart-bar-fill" style="width: ' + pct + '%; background: var(--primary);"></div></div>' +
+                    '<div class="chart-bar-fill" data-target="' + pct + '" style="background: linear-gradient(90deg, var(--primary-dark), var(--primary-soft)); box-shadow: 0 0 10px rgba(62,232,137,0.4); transition-delay: ' + (i * 0.06) + 's;"></div></div>' +
                     '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
-            }
+            });
             document.getElementById('merchantChart').innerHTML = merchantHtml || '<p style="color: var(--gray);">No data yet</p>';
+            animateBarFills('merchantChart');
 
             // Recent activity feed
             const recent = [...allExpenses].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 6);
@@ -2455,6 +2466,108 @@ function updateBulkDeleteButton() {
                     '</div>';
             });
             document.getElementById('recentActivity').innerHTML = activityHtml || '<p style="color: var(--gray);">No activity yet</p>';
+        }
+
+        // ===================== SHARED: COLOR HELPERS & BAR ANIMATION =====================
+        function lightenColor(hex, amt) {
+            hex = (hex || '#667eea').replace('#', '');
+            if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+            const num = parseInt(hex, 16);
+            let r = (num >> 16) & 255, g = (num >> 8) & 255, b = num & 255;
+            r = Math.round(r + (255 - r) * amt);
+            g = Math.round(g + (255 - g) * amt);
+            b = Math.round(b + (255 - b) * amt);
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+        function hexToRgba(hex, alpha) {
+            hex = (hex || '#667eea').replace('#', '');
+            if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+            const num = parseInt(hex, 16);
+            const r = (num >> 16) & 255, g = (num >> 8) & 255, b = num & 255;
+            return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+        }
+        function animateBarFills(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const fills = container.querySelectorAll('.chart-bar-fill[data-target]');
+            fills.forEach(f => f.style.transform = 'scaleX(0)');
+            fills.forEach(f => f.getBoundingClientRect());
+            requestAnimationFrame(() => {
+                fills.forEach(f => {
+                    const target = Math.min(parseFloat(f.getAttribute('data-target')) / 100, 1);
+                    f.style.transform = 'scaleX(' + target + ')';
+                });
+            });
+        }
+
+        // ===================== CATEGORY BREAKDOWN DONUT (gradients, glow, animated draw-in) =====================
+        function renderCategoryDonut(sortedCats, total) {
+            const donutEl = document.getElementById('categoryDonut');
+            if (!total || total <= 0) {
+                donutEl.innerHTML = '<p style="color: var(--gray);">No data yet</p>';
+                return;
+            }
+            const r = 58, cx = 75, cy = 75, strokeW = 18, circumference = 2 * Math.PI * r;
+            const gapDeg = sortedCats.length > 1 ? 2.2 : 0; // small visual gap between segments
+            let offsetDeg = 0;
+            let defs = '<filter id="donutGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+            let segments = '';
+            sortedCats.forEach(([cat, amount], i) => {
+                const color = CATEGORY_COLORS[cat] || '#667eea';
+                const gid = 'donutGrad' + i;
+                const fracDeg = (amount / total) * 360;
+                const segDeg = Math.max(fracDeg - gapDeg, 0.001);
+                const dash = (segDeg / 360) * circumference;
+                defs += '<linearGradient id="' + gid + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
+                    '<stop offset="0%" stop-color="' + lightenColor(color, 0.35) + '"/>' +
+                    '<stop offset="100%" stop-color="' + color + '"/>' +
+                '</linearGradient>';
+                segments += '<circle class="donut-segment" data-cat="' + escapeHtml(cat) + '" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="url(#' + gid + ')" stroke-width="' + strokeW + '" stroke-linecap="round" ' +
+                    'stroke-dasharray="' + dash + ' ' + (circumference - dash) + '" stroke-dashoffset="' + (dash) + '" ' +
+                    'transform="rotate(' + (-90 + offsetDeg) + ' ' + cx + ' ' + cy + ')" filter="url(#donutGlow)" ' +
+                    'style="transition: stroke-dashoffset 0.9s cubic-bezier(0.16,1,0.3,1) ' + (i * 0.08) + 's;"></circle>';
+                offsetDeg += fracDeg;
+            });
+
+            let legend = '';
+            sortedCats.forEach(([cat, amount]) => {
+                const pct = (amount / total * 100).toFixed(0);
+                const color = CATEGORY_COLORS[cat] || '#667eea';
+                legend += '<div class="donut-legend-item" data-cat="' + escapeHtml(cat) + '"><span class="donut-legend-dot" style="background:' + color + '; box-shadow: 0 0 6px ' + hexToRgba(color, 0.6) + ';"></span>' +
+                    cat + '<span class="donut-legend-pct">' + pct + '%</span></div>';
+            });
+
+            donutEl.innerHTML =
+                '<div class="donut-svg-wrap">' +
+                    '<svg viewBox="0 0 150 150" role="img" aria-label="Category breakdown donut chart"><defs>' + defs + '</defs>' + segments + '</svg>' +
+                    '<div class="donut-center"><div class="total-label">Total</div><div class="total-value" id="donutTotalValue">LKR 0</div></div>' +
+                '</div>' +
+                '<div class="donut-legend">' + legend + '</div>';
+
+            animateCounter(document.getElementById('donutTotalValue'), total, v => 'LKR ' + Math.round(v).toLocaleString('en-US'));
+
+            // Animate the draw-in
+            const segEls = donutEl.querySelectorAll('.donut-segment');
+            segEls.forEach(s => s.getBoundingClientRect());
+            requestAnimationFrame(() => { segEls.forEach(s => { s.style.strokeDashoffset = '0'; }); });
+
+            // Legend <-> segment hover linking
+            const wrapEl = donutEl;
+            function setActive(cat) {
+                if (!cat) {
+                    wrapEl.classList.remove('has-hover');
+                    segEls.forEach(s => s.classList.remove('active'));
+                    donutEl.querySelectorAll('.donut-legend-item').forEach(li => li.classList.remove('active'));
+                    return;
+                }
+                wrapEl.classList.add('has-hover');
+                segEls.forEach(s => s.classList.toggle('active', s.getAttribute('data-cat') === cat));
+                donutEl.querySelectorAll('.donut-legend-item').forEach(li => li.classList.toggle('active', li.getAttribute('data-cat') === cat));
+            }
+            donutEl.querySelectorAll('.donut-legend-item, .donut-segment').forEach(elm => {
+                elm.addEventListener('mouseenter', () => setActive(elm.getAttribute('data-cat')));
+                elm.addEventListener('mouseleave', () => setActive(null));
+            });
         }
 
         // ===================== SHARED: COUNT-UP ANIMATION =====================
@@ -2662,7 +2775,8 @@ function updateBulkDeleteButton() {
             for (let d = 1; d <= daysInMonth; d++) {
                 const amount = dailyTotals[d];
                 const isToday = d === todayDate;
-                cellsHtml += '<div class="heatmap-cell' + (isToday ? ' today' : '') + '" style="background:' + intensityColor(amount) + ';" title="' +
+                const delay = (startOffset + d - 1) * 0.015;
+                cellsHtml += '<div class="heatmap-cell' + (isToday ? ' today' : '') + (amount > 0 ? ' has-spend' : '') + '" style="background:' + intensityColor(amount) + '; animation-delay:' + delay.toFixed(3) + 's;" title="' +
                     new Date(year, month, d).toLocaleDateString('en', { month: 'short', day: 'numeric' }) +
                     (amount > 0 ? ' — LKR ' + amount.toLocaleString('en-US', { maximumFractionDigits: 0 }) : ' — no spend') + '"></div>';
             }
