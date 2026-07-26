@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal expense dashboard with Gmail sync">
+    <title>Expense Dashboard</title>
+
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Core palette — obsidian + neon green fintech */
+            --bg: #060706;
+            --white: #101210;         /* surface / card background */
+            --surface-2: #171a17;     /* elevated surface (hover, table head) */
+            --border: #232823;
+            --border-soft: #1a1d1a;
+
+            /* Text */
+            --dark: #edf2ee;          /* primary text */
+            --gray: #8b968e;          /* secondary text */
+            --gray-dim: #575f59;      /* tertiary / placeholder */
+
+            /* Accents */
+            --primary: #3ee889;       /* neon green — brand accent */
+            --primary-dark: #23c46e;
+            --primary-soft: #b8ffd9;
+            --success: #3ee889;       /* green — positive / synced */
+            --warning: #ffbb55;
+            --danger: #ff6f6f;        /* soft red — spend / delete */
+
+            --light-gray: #191d19;    /* neutral control surface */
+
+            --glow: 0 0 0 1px rgba(62,232,137,0.12), 0 8px 30px rgba(62,232,137,0.08);
+            --shadow: 0 1px 2px rgba(0,0,0,0.5);
+            --shadow-hover: 0 16px 40px rgba(0,0,0,0.55);
+            --radius: 20px;
+            --radius-sm: 12px;
+
+            --font-display: 'Space Grotesk', Inter, sans-serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse 60% 40% at 12% -5%, rgba(62,232,137,0.16), transparent 55%),
+                radial-gradient(ellipse 50% 45% at 100% 10%, rgba(62,232,137,0.10), transparent 50%),
+                radial-gradient(ellipse 55% 40% at 90% 100%, rgba(62,232,137,0.10), transparent 55%);
+            background-attachment: fixed;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+        .header {
+            position: relative;
+            background: var(--white);
+            border: 1px solid var(--border);
+            color: var(--dark);
+            padding: 32px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-soft));
+        }
+        .header h1 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+        .header p { color: var(--gray); font-size: 0.95rem; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-soft);
+        }
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #06120a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-family: var(--font-display);
+            flex-shrink: 0;
+        }
+
+        .auth-section {
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 56px 24px;
+            border-radius: var(--radius);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .auth-section h2 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+            letter-spacing: -0.01em;
+        }
+        .auth-section p { color: var(--gray); margin-bottom: 28px; }
+
+        .auth-btn {
+            background: #2a2d33;
+            color: var(--dark);
+            border: 1px solid var(--border);
+            padding: 12px 26px;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            font-family: var(--font-body);
+        }
+        .auth-btn:hover {
+            background: #33373f;
+            border-color: #3a3e46;
+        }
+        .auth-btn.logout { background: transparent; color: var(--danger); border-color: var(--border); }
+        .auth-btn.logout:hover { background: rgba(255,111,111,0.1); border-color: rgba(255,111,111,0.4); }
+        .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .debug-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(62,232,137,0.08);
+            border: 1px solid rgba(62,232,137,0.25);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            color: #a9f0c6;
+            text-align: left;
+            display: none;
+        }
+        .debug-box.active { display: block; }
+        .debug-box strong { display: block; margin-bottom: 8px; color: var(--dark); }
+        .debug-box code {
+            background: rgba(255,255,255,0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            position: relative;
+            background: linear-gradient(160deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01)), var(--white);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: var(--radius);
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            width: 140px; height: 140px;
+            right: -50px; bottom: -60px;
+            background: radial-gradient(circle, rgba(62,232,137,0.16), transparent 70%);
+            pointer-events: none;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .stat-card:hover {
+            border-color: rgba(62,232,137,0.3);
+            transform: translateY(-3px);
+            box-shadow: var(--glow);
+        }
+        .stat-card:hover::after { opacity: 1; }
+        .stat-card h3 {
+            font-size: 0.72rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            margin-bottom: 14px;
+            position: relative;
+        }
+        .stat-card .value {
+            font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
+            font-size: clamp(1.2rem, 2.6vw, 1.6rem);
+            font-weight: 600;
+            color: var(--dark);
+            letter-spacing: -0.01em;
+            position: relative;
+        }
+        .stat-card .change {
+            font-size: 0.78rem;
+            margin-top: 8px;
+            color: var(--gray-dim);
+            position: relative;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .sync-date-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            justify-content: center;
+        }
+        .sync-date-group label {
+            font-size: 0.7rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+        }
+        .sync-date-group input[type="date"] {
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            background: var(--light-gray);
+            color: var(--dark);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-family: var(--font-body);
+            color-scheme: dark;
+        }
+        .sync-date-group input[type="date"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .btn {
+            padding: 11px 20px;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: filter 0.15s, transform 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-weight: 500;
+            font-family: var(--font-body);
+            background: var(--light-gray);
+            color: var(--dark);
+            border-color: var(--border);
+        }
+        .btn:hover { filter: brightness(1.2); transform: translateY(-1px); border-color: #2c332c; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #06120a;
+            border-color: transparent;
+            font-weight: 600;
+        }
+        .btn-primary:hover { filter: brightness(1.08); }
+        .btn-success { background: transparent; color: var(--success); border-color: rgba(62,232,137,0.35); }
+        .btn-success:hover { background: rgba(62,232,137,0.1); }
+        .btn-warning { background: transparent; color: var(--warning); border-color: rgba(255,187,85,0.35); }
+        .btn-warning:hover { background: rgba(255,187,85,0.1); }
+        .btn-danger { background: transparent; color: var(--danger); border-color: rgba(255,111,111,0.35); }
+        .btn-danger:hover { background: rgba(255,111,111,0.1); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .filters {
+            background: linear-gradient(160deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)), var(--white);
+            border: 1px solid var(--border);
+            padding: 18px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 140px; }
+        .filter-group label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .filter-group input, .filter-group select {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            background: var(--light-gray);
+            color: var(--dark);
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            font-family: var(--font-body);
+            width: 100%;
+            color-scheme: dark;
+        }
+        .filter-group input::placeholder { color: var(--gray-dim); }
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(62,232,137,0.15);
+        }
+
+        .table-container {
+            background: linear-gradient(160deg, rgba(255,255,255,0.03), rgba(255,255,255,0.005)), var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .table-header {
+            padding: 20px 22px;
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .table-header h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; }
+
+        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th {
+            background: var(--surface-2);
+            padding: 13px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--border-soft); font-size: 0.88rem; color: var(--dark); }
+        tr { transition: background 0.15s; }
+        tr:hover { background: rgba(62,232,137,0.035); }
+
+        .category-badge {
+            padding: 4px 11px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            display: inline-block;
+            letter-spacing: 0.01em;
+        }
+        .cat-food { background: rgba(255,187,85,0.14); color: #ffca7a; }
+        .cat-travel { background: rgba(90,169,230,0.14); color: #7ec0f2; }
+        .cat-groceries { background: rgba(62,232,137,0.14); color: #6ff5ac; }
+        .cat-banking { background: rgba(168,133,230,0.14); color: #bda6ef; }
+        .cat-transfer { background: rgba(134,140,150,0.16); color: #a8adb6; }
+        .cat-uncategorized { background: rgba(134,140,150,0.1); color: var(--gray); }
+        .split-badge { padding: 4px 11px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; display: inline-block; letter-spacing: 0.01em; }
+        .split-badge.pending { background: rgba(255,187,85,0.14); color: #ffca7a; }
+        .split-badge.settled { background: rgba(62,232,137,0.14); color: #6ff5ac; }
+        .split-row { background: rgba(255,187,85,0.04) !important; }
+        .split-row.settled { background: rgba(62,232,137,0.04) !important; }
+        .amount { font-family: var(--font-mono); font-weight: 600; color: var(--danger); font-variant-numeric: tabular-nums; }
+        .sync-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .action-btns { display: flex; gap: 6px; flex-wrap: nowrap; }
+        .action-btns .btn { padding: 5px 12px; font-size: 0.75rem; }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .chart-card {
+            position: relative;
+            background: linear-gradient(160deg, rgba(255,255,255,0.035), rgba(255,255,255,0.005)), var(--white);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .chart-card::after {
+            content: '';
+            position: absolute;
+            width: 180px; height: 180px;
+            right: -70px; top: -80px;
+            background: radial-gradient(circle, rgba(62,232,137,0.10), transparent 70%);
+            pointer-events: none;
+        }
+        .chart-card h3 {
+            font-size: 0.72rem;
+            color: var(--gray);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            position: relative;
+        }
+        .chart-bar { display: flex; align-items: center; margin-bottom: 14px; gap: 10px; position: relative; }
+        .chart-bar-label { width: 90px; font-size: 0.78rem; color: var(--gray); flex-shrink: 0; }
+        .chart-bar-track {
+            flex: 1;
+            height: 9px;
+            background: var(--light-gray);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .chart-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+            box-shadow: 0 0 10px rgba(62,232,137,0.35);
+        }
+        .chart-bar-value {
+            width: 84px;
+            text-align: right;
+            font-size: 0.78rem;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            color: var(--dark);
+            flex-shrink: 0;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(2px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .modal {
+            background: linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.005)), var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-hover);
+            transform: scale(0.97);
+            transition: transform 0.2s;
+        }
+        .modal-overlay.active .modal { transform: scale(1); }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--gray);
+            padding: 4px;
+            line-height: 1;
+        }
+        .modal-close:hover { color: var(--dark); }
+        .modal-close:focus { outline: 2px solid var(--primary); border-radius: 4px; }
+        .modal-body { padding: 24px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 500;
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid var(--border);
+            background: var(--light-gray);
+            color: var(--dark);
+            border-radius: var(--radius-sm);
+            font-size: 0.92rem;
+            font-family: inherit;
+            color-scheme: dark;
+        }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: var(--gray-dim); }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(62,232,137,0.15);
+        }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(6,7,6,0.85);
+            backdrop-filter: blur(2px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .loading-overlay.active { display: flex; }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--light-gray);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: var(--dark); font-weight: 500; font-size: 0.9rem; }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            color: #06120a;
+            padding: 13px 18px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-hover);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            max-width: 400px;
+        }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.info { background: #5aa9e6; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .empty-state { text-align: center; padding: 64px 20px; color: var(--gray); }
+        .empty-state-icon { font-size: 2.4rem; margin-bottom: 15px; opacity: 0.6; }
+        .empty-state h3 { font-family: var(--font-display); font-size: 1.05rem; margin-bottom: 8px; color: var(--dark); font-weight: 600; }
+        .empty-state p { font-size: 0.88rem; }
+
+        @media (max-width: 768px) {
+            .container { padding: 14px; }
+            .header { padding: 22px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .action-bar { flex-direction: column; }
+            .action-bar .btn { width: 100%; justify-content: center; }
+            .filters { flex-direction: column; align-items: stretch; }
+            .filter-group { min-width: 100%; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .modal { max-height: 95vh; }
+            .table-header { flex-direction: column; align-items: flex-start; }
+            .action-btns { flex-direction: column; }
+            .action-btns .btn { width: 100%; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .auth-section { padding: 40px 16px; }
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
+        }
+
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .hidden { display: none !important; }
+
+        /* ===================== LANDING PAGE ===================== */
+  .landing {
+        position: relative;
+        min-height: 100vh;
+        background: #000000;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+        padding: 40px;
+    }
+
+    /* REMOVE landing-bg completely */
+
+    .landing-login {
+        position: absolute;
+        top: 28px;
+        right: 40px;
+        z-index: 5;
+        padding: 10px 22px;
+    }
+    
+/* Animated gradient layer */
+.landing-login::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        #2563EB,
+    #7C3AED,
+    #06B6D4,
+    #3B82F6
+    );
+    background-size: 300% 300%;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    animation: gradientMove 3s ease infinite;
+    border-radius: inherit;   /* <-- Add this */
+    z-index: -1;
+}
+
+.landing-login:hover::before {
+    opacity: 1;
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+    .landing .debug-box {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        max-width: 340px;
+        z-index: 50;
+    }
+
+    .logo {
+        position: absolute;
+        top: 40px;
+        left: 50px;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 40px;
+        letter-spacing: 2px;
+        
+    opacity: 0;
+    animation: fadeUp 1s ease forwards;
+    }
+
+    .headline {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 96px;
+        line-height: 1.05;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        max-width: 700px;
+        
+    opacity: 0;
+    animation: fadeUp 1.2s ease forwards;
+    animation-delay: 0.4s;
+    }
+
+    @media (max-width: 768px) {
+        .headline {
+            font-size: 48px;
+        }
+
+        .logo {
+            font-size: 100px;
+            left: 40px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .landing-login { 
+            top: 18px; 
+            right: 18px; 
+            padding: 8px 16px; 
+            font-size: 0.85rem; 
+        }
+    }
+    
+    @keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+    </style>
+    
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <section class="landing" id="landingSection" aria-label="Welcome">
+
+    <!-- Logo -->
+    <div class="logo">Expendiamus</div>
+
+    <!-- Headline -->
+    <div class="headline">
+        KEEPIN' YOUR *UCKIN<br>
+        BREAD STRAIGHT
+    </div>
+
+</section>
+       
+        <button class="btn btn-primary landing-login" id="signInBtn" onclick="signInWithGoogle()" aria-label="Log in with Google">
+            Log In
+        </button>
+
+    </section>
+
+    <div class="container">
+
+        <main id="dashboardContent" class="hidden" role="main">
+            <div class="stats-grid" role="region" aria-label="Statistics">
+                <article class="stat-card">
+                    <h3>Total Expenses (30 days)</h3>
+                    <div class="value" id="totalExpenses">LKR 0.00</div>
+                    <div class="change" id="expenseChange">--</div>
+                </article>
+                <article class="stat-card">
+                    <h3>This Month</h3>
+                    <div class="value" id="thisMonth">LKR 0.00</div>
+                    <div class="change" id="monthChange">--</div>
+                </article>
+                <article class="stat-card">
+                    <h3>Transactions</h3>
+                    <div class="value" id="transactionCount">0</div>
+                    <div class="change">Total synced</div>
+                </article>
+                <article class="stat-card">
+                    <h3>Top Category</h3>
+                    <div class="value" id="topCategory">--</div>
+                    <div class="change" id="topCategoryAmount">--</div>
+                </article>
+                <article class="stat-card">
+                    <h3>Owed to You</h3>
+                    <div class="value" id="owedToYou">LKR 0.00</div>
+                    <div class="change" id="owedCount">0 pending splits</div>
+                </article>
+                <article class="stat-card">
+                    <h3>Your Share (30 days)</h3>
+                    <div class="value" id="yourShare30">LKR 0.00</div>
+                    <div class="change">After splits</div>
+                </article>
+            </div>
+
+            <div class="charts-grid" role="region" aria-label="Charts">
+                <div class="chart-card">
+                    <h3>Spending by Category</h3>
+                    <div id="categoryChart"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Last 7 Days</h3>
+                    <div id="weeklyChart"></div>
+                </div>
+            </div>
+
+            <div class="action-bar" role="region" aria-label="Actions">
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <span aria-hidden="true">+</span> Add Expense
+    </button>
+                
+<div style="display:flex;align-items:end;gap:12px;flex-wrap:wrap;">
+
+    <div class="sync-date-group">
+        <label for="syncFromDate">Sync From</label>
+        <input type="date" id="syncFromDate">
+    </div>
+
+    <button class="btn btn-success" id="syncBtn" onclick="syncGmail()">
+        <span aria-hidden="true">&#x1F504;</span> Sync Gmail
+    </button>
+
+    <button 
+    class="btn btn-danger" 
+    id="bulkDeleteBtn"
+    onclick="deleteSelectedExpenses()"
+    style="display:none;">
+    🗑 Delete Selected
+</button>
+
+</div>
+                <button class="btn btn-warning" onclick="exportData()">
+                    <span aria-hidden="true">&#x1F4E5;</span> Export CSV
+                </button>
+                <button class="btn auth-btn logout" onclick="signOut()">
+                    <span aria-hidden="true">&#x1F6AA;</span> Sign Out
+                </button>
+            </div>
+
+            <div class="filters" role="search" aria-label="Filter expenses">
+                <div class="filter-group">
+                    <label for="searchFilter">Search</label>
+                    <input type="text" id="searchFilter" placeholder="Search expenses..." oninput="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label for="categoryFilter">Category</label>
+                    <select id="categoryFilter" onchange="applyFilters()">
+                        <option value="">All Categories</option>
+                        <option value="Food">Food</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Groceries">Groceries</option>
+                        <option value="Banking">Banking</option>
+                        <option value="Transfer">Transfer</option>
+                        <option value="Uncategorized">Uncategorized</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="fromDate">From Date</label>
+                    <input type="date" id="fromDate" onchange="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label for="toDate">To Date</label>
+                    <input type="date" id="toDate" onchange="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label for="sourceFilter">Source</label>
+                    <select id="sourceFilter" onchange="applyFilters()">
+                        <option value="">All Sources</option>
+                        <option value="manual">Manual</option>
+                        <option value="gmail">Gmail</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>Recent Expenses</h2>
+                    <span id="recordCount" style="color: var(--gray); font-size: 0.9rem;">0 records</span>
+                </div>
+                <div class="table-scroll">
+                    <div id="expensesTable">
+                        <div class="empty-state">
+                            <div class="empty-state-icon" aria-hidden="true">&#x1F4ED;</div>
+                            <h3>No expenses yet</h3>
+                            <p>Add expenses manually or sync with Gmail to get started</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="expenseModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Expense</h2>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="expenseForm" onsubmit="event.preventDefault(); saveExpense();">
+                    <input type="hidden" id="expenseId" aria-hidden="true">
+                    <div class="form-group">
+                        <label for="expenseDate">Date <span aria-label="required">*</span></label>
+                        <input type="date" id="expenseDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseMerchant">Merchant/Source <span aria-label="required">*</span></label>
+                        <input type="text" id="expenseMerchant" placeholder="e.g., PickMe, Amazon" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseAmount">Amount (LKR) <span aria-label="required">*</span></label>
+                        <input type="number" id="expenseAmount" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseCategory">Category <span aria-label="required">*</span></label>
+                        <select id="expenseCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Food">Food</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Groceries">Groceries</option>
+                            <option value="Banking">Banking</option>
+                            <option value="Transfer">Transfer</option>
+                            <option value="Uncategorized">Uncategorized</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseDescription">Description</label>
+                        <textarea id="expenseDescription" rows="3" placeholder="Optional notes..."></textarea>
+                    </div>
+                    <div style="border-top: 1px solid var(--border); margin: 20px 0; padding-top: 20px;">
+                        <div class="form-group">
+                            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:600;color:var(--dark);">
+                                <input type="checkbox" id="expenseSplitEnabled" onchange="toggleSplitFields()" style="width:18px;height:18px;accent-color:var(--primary);">
+                                <span>Split this expense with someone</span>
+                            </label>
+                        </div>
+                        <div id="splitFields" style="display:none;">
+                            <div class="form-group">
+                                <label for="expenseSplitWith">Split with (name or email)</label>
+                                <input type="text" id="expenseSplitWith" placeholder="e.g., john@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseSplitPercentage">Their share (%)</label>
+                                <input type="number" id="expenseSplitPercentage" min="0" max="100" value="50" oninput="updateSplitAmount()">
+                            </div>
+                            <div class="form-group">
+                                <label>They owe</label>
+                                <div id="splitAmountDisplay" style="font-family:var(--font-mono);font-size:1.15rem;color:var(--primary);font-weight:600;">LKR 0.00</div>
+                            </div>
+                            <div class="form-group" id="splitSettledGroup" style="display:none;">
+                                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                                    <input type="checkbox" id="expenseSplitSettled" style="width:18px;height:18px;accent-color:var(--primary);">
+                                    <span>Mark as settled (they paid me back)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveExpense()">Save Expense</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <div class="loading-text" id="loadingText">Loading...</div>
+    </div>
+
+    <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
+
+    <script type="module">
+        // ===================== FIREBASE IMPORTS (Modern v12 Module System) =====================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut as firebaseSignOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+        // ===================== CONFIGURATION =====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCnLN41Mlt8KSxGhyiR7DKT8_3VpzuTFsg",
+            authDomain: "expense-dashboard-21c59.firebaseapp.com",
+            projectId: "expense-dashboard-21c59",
+            storageBucket: "expense-dashboard-21c59.firebasestorage.app",
+            messagingSenderId: "269962454783",
+            appId: "1:269962454783:web:f219eea0367d2b6d27ceca",
+            measurementId: "G-L7X2GD3NDZ"
+        };
+
+        const GMAIL_CLIENT_ID = '983984180846-b1o9ddrlqrjc1hkl5r3ttp9vgg8c2hel.apps.googleusercontent.com';
+        const GMAIL_SCOPES = 'https://www.googleapis.com/auth/gmail.readonly';
+
+        const EMAIL_SOURCES = {
+            'support@pickme.lk': { name: 'PickMe', parser: 'pickme' }
+        };
+
+        // ===================== STATE =====================
+        let app, auth, db;
+        let currentUser = null;
+        let allExpenses = [];
+        let gmailAccessToken = null;
+        let selectedExpenses = new Set();
+
+        // ===================== DEBUG =====================
+        function showDebug(msg) {
+            const box = document.getElementById('debugBox');
+            const text = document.getElementById('debugText');
+            if (box && text) {
+                box.classList.add('active');
+                text.innerHTML += msg + '<br>';
+            }
+        }
+
+        // ===================== INITIALIZATION =====================
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            showDebug('&#x2705; Firebase initialized successfully');
+            showDebug('Domain: <code>' + window.location.hostname + '</code>');
+            showDebug('Protocol: <code>' + window.location.protocol + '</code>');
+
+            // Check for redirect result (after redirect sign-in)
+            getRedirectResult(auth).then((result) => {
+                if (result && result.user) {
+                    currentUser = result.user;
+                    showDashboard();
+                }
+            }).catch((error) => {
+                if (error.code && error.code !== 'auth/null-user') {
+                    showDebug('&#x274C; Redirect result error: ' + error.message);
+                }
+            });
+
+            // Auth state listener
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('signInBtn').style.display = 'none';
+                    showDashboard();
+                } else {
+                    showAuth();
+                }
+            }, (error) => {
+                showDebug('&#x274C; Auth state error: ' + error.message);
+            });
+
+        } catch (e) {
+            showDebug('&#x274C; Firebase init failed: ' + e.message);
+        }
+
+        // ===================== AUTH =====================
+        window.signInWithGoogle = function() {
+            showDebug('Sign-in button clicked...');
+
+            const provider = new GoogleAuthProvider();
+            provider.addScope('email');
+            provider.addScope('profile');
+
+            const btn = document.getElementById('signInBtn');
+            btn.disabled = true;
+            btn.innerHTML = 'Signing in...';
+
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    showDebug('&#x2705; Popup sign-in successful');
+                    currentUser = result.user;
+                    showDashboard();
+                })
+                .catch((error) => {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Log In';
+
+                    showDebug('&#x274C; Error code: <code>' + error.code + '</code>');
+                    showDebug('Message: ' + error.message);
+
+                    if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+                        showDebug('Trying redirect method...');
+                        signInWithRedirect(auth, provider);
+                    } else if (error.code === 'auth/unauthorized-domain') {
+                        showDebug('&#x26A0;&#xFE0F; FIX NEEDED: Add <code>' + window.location.hostname + '</code> to Firebase Auth > Settings > Authorized domains');
+                    } else if (error.code === 'auth/network-request-failed') {
+                        showDebug('&#x26A0;&#xFE0F; Check your internet connection');
+                    }
+                });
+        };
+
+        window.signOut = function() {
+            firebaseSignOut(auth);
+            gmailAccessToken = null;
+        };
+
+function showAuth() {
+    document.getElementById('landingSection').classList.remove('hidden');
+    document.getElementById('dashboardContent').classList.add('hidden');
+}
+
+function showDashboard() {
+    document.getElementById('landingSection').classList.add('hidden');
+    document.getElementById('dashboardContent').classList.remove('hidden');
+
+    loadExpenses();
+}
+
+        // ===================== DATA =====================
+        async function loadExpenses() {
+            showLoading('Loading expenses...');
+            try {
+                const q = query(
+                    collection(db, 'expenses'),
+                    where('userId', '==', currentUser.uid)
+                );
+                const snapshot = await getDocs(q);
+
+                allExpenses = [];
+                snapshot.forEach(doc => allExpenses.push({ id: doc.id, ...doc.data() }));
+                allExpenses.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+                applyFilters();
+                updateStats();
+                updateCharts();
+            } catch (e) {
+                showToast('Failed to load expenses: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        window.saveExpense = async function() {
+            const id = document.getElementById('expenseId').value;
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const data = {
+                userId: currentUser.uid,
+                date: document.getElementById('expenseDate').value,
+                merchant: document.getElementById('expenseMerchant').value.trim(),
+                amount: amount,
+                category: document.getElementById('expenseCategory').value,
+                description: document.getElementById('expenseDescription').value.trim(),
+                source: 'manual',
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            };
+
+            if (!data.date || !data.merchant || isNaN(amount) || amount < 0 || !data.category) {
+                showToast('Please fill all required fields correctly', 'error');
+                return;
+            }
+
+            const splitEnabled = document.getElementById('expenseSplitEnabled').checked;
+            if (splitEnabled) {
+                const splitPct = parseFloat(document.getElementById('expenseSplitPercentage').value) || 0;
+                const splitAmount = parseFloat((amount * splitPct / 100).toFixed(2));
+                data.split = {
+                    enabled: true,
+                    with: document.getElementById('expenseSplitWith').value.trim(),
+                    percentage: splitPct,
+                    amount: splitAmount,
+                    settled: document.getElementById('expenseSplitSettled').checked,
+                    settledAt: document.getElementById('expenseSplitSettled').checked ? serverTimestamp() : null
+                };
+            } else {
+                data.split = { enabled: false };
+            }
+
+            showLoading(id ? 'Updating...' : 'Saving...');
+            try {
+                if (id) {
+                    await updateDoc(doc(db, 'expenses', id), data);
+                    showToast('Expense updated!', 'success');
+                } else {
+                    await addDoc(collection(db, 'expenses'), data);
+                    showToast('Expense added!', 'success');
+                }
+                closeModal();
+                loadExpenses();
+            } catch (e) {
+                showToast('Failed to save: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+
+            if (!data.date || !data.merchant || isNaN(data.amount) || data.amount < 0 || !data.category) {
+                showToast('Please fill all required fields correctly', 'error');
+                return;
+            }
+
+            showLoading(id ? 'Updating...' : 'Saving...');
+            try {
+                if (id) {
+                    await updateDoc(doc(db, 'expenses', id), data);
+                    showToast('Expense updated!', 'success');
+                } else {
+                    await addDoc(collection(db, 'expenses'), data);
+                    showToast('Expense added!', 'success');
+                }
+                closeModal();
+                loadExpenses();
+            } catch (e) {
+                showToast('Failed to save: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+
+        window.deleteExpense = async function(id) {
+            if (!confirm('Delete this expense?')) return;
+            showLoading('Deleting...');
+            try {
+                await deleteDoc(doc(db, 'expenses', id));
+                showToast('Deleted', 'success');
+                loadExpenses();
+            } catch (e) {
+                showToast('Failed to delete: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+
+        window.deleteSelectedExpenses = async function() {
+
+    if (selectedExpenses.size === 0) return;
+
+    if (!confirm(`Delete ${selectedExpenses.size} selected expenses?`)) {
+        return;
+    }
+
+    try {
+        const batch = writeBatch(db);
+
+        selectedExpenses.forEach(id => {
+            batch.delete(doc(db, 'expenses', id));
+        });
+
+        await batch.commit();
+
+        showToast(`${selectedExpenses.size} expenses deleted`, 'success');
+
+        selectedExpenses.clear();
+
+        loadExpenses();
+
+    } catch (e) {
+        showToast('Delete failed: ' + e.message, 'error');
+    }
+};
+
+        // ===================== GMAIL SYNC =====================
+        window.syncGmail = async function() {
+            if (GMAIL_CLIENT_ID === 'YOUR_GMAIL_CLIENT_ID') {
+                showToast('Please configure your Gmail Client ID', 'error');
+                return;
+            }
+
+            if (!gmailAccessToken) {
+                authorizeGmail();
+                return;
+            }
+
+            showLoading('Syncing with Gmail...');
+try {
+const fromDateInput = document.getElementById('syncFromDate').value;
+
+let afterDate;
+
+if (fromDateInput) {
+    const fromDate = new Date(fromDateInput);
+    afterDate = Math.floor(fromDate.getTime() / 1000);
+} else {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    afterDate = Math.floor(thirtyDaysAgo.getTime() / 1000);
+}
+
+                let newExpenses = [];
+                const existingIds = new Set(allExpenses.map(e => e.gmailMessageId).filter(Boolean));
+
+for (const [email, config] of Object.entries(EMAIL_SOURCES)) {
+    const queryStr = `from:${email} after:${afterDate}`;
+
+    const messages = await fetchGmailMessages(queryStr);
+
+                    for (const message of messages) {
+                        if (existingIds.has(message.id)) continue;
+
+                        const fullMessage = await fetchGmailMessageDetail(message.id);
+                        const parsed = parseEmail(fullMessage, config.parser);
+
+                        if (parsed && parsed.amount > 0) {
+                            newExpenses.push({
+                                userId: currentUser.uid,
+                                ...parsed,
+                                gmailMessageId: message.id,
+                                source: 'gmail',
+                                createdAt: serverTimestamp()
+                            });
+                        }
+                    }
+                }
+
+                if (newExpenses.length > 0) {
+                    const batch = writeBatch(db);
+                    newExpenses.forEach(expense => batch.set(doc(collection(db, 'expenses')), expense));
+                    await batch.commit();
+                    showToast(`Synced ${newExpenses.length} new expense${newExpenses.length > 1 ? 's' : ''}!`, 'success');
+                } else {
+                    showToast('No new expenses found', 'info');
+                }
+
+                loadExpenses();
+            } catch (e) {
+                if (e.status === 401) {
+                    gmailAccessToken = null;
+                    showToast('Gmail session expired. Please re-authorize.', 'error');
+                } else {
+                    showToast('Sync failed: ' + (e.message || 'Unknown error'), 'error');
+                }
+            } finally {
+                hideLoading();
+            }
+        };
+
+        function authorizeGmail() {
+            if (typeof google === 'undefined' || !google.accounts) {
+                showToast('Google API not loaded yet. Please wait and try again.', 'error');
+                return;
+            }
+
+            const client = google.accounts.oauth2.initTokenClient({
+                client_id: GMAIL_CLIENT_ID,
+                scope: GMAIL_SCOPES,
+                callback: (tokenResponse) => {
+                    if (tokenResponse?.access_token) {
+                        gmailAccessToken = tokenResponse.access_token;
+                        showToast('Gmail authorized! Click sync again.', 'success');
+                    }
+                },
+                error_callback: (error) => {
+                    showToast('Gmail authorization failed: ' + (error?.message || 'Unknown error'), 'error');
+                }
+            });
+            client.requestAccessToken();
+        }
+
+        async function fetchGmailMessages(queryStr) {
+            const response = await fetch(
+                `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(queryStr)}`,
+                { headers: { 'Authorization': `Bearer ${gmailAccessToken}` } }
+            );
+            if (!response.ok) throw { status: response.status, message: 'Failed to fetch messages' };
+            const data = await response.json();
+            return data.messages || [];
+        }
+
+        async function fetchGmailMessageDetail(messageId) {
+            const response = await fetch(
+                `https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`,
+                { headers: { 'Authorization': `Bearer ${gmailAccessToken}` } }
+            );
+            if (!response.ok) throw { status: response.status, message: 'Failed to fetch message' };
+            return await response.json();
+        }
+
+        // ===================== EMAIL PARSERS =====================
+        function parseEmail(message, parserType) {
+            const headers = {};
+            message.payload.headers.forEach(h => headers[h.name.toLowerCase()] = h.value);
+            const subject = headers.subject || '';
+            const body = getEmailBody(message.payload);
+            const date = new Date(parseInt(message.internalDate));
+
+            if (parserType === 'pickme') return parsePickMeEmail(subject, body, date);
+        }
+
+        function getEmailBody(payload) {
+            let body = '';
+            if (payload.parts) {
+                for (const part of payload.parts) {
+                    if (part.mimeType === 'text/plain' && part.body?.data) {
+                        body += atob(part.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                    } else if (part.mimeType === 'text/html' && part.body?.data) {
+                        body += atob(part.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                    } else if (part.parts) {
+                        body += getEmailBody(part);
+                    }
+                }
+            } else if (payload.body?.data) {
+                body = atob(payload.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+            }
+            return body;
+        }
+
+function parsePickMeEmail(subject, body, date) {
+
+    const subjectLower = (subject || '').toLowerCase();
+    const htmlLower = (body || '').toLowerCase();
+
+    const cleanBody = (body || '')
+        .replace(/<style[\s\S]*?<\/style>/gi, '')
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .toLowerCase();
+
+    console.log("==========================================");
+console.log("PICKME EMAIL DEBUG");
+console.log("Subject:", subject);
+
+console.log("RAW BODY:");
+console.log(body);
+
+console.log("CLEAN BODY:");
+console.log(cleanBody);
+
+console.log("Contains Marketplace:", cleanBody.includes("marketplace"));
+console.log("Contains Merchant Price Amendment:", cleanBody.includes("merchant price amendment"));
+console.log("Contains Packaging Charge:", cleanBody.includes("packaging charge"));
+console.log("Contains Food:", cleanBody.includes("food"));
+console.log("Contains food@pickme.lk:", cleanBody.includes("food@pickme.lk"));
+console.log("Contains market@pickme.lk:", cleanBody.includes("market@pickme.lk"));
+console.log("==========================================");
+
+    // -----------------------------
+    // Category Detection
+    // -----------------------------
+    let category = 'Uncategorized';
+
+// RIDES
+if (
+    subjectLower.includes('trip id') ||
+    cleanBody.includes('trip id') ||
+    cleanBody.includes('driver partner') ||
+    cleanBody.includes('total trip fare') ||
+    cleanBody.includes('estimated fare') ||
+    cleanBody.includes('actual fare') ||
+    cleanBody.includes('estimated distance') ||
+    cleanBody.includes('actual distance') ||
+    cleanBody.includes('thanks for using pickme')
+) {
+    category = 'Travel';
+}
+
+// MARKETPLACE
+else if (
+    cleanBody.includes('merchant price amendment') ||
+    cleanBody.includes('packaging charge') ||
+    cleanBody.includes('market@pickme.lk') ||
+    cleanBody.includes('glomark') ||
+    cleanBody.includes('marketplace')
+) {
+    category = 'Groceries';
+}
+
+// FOOD
+else if (
+    subjectLower.includes('delivery email receipt')
+) {
+    // If it is a delivery receipt and it wasn't Marketplace,
+    // then it is Food.
+    category = 'Food';
+}
+
+    // -----------------------------
+    // Amount Extraction
+    // -----------------------------
+    
+const normalizedBody = (body || '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\u00A0/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ');
+
+// Extract every currency amount
+const amounts = [...normalizedBody.matchAll(
+    /(?:LKR|Rs\.?)\s*([+-]?\d[\d,]*\.\d{2})/gi
+)].map(m => parseFloat(m[1].replace(/,/g, '')));
+
+console.log("ALL AMOUNTS FOUND:", amounts);
+
+let amount = 0;
+
+// PickMe receipts always repeat the final charged amount as the LAST amount
+if (amounts.length > 0) {
+    amount = amounts[amounts.length - 1];
+}
+
+console.log("FINAL AMOUNT:", amount);
+
+    // -----------------------------
+    // Merchant Extraction
+    // -----------------------------
+let merchant = 'PickMe';
+
+if (category === 'Travel') {
+
+    merchant = 'PickMe Rides';
+
+}
+else {
+
+    const merchantMatch = normalizedBody.match(
+        /thanks for ordering,.*?([a-z0-9&(),.' -]+?)\s+(marketplace|food)/is
+    );
+
+    if (merchantMatch) {
+
+        merchant = merchantMatch[1].trim();
+
+    }
+
+    if (category === 'Food') {
+
+        merchant = merchant
+            ? `PickMe Food - ${merchant}`
+            : 'PickMe Food';
+
+    }
+    else if (category === 'Groceries') {
+
+        merchant = merchant
+            ? `PickMe Marketplace - ${merchant}`
+            : 'PickMe Marketplace';
+
+    }
+
+}
+
+    // -----------------------------
+    // Return
+    // -----------------------------
+const result = {
+    date: date.toISOString().split('T')[0],
+    merchant,
+    amount,
+    category,
+    description: subject
+};
+
+console.log("PARSED PICKME RESULT:", result);
+
+return result;
+}
+        
+        // ===================== UI =====================
+        window.applyFilters = function() {
+            const search = document.getElementById('searchFilter').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            const source = document.getElementById('sourceFilter').value;
+
+            const filtered = allExpenses.filter(e => {
+                if (search && !e.merchant?.toLowerCase().includes(search) && !e.description?.toLowerCase().includes(search)) return false;
+                if (category && e.category !== category) return false;
+                if (fromDate && e.date < fromDate) return false;
+                if (toDate && e.date > toDate) return false;
+                if (source && e.source !== source) return false;
+                return true;
+            });
+
+            renderTable(filtered);
+        };
+
+        function renderTable(expenses) {
+            const container = document.getElementById('expensesTable');
+            document.getElementById('recordCount').textContent = expenses.length + ' records';
+
+            if (expenses.length === 0) {
+                container.innerHTML = '<div class="empty-state">' +
+                    '<div class="empty-state-icon" aria-hidden="true">&#x1F4ED;</div>' +
+                    '<h3>No expenses found</h3>' +
+                    '<p>Try adjusting your filters or add new expenses</p></div>';
+                return;
+            }
+
+            let html = '<table role="table" aria-label="Expenses"><thead><tr role="row">' +
+    '<th scope="col"><input type="checkbox" id="selectAllExpenses" onchange="toggleSelectAllExpenses(this)"></th>' +
+    '<th scope="col">Date</th><th scope="col">Merchant</th><th scope="col">Category</th>' +
+    '<th scope="col">Amount</th><th scope="col">Source</th><th scope="col">Actions</th>' +
+    '</tr></thead><tbody>';
+
+            expenses.forEach(expense => {
+                const catClass = 'cat-' + (expense.category || 'uncategorized').toLowerCase();
+                const isSplit = expense.split && expense.split.enabled;
+                const sourceBadge = expense.source === 'gmail' 
+                    ? '<span class="sync-badge">&#x2713; Gmail</span>' 
+                    : '<span style="font-size: 0.75rem; color: var(--gray);">Manual</span>';
+                const descHtml = expense.description ? '<div style="font-size: 0.8rem; color: var(--gray);">' + escapeHtml(expense.description) + '</div>' : '';
+
+                let splitHtml = '';
+                let rowClass = '';
+                if (isSplit) {
+                    rowClass = expense.split.settled ? 'split-row settled' : 'split-row';
+                    const splitBadge = expense.split.settled 
+                        ? '<span class="split-badge settled">&#x2713; Settled</span>' 
+                        : `<span class="split-badge pending">Owes LKR ${(expense.split.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>`;
+                    splitHtml = `<div style="margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${splitBadge}<span style="font-size:0.72rem;color:var(--gray);">with ${escapeHtml(expense.split.with || 'someone')}</span></div>`;
+                }
+
+                const safeMerchantLabel = escapeHtml(expense.merchant || 'expense');
+                html += `<tr role="row" class="${rowClass}">
+    <td>
+        <input 
+            type="checkbox" 
+            class="expense-checkbox"
+            data-id="${expense.id}"
+            onchange="toggleExpenseSelection('${expense.id}')"
+        >
+    </td>
+    <td>${formatDate(expense.date)}</td>
+                    <td><div style="font-weight: 500;">${escapeHtml(expense.merchant || '')}</div>${descHtml}${splitHtml}</td>
+                    <td><span class="category-badge ${catClass}">${expense.category || 'Uncategorized'}</span></td>
+                    <td class="amount">LKR ${(expense.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td>${sourceBadge}</td>
+                    <td><div class="action-btns">
+                    <button class="btn" style="padding: 5px 10px; font-size: 0.75rem; background: var(--light-gray);" onclick="editExpense('${expense.id}')" aria-label="Edit ${safeMerchantLabel}">Edit</button>
+                    ${isSplit ? `<button class="btn ${expense.split.settled ? 'btn-warning' : 'btn-success'}" style="padding: 5px 10px; font-size: 0.75rem;" onclick="toggleSettled('${expense.id}')" aria-label="${expense.split.settled ? 'Mark pending' : 'Mark settled'} ${safeMerchantLabel}">${expense.split.settled ? 'Un-settle' : 'Settle'}</button>` : ''}
+                    <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.75rem;" onclick="deleteExpense('${expense.id}')" aria-label="Delete ${safeMerchantLabel}">Delete</button>
+                    </div></td></tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function toggleExpenseSelection(id) {
+    if (selectedExpenses.has(id)) {
+        selectedExpenses.delete(id);
+    } else {
+        selectedExpenses.add(id);
+    }
+
+    updateBulkDeleteButton();
+}
+
+
+window.toggleSelectAllExpenses = function(checkbox) {
+    const checkboxes = document.querySelectorAll('.expense-checkbox');
+
+    checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+
+        if (checkbox.checked) {
+            selectedExpenses.add(cb.dataset.id);
+        } else {
+            selectedExpenses.delete(cb.dataset.id);
+        }
+    });
+
+    updateBulkDeleteButton();
+}
+
+
+function updateBulkDeleteButton() {
+    const btn = document.getElementById('bulkDeleteBtn');
+
+    if (!btn) return;
+
+    if (selectedExpenses.size > 0) {
+        btn.style.display = 'inline-block';
+        btn.textContent = `🗑 Delete Selected (${selectedExpenses.size})`;
+    } else {
+        btn.style.display = 'none';
+    }
+}
+
+        function updateStats() {
+            const now = new Date();
+            const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            const thisMonth = now.getMonth();
+            const thisYear = now.getFullYear();
+
+            let total30Days = 0, totalThisMonth = 0, yourShare30 = 0, yourShareMonth = 0;
+            let owedToYou = 0;
+            let pendingSplits = 0;
+            const categoryTotals = {};
+
+            allExpenses.forEach(e => {
+                const d = new Date(e.date);
+                const amount = e.amount || 0;
+                const isSplit = e.split && e.split.enabled;
+                const theirShare = isSplit ? (e.split.amount || 0) : 0;
+                const yourShare = amount - theirShare;
+
+                if (d >= thirtyDaysAgo) {
+                    total30Days += amount;
+                    yourShare30 += yourShare;
+                }
+                if (d.getMonth() === thisMonth && d.getFullYear() === thisYear) {
+                    totalThisMonth += amount;
+                    yourShareMonth += yourShare;
+                }
+                categoryTotals[e.category] = (categoryTotals[e.category] || 0) + amount;
+
+                if (isSplit && !e.split.settled) {
+                    owedToYou += theirShare;
+                    pendingSplits++;
+                }
+            });
+
+            document.getElementById('totalExpenses').textContent = 
+                'LKR ' + total30Days.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('thisMonth').textContent = 
+                'LKR ' + totalThisMonth.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('transactionCount').textContent = allExpenses.length;
+            document.getElementById('yourShare30').textContent = 
+                'LKR ' + yourShare30.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('owedToYou').textContent = 
+                'LKR ' + owedToYou.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('owedCount').textContent = pendingSplits + ' pending split' + (pendingSplits !== 1 ? 's' : '');
+
+            let topCat = '--', topAmount = 0;
+            for (const [cat, amount] of Object.entries(categoryTotals)) {
+                if (amount > topAmount) { topCat = cat; topAmount = amount; }
+            }
+            document.getElementById('topCategory').textContent = topCat;
+            document.getElementById('topCategoryAmount').textContent = topAmount > 0 ? 'LKR ' + topAmount.toFixed(2) : '--';
+        }
+
+        function updateCharts() {
+            const categoryTotals = {};
+            allExpenses.forEach(e => categoryTotals[e.category] = (categoryTotals[e.category] || 0) + (e.amount || 0));
+
+            const total = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
+            const colors = { 'Food': '#ffbb55', 'Travel': '#5aa9e6', 'Groceries': '#3ee889', 'Banking': '#b389f0', 'Transfer': '#8b968e', 'Uncategorized': '#5f6b62' };
+
+            let catHtml = '';
+            for (const [cat, amount] of Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])) {
+                const pct = total > 0 ? (amount / total * 100).toFixed(1) : 0;
+                catHtml += '<div class="chart-bar">' +
+                    '<div class="chart-bar-label">' + cat + '</div>' +
+                    '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
+                    '<div class="chart-bar-fill" style="width: ' + pct + '%; background: ' + (colors[cat] || '#667eea') + ';"></div></div>' +
+                    '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
+            }
+            document.getElementById('categoryChart').innerHTML = catHtml || '<p style="color: var(--gray);">No data yet</p>';
+
+            const dailyTotals = {};
+            const today = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(today); d.setDate(d.getDate() - i);
+                dailyTotals[d.toISOString().split('T')[0]] = 0;
+            }
+            allExpenses.forEach(e => { if (dailyTotals.hasOwnProperty(e.date)) dailyTotals[e.date] += (e.amount || 0); });
+
+            let weekHtml = '';
+            const maxDay = Math.max(...Object.values(dailyTotals), 1);
+            for (const [date, amount] of Object.entries(dailyTotals)) {
+                const dayName = new Date(date).toLocaleDateString('en', { weekday: 'short' });
+                const pct = (amount / maxDay * 100).toFixed(1);
+                weekHtml += '<div class="chart-bar">' +
+                    '<div class="chart-bar-label">' + dayName + '</div>' +
+                    '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
+                    '<div class="chart-bar-fill" style="width: ' + pct + '%; background: var(--primary);"></div></div>' +
+                    '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
+            }
+            document.getElementById('weeklyChart').innerHTML = weekHtml;
+        }
+
+        // ===================== SPLIT FUNCTIONS =====================
+        window.toggleSplitFields = function() {
+            const enabled = document.getElementById('expenseSplitEnabled').checked;
+            document.getElementById('splitFields').style.display = enabled ? 'block' : 'none';
+            if (enabled) updateSplitAmount();
+        };
+
+        window.updateSplitAmount = function() {
+            const amount = parseFloat(document.getElementById('expenseAmount').value) || 0;
+            const pct = parseFloat(document.getElementById('expenseSplitPercentage').value) || 0;
+            const splitAmount = parseFloat((amount * Math.min(100, Math.max(0, pct)) / 100).toFixed(2));
+            document.getElementById('splitAmountDisplay').textContent = 
+                'LKR ' + splitAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        };
+
+        window.toggleSettled = async function(expenseId) {
+            const expense = allExpenses.find(e => e.id === expenseId);
+            if (!expense || !expense.split || !expense.split.enabled) return;
+            const newStatus = !expense.split.settled;
+            showLoading(newStatus ? 'Marking settled...' : 'Marking pending...');
+            try {
+                await updateDoc(doc(db, 'expenses', expenseId), {
+                    'split.settled': newStatus,
+                    'split.settledAt': newStatus ? serverTimestamp() : null,
+                    updatedAt: serverTimestamp()
+                });
+                showToast(newStatus ? 'Marked as settled!' : 'Marked as pending', 'success');
+                loadExpenses();
+            } catch (e) {
+                showToast('Failed to update: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+
+        // ===================== MODAL =====================
+        window.openAddModal = function() {
+            document.getElementById('expenseId').value = '';
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('expenseMerchant').value = '';
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseCategory').value = '';
+            document.getElementById('expenseDescription').value = '';
+            document.getElementById('expenseSplitEnabled').checked = false;
+            document.getElementById('expenseSplitWith').value = '';
+            document.getElementById('expenseSplitPercentage').value = 50;
+            document.getElementById('expenseSplitSettled').checked = false;
+            document.getElementById('splitSettledGroup').style.display = 'none';
+            toggleSplitFields();
+            document.getElementById('modalTitle').textContent = 'Add Expense';
+            document.getElementById('expenseModal').classList.add('active');
+            document.getElementById('expenseDate').focus();
+        };
+
+        window.editExpense = function(id) {
+            const expense = allExpenses.find(e => e.id === id);
+            if (!expense) return;
+
+            document.getElementById('expenseId').value = expense.id;
+            document.getElementById('expenseDate').value = expense.date;
+            document.getElementById('expenseMerchant').value = expense.merchant || '';
+            document.getElementById('expenseAmount').value = expense.amount || '';
+            document.getElementById('expenseCategory').value = expense.category || '';
+            document.getElementById('expenseDescription').value = expense.description || '';
+            document.getElementById('modalTitle').textContent = 'Edit Expense';
+
+            if (expense.split && expense.split.enabled) {
+                document.getElementById('expenseSplitEnabled').checked = true;
+                document.getElementById('expenseSplitWith').value = expense.split.with || '';
+                document.getElementById('expenseSplitPercentage').value = expense.split.percentage || 50;
+                document.getElementById('expenseSplitSettled').checked = expense.split.settled || false;
+                document.getElementById('splitSettledGroup').style.display = 'block';
+                toggleSplitFields();
+                updateSplitAmount();
+            } else {
+                document.getElementById('expenseSplitEnabled').checked = false;
+                document.getElementById('expenseSplitWith').value = '';
+                document.getElementById('expenseSplitPercentage').value = 50;
+                document.getElementById('expenseSplitSettled').checked = false;
+                document.getElementById('splitSettledGroup').style.display = 'none';
+                toggleSplitFields();
+            }
+
+            document.getElementById('expenseModal').classList.add('active');
+            document.getElementById('expenseDate').focus();
+        };
+
+        window.closeModal = function() {
+            document.getElementById('expenseModal').classList.remove('active');
+        };
+
+        // ===================== EXPORT =====================
+        window.exportData = function() {
+            const filtered = getFilteredExpenses();
+            if (filtered.length === 0) { showToast('No data to export', 'error'); return; }
+
+            let csv = 'Date,Merchant,Category,Amount,Description,Source,Split With,Split %,Split Amount,Split Settled\n';
+            filtered.forEach(e => {
+                const s = e.split && e.split.enabled ? e.split : null;
+                csv += e.date + ',' + escapeCsv(e.merchant || '') + ',' + (e.category || '') + ',' + (e.amount || 0) + ',' + escapeCsv(e.description || '') + ',' + (e.source || '') + ',' +
+                    escapeCsv(s ? (s.with || '') : '') + ',' + (s ? (s.percentage || 0) : 0) + ',' + (s ? (s.amount || 0) : 0) + ',' + (s ? (s.settled ? 'Yes' : 'No') : 'No') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `expenses_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('CSV exported!', 'success');
+        };
+
+        // ===================== UTILITIES =====================
+        function getFilteredExpenses() {
+            const search = document.getElementById('searchFilter').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            const source = document.getElementById('sourceFilter').value;
+
+            return allExpenses.filter(e => {
+                if (search && !e.merchant?.toLowerCase().includes(search) && !e.description?.toLowerCase().includes(search)) return false;
+                if (category && e.category !== category) return false;
+                if (fromDate && e.date < fromDate) return false;
+                if (toDate && e.date > toDate) return false;
+                if (source && e.source !== source) return false;
+                return true;
+            });
+        }
+
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        function escapeCsv(text) {
+            if (text.includes(',') || text.includes('"') || text.includes('\n')) {
+                return '"' + text.replace(/"/g, '""') + '"';
+            }
+            return text;
+        }
+
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function showToast(message, type) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.setAttribute('role', 'alert');
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Close modal on overlay click
+        document.getElementById('expenseModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('expenseModal')) closeModal();
+        });
+    </script>
+</body>
+</html>
