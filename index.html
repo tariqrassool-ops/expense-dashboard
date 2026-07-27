@@ -32,8 +32,8 @@
             --primary-dark: #002813;  /* deep forest green */
             --primary-soft: #7ee6ae;
             --success: #1fa25e;       /* green — positive / synced */
-            --warning: #d4a62b;       /* antique gold */
-            --danger: #d6524a;        /* muted brick red */
+            --warning: #e9bf16;       /* gold */
+            --danger: #e60000;        /* red */
 
             --light-gray: #101710;    /* neutral control surface */
 
@@ -236,7 +236,7 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .gauge-pct.over { background: linear-gradient(135deg, #e9736a, var(--danger)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .gauge-pct.over { background: linear-gradient(135deg, #ff6b5c, var(--danger)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         .gauge-label {
             font-size: 0.7rem;
             color: var(--gray);
@@ -432,7 +432,7 @@
             border-color: #24362a;
         }
         .auth-btn.logout { background: transparent; color: var(--danger); border-color: var(--border); }
-        .auth-btn.logout:hover { background: rgba(214,82,74,0.1); border-color: rgba(214,82,74,0.4); }
+        .auth-btn.logout:hover { background: rgba(230,0,0,0.1); border-color: rgba(230,0,0,0.4); }
         .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .debug-box {
@@ -543,7 +543,7 @@
             background: linear-gradient(90deg, var(--primary), var(--primary-dark));
             transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .budget-bar-fill.over { background: linear-gradient(90deg, var(--danger), #8b241f); }
+        .budget-bar-fill.over { background: linear-gradient(90deg, var(--danger), #730000); }
 
         /* Donut chart */
         .donut-wrap {
@@ -740,8 +740,8 @@
         .btn-success:hover { background: rgba(31,162,94,0.1); }
         .btn-warning { background: transparent; color: var(--warning); border-color: rgba(255,187,85,0.35); }
         .btn-warning:hover { background: rgba(255,187,85,0.1); }
-        .btn-danger { background: transparent; color: var(--danger); border-color: rgba(214,82,74,0.35); }
-        .btn-danger:hover { background: rgba(214,82,74,0.1); }
+        .btn-danger { background: transparent; color: var(--danger); border-color: rgba(230,0,0,0.35); }
+        .btn-danger:hover { background: rgba(230,0,0,0.1); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         .filters {
@@ -826,13 +826,13 @@
             display: inline-block;
             letter-spacing: 0.01em;
         }
-        .cat-food { background: rgba(212,166,43,0.16); color: #e0bf6e; }
-        .cat-travel { background: rgba(44,122,123,0.18); color: #6cc7c9; }
-        .cat-groceries { background: rgba(31,162,94,0.16); color: #6ee6a8; }
-        .cat-banking { background: rgba(122,51,80,0.20); color: #d98cb0; }
-        .cat-transfer { background: rgba(92,107,98,0.20); color: #b3c2b8; }
-        .cat-loan-payment { background: rgba(168,85,46,0.18); color: #e8a683; }
-        .cat-uncategorized { background: rgba(92,107,98,0.12); color: var(--gray); }
+        .cat-food { background: rgba(250,75,0,0.18); color: #ff9466; }
+        .cat-travel { background: rgba(0,3,217,0.24); color: #8b8dff; }
+        .cat-groceries { background: rgba(57,255,20,0.16); color: #8dffa8; }
+        .cat-banking { background: rgba(191,0,255,0.20); color: #e08bff; }
+        .cat-transfer { background: rgba(233,191,22,0.18); color: #f0d873; }
+        .cat-loan-payment { background: rgba(230,0,0,0.18); color: #ff8a80; }
+        .cat-uncategorized { background: rgba(231,255,18,0.14); color: #eaff8a; }
         .amount { font-family: var(--font-mono); font-weight: 600; color: var(--danger); font-variant-numeric: tabular-nums; }
         .sync-badge {
             display: inline-flex;
@@ -1142,7 +1142,7 @@
             transition: filter 0.15s;
         }
         .split-badge:hover { filter: brightness(1.25); }
-        .split-badge.unsettled { background: rgba(212,166,43,0.18); color: #e0bf6e; }
+        .split-badge.unsettled { background: rgba(233,191,22,0.20); color: #f0d873; }
         .split-badge.settled { background: rgba(31,162,94,0.16); color: #7ee6ae; }
 
         /* ===================== LOANS ===================== */
@@ -1169,8 +1169,8 @@
             font-weight: 600;
             padding: 3px 10px;
             border-radius: 999px;
-            background: rgba(168,85,46,0.18);
-            color: #e8a683;
+            background: rgba(230,0,0,0.18);
+            color: #ff8a80;
             white-space: nowrap;
             text-transform: uppercase;
             letter-spacing: 0.03em;
@@ -1198,8 +1198,8 @@
         .loan-progress-fill {
             height: 100%;
             border-radius: 999px;
-            background: linear-gradient(90deg, #a8552e, #e8a683);
-            box-shadow: 0 0 10px rgba(168,85,46,0.4);
+            background: linear-gradient(90deg, #4d0000, #e60000);
+            box-shadow: 0 0 10px rgba(230,0,0,0.4);
             transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .loan-meta-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--gray); margin-bottom: 4px; }
@@ -2362,7 +2362,7 @@ return result;
                 const catClass = 'cat-' + (expense.category || 'uncategorized').toLowerCase().replace(/\s+/g, '-');
                 let sourceBadge;
                 if (expense.source === 'gmail') sourceBadge = '<span class="sync-badge">&#x2713; Gmail</span>';
-                else if (expense.source === 'loan_payment') sourceBadge = '<span style="font-size: 0.75rem; color: #e8a683;">&#x1F3E6; Loan Payment</span>';
+                else if (expense.source === 'loan_payment') sourceBadge = '<span style="font-size: 0.75rem; color: #ff8a80;">&#x1F3E6; Loan Payment</span>';
                 else sourceBadge = '<span style="font-size: 0.75rem; color: var(--gray);">Manual</span>';
                 const descHtml = expense.description ? '<div style="font-size: 0.8rem; color: var(--gray);">' + escapeHtml(expense.description) + '</div>' : '';
 
@@ -2734,7 +2734,7 @@ function updateBulkDeleteButton() {
             }
         };
 
-        const CATEGORY_COLORS = { 'Food': '#d4a62b', 'Travel': '#2c7a7b', 'Groceries': '#1fa25e', 'Banking': '#7a3350', 'Transfer': '#5c6b62', 'Loan Payment': '#a8552e', 'Uncategorized': '#4a5550' };
+        const CATEGORY_COLORS = { 'Food': '#fa4b00', 'Travel': '#0003d9', 'Groceries': '#39ff14', 'Banking': '#bf00ff', 'Transfer': '#e9bf16', 'Loan Payment': '#e60000', 'Uncategorized': '#e7ff12' };
 
         // An expense that's split shows the full amount you logged (e.g. the whole bill),
         // but only your actual share should count toward totals/averages/charts.
@@ -2884,13 +2884,13 @@ function updateBulkDeleteButton() {
             sortedCats.forEach(([cat, amount], i) => {
                 const pct = total > 0 ? (amount / total * 100).toFixed(1) : 0;
                 const color = CATEGORY_COLORS[cat] || '#3d6b75';
-                const grad = 'linear-gradient(90deg, ' + color + ', ' + lightenColor(color, 0.4) + ')';
+                const grad = 'linear-gradient(90deg, ' + darkenColor(color, 0.6) + ', ' + color + ')';
                 catHtml += '<div class="chart-bar">' +
                     '<div class="chart-bar-label">' + cat + '</div>' +
                     '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
                     '<div class="chart-bar-fill" data-target="' + pct + '" style="background: ' + grad + '; box-shadow: 0 0 10px ' + hexToRgba(color, 0.45) + '; transition-delay: ' + (i * 0.06) + 's;"></div></div>' +
                     '<div class="chart-bar-pct">' + pct + '%</div>' +
-                    '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
+                    '<div class="chart-bar-value">LKR ' + formatCompactAmount(amount) + '</div></div>';
             });
             document.getElementById('categoryChart').innerHTML = catHtml || '<p style="color: var(--gray);">No data yet</p>';
             animateBarFills('categoryChart');
@@ -2954,8 +2954,8 @@ function updateBulkDeleteButton() {
                 merchantHtml += '<div class="chart-bar">' +
                     '<div class="chart-bar-label">' + escapeHtml(merchant) + '</div>' +
                     '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
-                    '<div class="chart-bar-fill" data-target="' + pct + '" style="background: linear-gradient(90deg, var(--primary-dark), var(--primary-soft)); box-shadow: 0 0 10px rgba(31,162,94,0.4); transition-delay: ' + (i * 0.06) + 's;"></div></div>' +
-                    '<div class="chart-bar-value">LKR ' + amount.toLocaleString('en-US') + '</div></div>';
+                    '<div class="chart-bar-fill" data-target="' + pct + '" style="background: linear-gradient(90deg, var(--primary-dark), var(--primary)); box-shadow: 0 0 10px rgba(31,162,94,0.4); transition-delay: ' + (i * 0.06) + 's;"></div></div>' +
+                    '<div class="chart-bar-value">LKR ' + formatCompactAmount(amount) + '</div></div>';
             });
             document.getElementById('merchantChart').innerHTML = merchantHtml || '<p style="color: var(--gray);">No data yet</p>';
             animateBarFills('merchantChart');
@@ -2984,6 +2984,18 @@ function updateBulkDeleteButton() {
             r = Math.round(r + (255 - r) * amt);
             g = Math.round(g + (255 - g) * amt);
             b = Math.round(b + (255 - b) * amt);
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+        // Darkens a color toward black by `amt` (0-1) — used for gradients so bars/segments
+        // deepen into a richer shade of themselves instead of washing out toward white.
+        function darkenColor(hex, amt) {
+            hex = (hex || '#3d6b75').replace('#', '');
+            if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+            const num = parseInt(hex, 16);
+            let r = (num >> 16) & 255, g = (num >> 8) & 255, b = num & 255;
+            r = Math.round(r * (1 - amt));
+            g = Math.round(g * (1 - amt));
+            b = Math.round(b * (1 - amt));
             return 'rgb(' + r + ',' + g + ',' + b + ')';
         }
         function hexToRgba(hex, alpha) {
@@ -3026,7 +3038,7 @@ function updateBulkDeleteButton() {
                 const segDeg = Math.max(fracDeg - gapDeg, 0.001);
                 const dash = (segDeg / 360) * circumference;
                 defs += '<linearGradient id="' + gid + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
-                    '<stop offset="0%" stop-color="' + lightenColor(color, 0.35) + '"/>' +
+                    '<stop offset="0%" stop-color="' + darkenColor(color, 0.55) + '"/>' +
                     '<stop offset="100%" stop-color="' + color + '"/>' +
                 '</linearGradient>';
                 segments += '<circle class="donut-segment" data-cat="' + escapeHtml(cat) + '" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="url(#' + gid + ')" stroke-width="' + strokeW + '" stroke-linecap="round" ' +
@@ -3122,8 +3134,8 @@ function updateBulkDeleteButton() {
                             '<stop offset="100%" stop-color="#1fa25e"/>' +
                         '</linearGradient>' +
                         '<linearGradient id="' + gaugeGradId + '_over" x1="0%" y1="0%" x2="100%" y2="100%">' +
-                            '<stop offset="0%" stop-color="#e9736a"/>' +
-                            '<stop offset="100%" stop-color="#8b241f"/>' +
+                            '<stop offset="0%" stop-color="#ff6b5c"/>' +
+                            '<stop offset="100%" stop-color="#730000"/>' +
                         '</linearGradient>' +
                         '<filter id="' + gaugeGradId + '_glow" x="-60%" y="-60%" width="220%" height="220%">' +
                             '<feGaussianBlur stdDeviation="4.5" result="blur"/>' +
