@@ -1240,14 +1240,21 @@
         .loan-card-actions .btn { padding: 7px 14px; font-size: 0.78rem; }
 
         /* ----- mini payment card visual (shown on loans with card details) ----- */
+        /* Sized to a real card's aspect ratio (85.60mm x 53.98mm ≈ 1.586:1) */
         .loan-mini-card {
             position: relative;
+            width: 100%;
+            max-width: 272px;
+            aspect-ratio: 85.6 / 53.98;
             border-radius: 14px;
-            padding: 16px 18px 14px;
-            margin: 4px 0 16px;
+            padding: 16px 18px;
+            margin: 4px auto 18px;
             overflow: hidden;
             color: #fff;
             box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .loan-mini-card::before {
             content: '';
@@ -1258,22 +1265,36 @@
                 radial-gradient(90% 120% at -10% 120%, rgba(0,0,0,0.18), transparent 60%);
             pointer-events: none;
         }
-        .loan-mini-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; }
+        .loan-mini-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .loan-mini-card-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.75; margin-bottom: 3px; }
-        .loan-mini-card-issuer { font-family: var(--font-display); font-weight: 600; font-size: 0.88rem; }
-        .loan-mini-card-network-mark { display: flex; align-items: center; }
-        .loan-mini-card-number { font-family: var(--font-mono); font-size: 1rem; letter-spacing: 0.12em; margin-bottom: 14px; opacity: 0.95; position: relative; }
+        .loan-mini-card-issuer { font-family: var(--font-display); font-weight: 600; font-size: 0.86rem; line-height: 1.2; }
+        .loan-mini-card-network-mark { display: flex; align-items: center; flex-shrink: 0; margin-left: 8px; }
+        .loan-mini-card-number { font-family: var(--font-mono); font-size: 0.98rem; letter-spacing: 0.1em; opacity: 0.95; position: relative; }
         .loan-mini-card-bottom { display: flex; justify-content: space-between; align-items: flex-end; position: relative; }
         .loan-mini-card-expiry-label { font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.7; }
-        .loan-mini-card-expiry-value { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; }
+        .loan-mini-card-expiry-value { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 600; }
         .loan-mini-card-name { font-size: 0.72rem; font-weight: 500; opacity: 0.9; max-width: 60%; }
         /* Visa wordmark */
-        .card-logo-visa { font-family: Arial, Helvetica, sans-serif; font-style: italic; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em; color: #fff; }
+        .card-logo-visa { font-family: Arial, Helvetica, sans-serif; font-style: italic; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; color: #fff; }
         /* Mastercard interlocking circles */
         .card-logo-mastercard { display: flex; align-items: center; }
-        .card-logo-mastercard span { width: 22px; height: 22px; border-radius: 50%; display: inline-block; }
-        .card-logo-mastercard span:first-child { background: #eb5a2c; margin-right: -9px; }
+        .card-logo-mastercard span { width: 21px; height: 21px; border-radius: 50%; display: inline-block; }
+        .card-logo-mastercard span:first-child { background: #eb5a2c; margin-right: -8px; }
         .card-logo-mastercard span:last-child { background: #f2a900; mix-blend-mode: normal; opacity: 0.92; }
+        /* Amex wordmark badge */
+        .card-logo-amex {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.66rem;
+            letter-spacing: 0.03em;
+            color: #fff;
+            background: rgba(255,255,255,0.22);
+            border: 1px solid rgba(255,255,255,0.35);
+            padding: 4px 7px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
 
         /* ===================== LANDING PAGE ===================== */
   .landing {
@@ -1765,6 +1786,7 @@
                             <option value="">None / Not a card</option>
                             <option value="visa">Visa</option>
                             <option value="mastercard">Mastercard</option>
+                            <option value="amex">American Express</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -2905,21 +2927,26 @@ function updateBulkDeleteButton() {
             return hslToHex(hue, 68, 46);
         }
 
-        // Cycles through a few card-style gradients so multiple cards in the grid look distinct.
-        const LOAN_CARD_GRADIENTS = [
-            'linear-gradient(135deg, #9b58de 0%, #d946ef 55%, #ef4d6f 100%)', // purple -> magenta -> coral
-            'linear-gradient(135deg, #ef4d6f 0%, #d946ef 55%, #9b58de 100%)', // coral -> magenta -> purple
-            'linear-gradient(135deg, #1fa2e0 0%, #2ac9c9 55%, #1fa25e 100%)', // blue -> teal -> green
-            'linear-gradient(135deg, #2a0e4a 0%, #9b58de 60%, #d946ef 100%)'  // deep purple -> violet -> magenta
-        ];
+        // Distinct color per network so cards read like the different physical cards they represent.
+        const LOAN_CARD_GRADIENTS = {
+            visa: 'linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%)',        // blue -> teal
+            mastercard: 'linear-gradient(135deg, #8b5cf6 0%, #5b21b6 100%)',  // violet -> deep purple
+            amex: 'linear-gradient(135deg, #fb7185 0%, #9333ea 100%)',       // coral -> purple
+            default: [
+                'linear-gradient(135deg, #9b58de 0%, #d946ef 55%, #ef4d6f 100%)', // purple -> magenta -> coral
+                'linear-gradient(135deg, #2a0e4a 0%, #9b58de 60%, #d946ef 100%)', // deep purple -> violet -> magenta
+                'linear-gradient(135deg, #1fa2e0 0%, #2ac9c9 55%, #1fa25e 100%)'  // blue -> teal -> green
+            ]
+        };
         function loanCardGradient(loan, index) {
-            if (loan.cardNetwork === 'visa') return LOAN_CARD_GRADIENTS[0];
-            if (loan.cardNetwork === 'mastercard') return LOAN_CARD_GRADIENTS[1];
-            return LOAN_CARD_GRADIENTS[index % LOAN_CARD_GRADIENTS.length];
+            if (loan.cardNetwork && LOAN_CARD_GRADIENTS[loan.cardNetwork]) return LOAN_CARD_GRADIENTS[loan.cardNetwork];
+            const fallback = LOAN_CARD_GRADIENTS.default;
+            return fallback[index % fallback.length];
         }
         function renderLoanNetworkLogo(network) {
             if (network === 'visa') return '<span class="card-logo-visa">VISA</span>';
             if (network === 'mastercard') return '<span class="card-logo-mastercard"><span></span><span></span></span>';
+            if (network === 'amex') return '<span class="card-logo-amex">AMEX</span>';
             return '';
         }
         function renderLoanMiniCard(loan, safeName) {
@@ -3672,14 +3699,20 @@ function updateBulkDeleteButton() {
             if (e.target === document.getElementById('expenseModal')) closeModal();
         });
 
-        // Auto-format loan card number (groups of 4) and expiry (MM/YY)
+        // Auto-format loan card number (groups of 4, or 4-6-5 for Amex) and expiry (MM/YY)
         (function () {
             const numberInput = document.getElementById('loanCardNumber');
+            const networkSelect = document.getElementById('loanCardNetwork');
             if (numberInput) {
-                numberInput.addEventListener('input', () => {
-                    const digits = numberInput.value.replace(/\D/g, '').slice(0, 16);
-                    numberInput.value = digits.replace(/(.{4})/g, '$1 ').trim();
-                });
+                const formatNumber = () => {
+                    const isAmex = networkSelect && networkSelect.value === 'amex';
+                    const digits = numberInput.value.replace(/\D/g, '').slice(0, isAmex ? 15 : 16);
+                    numberInput.value = isAmex
+                        ? digits.replace(/(\d{4})(\d{0,6})(\d{0,5})/, (m, a, b, c) => [a, b, c].filter(Boolean).join(' '))
+                        : digits.replace(/(.{4})/g, '$1 ').trim();
+                };
+                numberInput.addEventListener('input', formatNumber);
+                if (networkSelect) networkSelect.addEventListener('change', formatNumber);
             }
             const expiryInput = document.getElementById('loanCardExpiry');
             if (expiryInput) {
