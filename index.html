@@ -34,7 +34,7 @@
             --primary-pop: #d946ef;   /* vivid magenta — pairs with primary for punchier buttons/glows */
             --success: #1fa25e;       /* green — reserved for real success states (settled, paid off) */
             --warning: #e9bf16;       /* gold */
-            --danger: #e60000;        /* red — reserved for real errors / over-budget */
+            --danger: #d22d2d;        /* red — reserved for real errors / over-budget */
 
             /* Dedicated trend colors for stat-card % change indicators (both purple-family, but distinct hues) */
             --trend-up: #e454c9;      /* fuchsia-violet — spend increased */
@@ -241,7 +241,7 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .gauge-pct.over { background: linear-gradient(135deg, #ff6b5c, var(--danger)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .gauge-pct.over { background: linear-gradient(135deg, #e8776a, var(--danger)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         .gauge-label {
             font-size: 0.7rem;
             color: var(--gray);
@@ -437,7 +437,7 @@
             border-color: #33253f;
         }
         .auth-btn.logout { background: transparent; color: var(--danger); border-color: var(--border); }
-        .auth-btn.logout:hover { background: rgba(230,0,0,0.1); border-color: rgba(230,0,0,0.4); }
+        .auth-btn.logout:hover { background: rgba(210,45,45,0.1); border-color: rgba(210,45,45,0.4); }
         .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .debug-box {
@@ -548,7 +548,7 @@
             background: linear-gradient(90deg, var(--primary), var(--primary-dark));
             transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .budget-bar-fill.over { background: linear-gradient(90deg, var(--danger), #730000); }
+        .budget-bar-fill.over { background: linear-gradient(90deg, var(--danger), #5c1f1f); }
 
         /* Donut chart */
         .donut-wrap {
@@ -770,8 +770,8 @@
         .btn-success:hover { background: rgba(31,162,94,0.1); }
         .btn-warning { background: transparent; color: var(--warning); border-color: rgba(255,187,85,0.35); }
         .btn-warning:hover { background: rgba(255,187,85,0.1); }
-        .btn-danger { background: transparent; color: var(--danger); border-color: rgba(230,0,0,0.35); }
-        .btn-danger:hover { background: rgba(230,0,0,0.1); }
+        .btn-danger { background: transparent; color: var(--danger); border-color: rgba(210,45,45,0.35); }
+        .btn-danger:hover { background: rgba(210,45,45,0.1); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         .filters {
@@ -862,7 +862,7 @@
         .cat-banking { background: rgba(191,0,255,0.20); color: #e08bff; }
         .cat-transfer { background: rgba(233,191,22,0.18); color: #f0d873; }
         .cat-utilities { background: rgba(0,184,217,0.18); color: #7ee6f5; }
-        .cat-loan-payment { background: rgba(230,0,0,0.18); color: #ff8a80; }
+        .cat-loan-payment { background: rgba(210,45,45,0.18); color: #d98f89; }
         .cat-uncategorized { background: rgba(231,255,18,0.14); color: #eaff8a; }
         .amount { font-family: var(--font-mono); font-weight: 600; color: var(--danger); font-variant-numeric: tabular-nums; }
         .sync-badge {
@@ -1203,8 +1203,8 @@
             font-weight: 600;
             padding: 3px 10px;
             border-radius: 999px;
-            background: rgba(230,0,0,0.18);
-            color: #ff8a80;
+            background: rgba(210,45,45,0.18);
+            color: #d98f89;
             white-space: nowrap;
             text-transform: uppercase;
             letter-spacing: 0.03em;
@@ -1232,8 +1232,6 @@
         .loan-progress-fill {
             height: 100%;
             border-radius: 999px;
-            background: linear-gradient(90deg, #4d0000, #e60000);
-            box-shadow: 0 0 10px rgba(230,0,0,0.4);
             transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .loan-meta-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--gray); margin-bottom: 4px; }
@@ -2404,7 +2402,7 @@ return result;
                 const catClass = 'cat-' + (expense.category || 'uncategorized').toLowerCase().replace(/\s+/g, '-');
                 let sourceBadge;
                 if (expense.source === 'gmail') sourceBadge = '<span class="sync-badge">&#x2713; Gmail</span>';
-                else if (expense.source === 'loan_payment') sourceBadge = '<span style="font-size: 0.75rem; color: #ff8a80;">&#x1F3E6; Loan Payment</span>';
+                else if (expense.source === 'loan_payment') sourceBadge = '<span style="font-size: 0.75rem; color: #d98f89;">&#x1F3E6; Loan Payment</span>';
                 else sourceBadge = '<span style="font-size: 0.75rem; color: var(--gray);">Manual</span>';
                 const descHtml = expense.description ? '<div style="font-size: 0.8rem; color: var(--gray);">' + escapeHtml(expense.description) + '</div>' : '';
 
@@ -2536,6 +2534,9 @@ function updateBulkDeleteButton() {
                 const remaining = Math.max(loan.remainingBalance || 0, 0);
                 const paidOff = remaining <= 0;
                 const paidFrac = principal > 0 ? Math.min(((principal - remaining) / principal) * 100, 100) : 0;
+                const owedFrac = principal > 0 ? Math.min((remaining / principal) * 100, 100) : 0;
+                const heatColor = loanHeatColor(owedFrac);
+                const heatColorDark = darkenColor(heatColor, 0.4);
                 const safeName = escapeHtml(loan.name || 'Loan');
 
                 html += '<div class="loan-card' + (paidOff ? ' paid-off' : '') + '">' +
@@ -2554,7 +2555,7 @@ function updateBulkDeleteButton() {
                             '<div class="loan-balance-value" style="font-size:1.05rem;">' + paidFrac.toFixed(0) + '%</div>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="loan-progress-track"><div class="loan-progress-fill" style="width:' + paidFrac.toFixed(1) + '%;"></div></div>' +
+                    '<div class="loan-progress-track"><div class="loan-progress-fill" style="width:' + paidFrac.toFixed(1) + '%; background: linear-gradient(90deg, ' + heatColorDark + ', ' + heatColor + '); box-shadow: 0 0 6px ' + hexToRgba(heatColor, 0.3) + ';"></div></div>' +
                     '<div class="loan-meta-row"><span>Original Amount</span><span>LKR ' + principal.toLocaleString('en-US') + '</span></div>' +
                     (loan.installmentAmount ? '<div class="loan-meta-row"><span>Installment</span><span>LKR ' + (loan.installmentAmount || 0).toLocaleString('en-US') + '/mo</span></div>' : '') +
                     (loan.interestRate ? '<div class="loan-meta-row"><span>Interest Rate</span><span>' + loan.interestRate + '% p.a.</span></div>' : '') +
@@ -2818,7 +2819,29 @@ function updateBulkDeleteButton() {
             }
         };
 
-        const CATEGORY_COLORS = { 'Food': '#fa4b00', 'Travel': '#0003d9', 'Groceries': '#39ff14', 'Banking': '#bf00ff', 'Transfer': '#e9bf16', 'Utilities': '#00b8d9', 'Loan Payment': '#e60000', 'Uncategorized': '#e7ff12' };
+        // Monochromatic violet shade scale for charts (Spending by Category / Category Breakdown).
+        // Biggest slice gets the most vivid shade; smaller slices fade toward soft lavender —
+        // one color family, varying only in lightness, instead of a rainbow of unrelated hues.
+        function hslToHex(h, s, l) {
+            s /= 100; l /= 100;
+            const k = n => (n + h / 30) % 12;
+            const a = s * Math.min(l, 1 - l);
+            const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+            const toHex = x => Math.round(x * 255).toString(16).padStart(2, '0');
+            return '#' + toHex(f(0)) + toHex(f(8)) + toHex(f(4));
+        }
+        function categoryShade(index, count) {
+            const hue = 270, sat = 60;
+            const minL = 34, maxL = 76;
+            const t = count > 1 ? index / (count - 1) : 0;
+            return hslToHex(hue, sat, minL + t * (maxL - minL));
+        }
+        // Loan payoff heat-meter: little owed -> green, a lot owed -> orange/red.
+        function loanHeatColor(owedPct) {
+            const t = Math.max(0, Math.min(owedPct, 100)) / 100;
+            const hue = 130 * (1 - t); // 130 = green, ~65 = amber, 0 = red
+            return hslToHex(hue, 68, 46);
+        }
 
         // An expense that's split shows the full amount you logged (e.g. the whole bill),
         // but only your actual share should count toward totals/averages/charts.
@@ -2967,12 +2990,12 @@ function updateBulkDeleteButton() {
             let catHtml = '';
             sortedCats.forEach(([cat, amount], i) => {
                 const pct = total > 0 ? (amount / total * 100).toFixed(1) : 0;
-                const color = CATEGORY_COLORS[cat] || '#3d6b75';
-                const grad = 'linear-gradient(90deg, ' + darkenColor(color, 0.6) + ', ' + color + ')';
+                const color = categoryShade(i, sortedCats.length);
+                const grad = 'linear-gradient(90deg, ' + darkenColor(color, 0.45) + ', ' + color + ')';
                 catHtml += '<div class="chart-bar">' +
                     '<div class="chart-bar-label">' + cat + '</div>' +
                     '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
-                    '<div class="chart-bar-fill" data-target="' + pct + '" style="background: ' + grad + '; box-shadow: 0 0 10px ' + hexToRgba(color, 0.45) + '; transition-delay: ' + (i * 0.06) + 's;"></div></div>' +
+                    '<div class="chart-bar-fill" data-target="' + pct + '" style="background: ' + grad + '; box-shadow: 0 0 6px ' + hexToRgba(color, 0.25) + '; transition-delay: ' + (i * 0.06) + 's;"></div></div>' +
                     '<div class="chart-bar-pct">' + pct + '%</div>' +
                     '<div class="chart-bar-value">LKR ' + formatCompactAmount(amount) + '</div></div>';
             });
@@ -3113,16 +3136,16 @@ function updateBulkDeleteButton() {
             const r = 58, cx = 75, cy = 75, strokeW = 18, circumference = 2 * Math.PI * r;
             const gapDeg = sortedCats.length > 1 ? 2.2 : 0; // small visual gap between segments
             let offsetDeg = 0;
-            let defs = '<filter id="donutGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+            let defs = '<filter id="donutGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
             let segments = '';
             sortedCats.forEach(([cat, amount], i) => {
-                const color = CATEGORY_COLORS[cat] || '#3d6b75';
+                const color = categoryShade(i, sortedCats.length);
                 const gid = 'donutGrad' + i;
                 const fracDeg = (amount / total) * 360;
                 const segDeg = Math.max(fracDeg - gapDeg, 0.001);
                 const dash = (segDeg / 360) * circumference;
                 defs += '<linearGradient id="' + gid + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
-                    '<stop offset="0%" stop-color="' + darkenColor(color, 0.55) + '"/>' +
+                    '<stop offset="0%" stop-color="' + darkenColor(color, 0.4) + '"/>' +
                     '<stop offset="100%" stop-color="' + color + '"/>' +
                 '</linearGradient>';
                 segments += '<circle class="donut-segment" data-cat="' + escapeHtml(cat) + '" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="url(#' + gid + ')" stroke-width="' + strokeW + '" stroke-linecap="round" ' +
@@ -3133,10 +3156,10 @@ function updateBulkDeleteButton() {
             });
 
             let legend = '';
-            sortedCats.forEach(([cat, amount]) => {
+            sortedCats.forEach(([cat, amount], i) => {
                 const pct = (amount / total * 100).toFixed(0);
-                const color = CATEGORY_COLORS[cat] || '#3d6b75';
-                legend += '<div class="donut-legend-item" data-cat="' + escapeHtml(cat) + '"><span class="donut-legend-dot" style="background:' + color + '; box-shadow: 0 0 6px ' + hexToRgba(color, 0.6) + ';"></span>' +
+                const color = categoryShade(i, sortedCats.length);
+                legend += '<div class="donut-legend-item" data-cat="' + escapeHtml(cat) + '"><span class="donut-legend-dot" style="background:' + color + ';"></span>' +
                     cat + '<span class="donut-legend-pct">' + pct + '%</span></div>';
             });
 
@@ -3218,8 +3241,8 @@ function updateBulkDeleteButton() {
                             '<stop offset="100%" stop-color="#9b58de"/>' +
                         '</linearGradient>' +
                         '<linearGradient id="' + gaugeGradId + '_over" x1="0%" y1="0%" x2="100%" y2="100%">' +
-                            '<stop offset="0%" stop-color="#ff6b5c"/>' +
-                            '<stop offset="100%" stop-color="#730000"/>' +
+                            '<stop offset="0%" stop-color="#e8776a"/>' +
+                            '<stop offset="100%" stop-color="#5c1f1f"/>' +
                         '</linearGradient>' +
                         '<filter id="' + gaugeGradId + '_glow" x="-60%" y="-60%" width="220%" height="220%">' +
                             '<feGaussianBlur stdDeviation="4.5" result="blur"/>' +
