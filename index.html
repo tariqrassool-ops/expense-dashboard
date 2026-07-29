@@ -31,6 +31,7 @@
             --primary: #9b58de;       /* violet — brand accent */
             --primary-dark: #2a0e4a;  /* deep purple */
             --primary-soft: #cbb4f7;
+            --primary-pop: #d946ef;   /* vivid magenta — pairs with primary for punchier buttons/glows */
             --success: #1fa25e;       /* green — reserved for real success states (settled, paid off) */
             --warning: #e9bf16;       /* gold */
             --danger: #e60000;        /* red — reserved for real errors / over-budget */
@@ -704,7 +705,7 @@
         }
         .tab-btn:hover { color: var(--dark); }
         .tab-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(135deg, var(--primary), var(--primary-pop));
             color: #180a28;
         }
 
@@ -759,12 +760,12 @@
         }
         .btn:hover { filter: brightness(1.2); transform: translateY(-1px); border-color: #33253f; }
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(135deg, var(--primary), var(--primary-pop));
             color: #180a28;
             border-color: transparent;
             font-weight: 600;
         }
-        .btn-primary:hover { filter: brightness(1.08); }
+        .btn-primary:hover { filter: brightness(1.12); transform: translateY(-2px); }
         .btn-success { background: transparent; color: var(--success); border-color: rgba(31,162,94,0.35); }
         .btn-success:hover { background: rgba(31,162,94,0.1); }
         .btn-warning { background: transparent; color: var(--warning); border-color: rgba(255,187,85,0.35); }
@@ -1261,17 +1262,17 @@
         padding: 10px 22px;
     }
     
-/* Animated gradient layer */
+/* Animated gradient layer — swaps in a contrasting cyan/indigo mix on hover */
 .landing-login::before {
     content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(
         120deg,
-        #9b58de,
-    #2a0e4a,
-    #2c7a7b,
-    #cbb4f7
+        #22d3ee,
+    #6366f1,
+    #9b58de,
+    #22d3ee
     );
     background-size: 300% 300%;
     opacity: 0;
