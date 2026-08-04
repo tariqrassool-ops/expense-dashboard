@@ -550,14 +550,14 @@
         }
         .budget-bar-fill.over { background: linear-gradient(90deg, var(--danger), #5c1f1f); }
 
-        /* Donut chart — thick continuous-gradient ring, big centered total, row legend below */
+        /* Donut chart — thin ring on the left, list-style breakdown on the right */
         .donut-wrap {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            gap: 22px;
+            gap: 28px;
         }
-        .donut-svg-wrap { position: relative; width: 168px; height: 168px; flex-shrink: 0; }
+        .donut-svg-wrap { position: relative; width: 192px; height: 192px; flex-shrink: 0; }
         .donut-svg-wrap svg { width: 100%; height: 100%; overflow: visible; }
         .donut-center {
             position: absolute;
@@ -568,39 +568,50 @@
             justify-content: center;
             text-align: center;
             pointer-events: none;
+            padding: 0 20px;
         }
-        .donut-center .total-value { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--dark); letter-spacing: -0.01em; }
-        .donut-center .total-label { font-size: 0.68rem; color: var(--gray); margin-top: 3px; line-height: 1.3; max-width: 100px; }
+        .donut-center .total-value { font-family: var(--font-display); font-size: 1.18rem; font-weight: 700; color: var(--dark); letter-spacing: -0.01em; line-height: 1.15; }
+        .donut-center .total-label { font-size: 0.6rem; color: var(--gray); margin-top: 4px; line-height: 1.3; max-width: 92px; }
         .donut-segment { transition: opacity 0.2s ease, filter 0.2s ease; cursor: pointer; }
         .donut-wrap.has-hover .donut-segment { opacity: 0.35; }
         .donut-wrap.has-hover .donut-segment.active { opacity: 1; filter: brightness(1.15); }
         .donut-legend {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px 26px;
-            width: 100%;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
         }
         .donut-legend-item {
             display: flex;
-            flex-direction: column;
-            gap: 3px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
             cursor: pointer;
-            padding: 5px 8px;
+            padding: 9px 6px;
             border-radius: 8px;
+            border-bottom: 1px solid var(--border-soft);
             transition: background 0.15s ease;
         }
+        .donut-legend-item:last-child { border-bottom: none; }
         .donut-legend-item:hover, .donut-legend-item.active { background: rgba(155,88,222,0.08); }
-        .donut-legend-amount {
-            font-family: var(--font-mono);
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--dark);
-        }
+        .donut-legend-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
+        .donut-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .donut-legend-cat {
-            font-size: 0.72rem;
+            font-size: 0.8rem;
             color: var(--gray);
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .donut-legend-amount {
+            font-family: var(--font-mono);
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: var(--dark);
+            flex-shrink: 0;
+        }
+        @media (max-width: 460px) {
+            .donut-wrap { flex-direction: column; }
         }
 
 
@@ -618,6 +629,43 @@
         .activity-merchant { font-size: 0.88rem; color: var(--dark); font-weight: 500; }
         .activity-date { font-size: 0.74rem; color: var(--gray-dim); }
         .activity-amount { font-family: var(--font-mono); font-weight: 600; color: var(--dark); font-size: 0.88rem; }
+
+        /* Top merchants list — same row/divider treatment as Recent Activity, with a rank badge
+           and a single-line, ellipsis-truncated name so entries stay uniform regardless of name length. */
+        .merchant-list { display: flex; flex-direction: column; }
+        .merchant-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 11px 0;
+            border-bottom: 1px solid var(--border-soft);
+        }
+        .merchant-item:last-child { border-bottom: none; }
+        .merchant-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+        .merchant-rank {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(155,88,222,0.12);
+            color: var(--primary);
+            font-size: 0.66rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .merchant-name {
+            font-size: 0.88rem;
+            color: var(--dark);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+        .merchant-amount { font-family: var(--font-mono); font-weight: 600; color: var(--dark); font-size: 0.88rem; flex-shrink: 0; }
 
         /* Category chart with percentage */
         .chart-bar-pct {
@@ -1558,7 +1606,7 @@
                     </div>
                     <div class="chart-card">
                         <h3>Top Merchants</h3>
-                        <div id="merchantChart"></div>
+                        <div id="merchantChart" class="merchant-list"></div>
                     </div>
                     <div class="chart-card">
                         <h3>Recent Activity</h3>
@@ -3176,18 +3224,17 @@ function updateBulkDeleteButton() {
                 merchantTotals[key] = (merchantTotals[key] || 0) + netAmount(e);
             });
             const topMerchants = Object.entries(merchantTotals).sort((a, b) => b[1] - a[1]).slice(0, 5);
-            const maxMerchant = Math.max(...topMerchants.map(m => m[1]), 1);
             let merchantHtml = '';
             topMerchants.forEach(([merchant, amount], i) => {
-                const pct = (amount / maxMerchant * 100).toFixed(1);
-                merchantHtml += '<div class="chart-bar">' +
-                    '<div class="chart-bar-label">' + escapeHtml(merchant) + '</div>' +
-                    '<div class="chart-bar-track" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100">' +
-                    '<div class="chart-bar-fill" data-target="' + pct + '" style="background: linear-gradient(90deg, var(--primary-dark), var(--primary)); box-shadow: 0 0 10px rgba(155,88,222,0.4); transition-delay: ' + (i * 0.06) + 's;"></div></div>' +
-                    '<div class="chart-bar-value">LKR ' + formatCompactAmount(amount) + '</div></div>';
+                merchantHtml += '<div class="merchant-item">' +
+                    '<div class="merchant-left">' +
+                    '<span class="merchant-rank">' + (i + 1) + '</span>' +
+                    '<span class="merchant-name" title="' + escapeHtml(merchant) + '">' + escapeHtml(merchant) + '</span>' +
+                    '</div>' +
+                    '<span class="merchant-amount">LKR ' + formatCompactAmount(amount) + '</span>' +
+                    '</div>';
             });
             document.getElementById('merchantChart').innerHTML = merchantHtml || '<p style="color: var(--gray);">No data yet</p>';
-            animateBarFills('merchantChart');
 
             // Recent activity feed
             const recent = [...allExpenses].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 6);
@@ -3258,7 +3305,7 @@ function updateBulkDeleteButton() {
                 donutEl.innerHTML = '<p style="color: var(--gray);">No data yet</p>';
                 return;
             }
-            const r = 62, cx = 75, cy = 75, strokeW = 10, circumference = 2 * Math.PI * r;
+            const r = 64, cx = 75, cy = 75, strokeW = 8, circumference = 2 * Math.PI * r;
             const gapDeg = sortedCats.length > 1 ? 3 : 0; // small visual gap between segments
             let offsetDeg = 0;
             let defs = '<filter id="donutGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
@@ -3284,8 +3331,9 @@ function updateBulkDeleteButton() {
             sortedCats.forEach(([cat, amount], i) => {
                 const color = DONUT_PALETTE[i % DONUT_PALETTE.length];
                 legend += '<div class="donut-legend-item" data-cat="' + escapeHtml(cat) + '">' +
-                    '<span class="donut-legend-amount" data-amount="' + amount + '" style="color:' + color + ';">LKR 0</span>' +
-                    '<span class="donut-legend-cat">' + escapeHtml(cat) + '</span>' +
+                    '<div class="donut-legend-left"><span class="donut-legend-dot" style="background:' + color + ';"></span>' +
+                    '<span class="donut-legend-cat">' + escapeHtml(cat) + '</span></div>' +
+                    '<span class="donut-legend-amount" data-amount="' + amount + '">LKR 0</span>' +
                 '</div>';
             });
 
