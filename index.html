@@ -3033,9 +3033,9 @@ function updateBulkDeleteButton() {
             const isOver = budgetPct > 100;
             renderBudgetGauge(budgetPct, isOver);
             document.getElementById('gaugeSubLabel').textContent = isOver ? 'over budget' : 'of budget used';
-            animateCounter(document.getElementById('gaugeSpent'), totalThisMonth, v => 'LKR ' + Math.round(v).toLocaleString('en-US'));
+            animateCounter(document.getElementById('gaugeSpent'), totalThisMonth, v => 'LKR ' + formatCompactAmount(v, 0));
             const remaining = budget - totalThisMonth;
-            animateCounter(document.getElementById('gaugeRemaining'), Math.abs(remaining), v => (remaining < 0 ? '-' : '') + 'LKR ' + Math.round(v).toLocaleString('en-US'));
+            animateCounter(document.getElementById('gaugeRemaining'), Math.abs(remaining), v => (remaining < 0 ? '-' : '') + 'LKR ' + formatCompactAmount(v, 0));
             document.getElementById('gaugeRemainingBox').classList.toggle('over', remaining < 0);
 
             // Average Spend (last 30 days)
@@ -3248,32 +3248,32 @@ function updateBulkDeleteButton() {
             });
         }
 
-        // ===================== CATEGORY BREAKDOWN DONUT (continuous gradient sweep, glow, animated draw-in) =====================
+        // ===================== CATEGORY BREAKDOWN DONUT (thin ring, distinct category colors, glow, animated draw-in) =====================
+        // Curated categorical palette so each slice reads as its own color (teal / blue / slate / green / violet / amber...)
+        // instead of one continuous hue sweep — matches the thin, multi-color reference design.
+        const DONUT_PALETTE = ['#2dd4bf', '#38bdf8', '#94a3b8', '#4ade80', '#a78bfa', '#fbbf24', '#f472b6', '#fb923c'];
         function renderCategoryDonut(sortedCats, total) {
             const donutEl = document.getElementById('categoryDonut');
             if (!total || total <= 0) {
                 donutEl.innerHTML = '<p style="color: var(--gray);">No data yet</p>';
                 return;
             }
-            const r = 58, cx = 75, cy = 75, strokeW = 18, circumference = 2 * Math.PI * r;
-            const gapDeg = sortedCats.length > 1 ? 2.2 : 0; // small visual gap between segments
+            const r = 62, cx = 75, cy = 75, strokeW = 10, circumference = 2 * Math.PI * r;
+            const gapDeg = sortedCats.length > 1 ? 3 : 0; // small visual gap between segments
             let offsetDeg = 0;
-            // One shared gradient (fixed to the chart's own coordinates) spans every segment, so the
-            // ring reads as a single continuous color sweep — teal -> violet -> pink — rather than
-            // each category getting its own isolated flat color.
-            let defs = '<filter id="donutGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
-                '<linearGradient id="donutSweep" gradientUnits="userSpaceOnUse" x1="10" y1="20" x2="140" y2="130">' +
-                    '<stop offset="0%" stop-color="#2dd4bf"/>' +
-                    '<stop offset="45%" stop-color="#38bdf8"/>' +
-                    '<stop offset="75%" stop-color="#9b58de"/>' +
-                    '<stop offset="100%" stop-color="#ef4d6f"/>' +
-                '</linearGradient>';
+            let defs = '<filter id="donutGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
             let segments = '';
             sortedCats.forEach(([cat, amount], i) => {
+                const color = DONUT_PALETTE[i % DONUT_PALETTE.length];
+                const gid = 'donutGrad' + i;
                 const fracDeg = (amount / total) * 360;
                 const segDeg = Math.max(fracDeg - gapDeg, 0.001);
                 const dash = (segDeg / 360) * circumference;
-                segments += '<circle class="donut-segment" data-cat="' + escapeHtml(cat) + '" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="url(#donutSweep)" stroke-width="' + strokeW + '" stroke-linecap="round" ' +
+                defs += '<linearGradient id="' + gid + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
+                    '<stop offset="0%" stop-color="' + darkenColor(color, 0.15) + '"/>' +
+                    '<stop offset="100%" stop-color="' + color + '"/>' +
+                '</linearGradient>';
+                segments += '<circle class="donut-segment" data-cat="' + escapeHtml(cat) + '" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="url(#' + gid + ')" stroke-width="' + strokeW + '" stroke-linecap="round" ' +
                     'stroke-dasharray="' + dash + ' ' + (circumference - dash) + '" stroke-dashoffset="' + (dash) + '" ' +
                     'transform="rotate(' + (-90 + offsetDeg) + ' ' + cx + ' ' + cy + ')" filter="url(#donutGlow)" ' +
                     'style="transition: stroke-dashoffset 0.9s cubic-bezier(0.16,1,0.3,1) ' + (i * 0.08) + 's;"></circle>';
@@ -3281,9 +3281,10 @@ function updateBulkDeleteButton() {
             });
 
             let legend = '';
-            sortedCats.forEach(([cat, amount]) => {
+            sortedCats.forEach(([cat, amount], i) => {
+                const color = DONUT_PALETTE[i % DONUT_PALETTE.length];
                 legend += '<div class="donut-legend-item" data-cat="' + escapeHtml(cat) + '">' +
-                    '<span class="donut-legend-amount" data-amount="' + amount + '">LKR 0</span>' +
+                    '<span class="donut-legend-amount" data-amount="' + amount + '" style="color:' + color + ';">LKR 0</span>' +
                     '<span class="donut-legend-cat">' + escapeHtml(cat) + '</span>' +
                 '</div>';
             });
@@ -3295,9 +3296,9 @@ function updateBulkDeleteButton() {
                 '</div>' +
                 '<div class="donut-legend">' + legend + '</div>';
 
-            animateCounter(document.getElementById('donutTotalValue'), total, v => 'LKR ' + Math.round(v).toLocaleString('en-US'));
+            animateCounter(document.getElementById('donutTotalValue'), total, v => 'LKR ' + formatCompactAmount(v, 0));
             donutEl.querySelectorAll('.donut-legend-amount').forEach(el => {
-                animateCounter(el, parseFloat(el.getAttribute('data-amount')), v => 'LKR ' + Math.round(v).toLocaleString('en-US'));
+                animateCounter(el, parseFloat(el.getAttribute('data-amount')), v => 'LKR ' + formatCompactAmount(v, 0));
             });
 
             // Animate the draw-in
