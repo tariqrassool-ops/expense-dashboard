@@ -9,9 +9,10 @@ import { state } from "./state.js";
 
 export async function ensureUserProfile() {
     if (!state.currentUser) return;
-
+    
+    const workspaceId = `${state.currentUser.uid}_personal`;
+    
     const ref = doc(state.db, "users", state.currentUser.uid);
-
     const snapshot = await getDoc(ref);
 
     if (!snapshot.exists()) {
@@ -23,15 +24,16 @@ export async function ensureUserProfile() {
             createdAt: serverTimestamp(),
             lastLoginAt: serverTimestamp(),
             onboardingComplete: false,
-            defaultWorkspaceId: null
+            defaultWorkspaceId: workspaceId
         });
     } else {
         await setDoc(
-            ref,
-            {
-                lastLoginAt: serverTimestamp()
-            },
-            { merge: true }
-        );
-    }
+    ref,
+    {
+        lastLoginAt: serverTimestamp(),
+        defaultWorkspaceId: workspaceId
+    },
+    { merge: true }
+);
+}
 }
