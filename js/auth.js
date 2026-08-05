@@ -57,7 +57,11 @@ export async function showDashboard() {
     document.getElementById('landingSection').classList.add('hidden');
     document.getElementById('dashboardContent').classList.remove('hidden');
 
+    try {
     await ensureUserProfile();
+} catch (error) {
+    console.error("Failed to ensure user profile:", error);
+}
 
     const avatarEl = document.getElementById('topbarAvatar');
     if (avatarEl && state.currentUser) {
