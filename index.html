@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal expense dashboard with Gmail sync">
+    <title>Expense Dashboard</title>
+
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+</head>
+<body>
+    <section class="landing" id="landingSection" aria-label="Welcome">
+
+    <!-- Logo -->
+    <div class="logo">Expendiamus</div>
+
+    <!-- Headline -->
+    <div class="headline">
+        KEEPIN' YOUR *UCKIN<br>
+        BREAD STRAIGHT
+    </div>
+
+</section>
+       
+        <button class="btn btn-primary landing-login" id="signInBtn" onclick="signInWithGoogle()" aria-label="Log in with Google">
+            Log In
+        </button>
+
+    </section>
+
+    <div class="container">
+
+        <main id="dashboardContent" class="hidden" role="main">
+            <div class="app-topbar">
+                <div class="app-topbar-welcome">
+                    <div class="welcome-heading">
+                        Welcome back, <span id="welcomeName">there</span><button class="edit-name-btn" id="editNameBtn" onclick="editDisplayName()" aria-label="Edit your name" title="Edit your name">&#9998;</button>
+                    </div>
+                    <div class="welcome-sub"><span class="dot" aria-hidden="true"></span> Here's what's happening with your expenses</div>
+                </div>
+                <div class="app-topbar-actions">
+                    <div class="topbar-search-wrap hidden" id="topbarSearchWrap">
+                        <input type="text" id="topbarSearchInput" placeholder="Search expenses..." aria-label="Search expenses" oninput="topbarSearch(this.value)">
+                    </div>
+                    <button class="icon-btn" id="topbarSearchBtn" aria-label="Search" onclick="toggleTopbarSearch()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                    <button class="icon-btn" id="notifBtn" aria-label="Notifications" onclick="showNotifications()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        <span class="icon-badge" id="notifBadge"></span>
+                    </button>
+                    <div class="topbar-avatar" id="topbarAvatar" title="Account">A</div>
+                    <button class="btn auth-btn logout" onclick="signOut()">
+                        <span aria-hidden="true">&#x1F6AA;</span> Sign Out
+                    </button>
+                </div>
+            </div>
+
+            <nav class="tabs" role="tablist" aria-label="Dashboard sections">
+                <button class="tab-btn active" id="tabBtnDashboard" role="tab" aria-selected="true" onclick="switchTab('dashboard')">Dashboard</button>
+                <button class="tab-btn" id="tabBtnTransactions" role="tab" aria-selected="false" onclick="switchTab('transactions')">Manage Expenses</button>
+                <button class="tab-btn" id="tabBtnLoans" role="tab" aria-selected="false" onclick="switchTab('loans')">Loans</button>
+            </nav>
+
+            <section id="panelDashboard" class="tab-panel" role="tabpanel" aria-labelledby="tabBtnDashboard">
+                <div class="stats-grid" role="region" aria-label="Statistics">
+                    <article class="stat-card">
+                        <h3>Total Expenses (30 days)</h3>
+                        <div class="value" id="totalExpenses">LKR 0.00</div>
+                        <div class="change" id="expenseChange">--</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Average Spend</h3>
+                        <div class="value" id="avgSpend">LKR 0/day</div>
+                        <div class="change">Based on last 30 days</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Largest Purchase</h3>
+                        <div class="value" id="largestMerchant">--</div>
+                        <div class="change" id="largestDetail">--</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Transactions This Month</h3>
+                        <div class="value" id="txnCount">0</div>
+                        <div class="change" id="txnChange">--</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Top Category</h3>
+                        <div class="value" id="topCategory">--</div>
+                        <div class="change" id="topCategoryDetail">--</div>
+                    </article>
+                    <article class="stat-card">
+                        <h3>Owed to You</h3>
+                        <div class="value" id="owedToYou">LKR 0.00</div>
+                        <div class="change" id="owedToYouDetail">--</div>
+                    </article>
+                </div>
+
+                <div class="dashboard-row-featured" role="region" aria-label="Monthly trend, budget and spending heatmap">
+                    <div class="chart-card">
+                        <h3>Monthly Trend</h3>
+                        <div class="trend-chart-wrap" id="monthlyTrendChart"></div>
+                    </div>
+                    <div class="chart-card gauge-card">
+                        <h3 style="align-self: flex-start;">Monthly Budget <button class="edit-budget-btn" onclick="editBudget()" aria-label="Edit budget" title="Edit budget">&#9998;</button></h3>
+                        <div class="gauge-wrap" id="gaugeWrap">
+                            <div class="gauge-center">
+                                <div class="gauge-pct" id="gaugePct">0%</div>
+                                <div class="gauge-label" id="gaugeSubLabel">of budget used</div>
+                            </div>
+                        </div>
+                        <div class="gauge-substats">
+                            <div class="gauge-substat">
+                                <span class="label">Spent</span>
+                                <span class="value" id="gaugeSpent">LKR 0</span>
+                            </div>
+                            <div class="gauge-substat" id="gaugeRemainingBox">
+                                <span class="label">Remaining</span>
+                                <span class="value" id="gaugeRemaining">LKR 0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Spending Heatmap</h3>
+                        <div id="spendingHeatmap" class="heatmap-cal"></div>
+                    </div>
+                </div>
+
+                <div class="charts-grid" role="region" aria-label="Charts">
+                    <div class="chart-card">
+                        <h3>Spending by Category</h3>
+                        <div id="categoryChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Category Breakdown</h3>
+                        <div id="categoryDonut" class="donut-wrap"></div>
+                    </div>
+                </div>
+
+                <div class="charts-grid charts-grid-3" role="region" aria-label="More charts and activity">
+                    <div class="chart-card">
+                        <h3>Spend — Last 7 Days</h3>
+                        <div id="weeklyChart"></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Top Merchants</h3>
+                        <div id="merchantChart" class="merchant-list"></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Recent Activity</h3>
+                        <div id="recentActivity" class="activity-list"></div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section id="panelTransactions" class="tab-panel hidden" role="tabpanel" aria-labelledby="tabBtnTransactions">
+                <div class="action-bar" role="region" aria-label="Actions">
+                    <button class="btn btn-primary" onclick="openAddModal()">
+                        <span aria-hidden="true">+</span> Add Expense
+                    </button>
+
+                    <div class="sync-date-group">
+                        <label for="syncFromDate">Sync From</label>
+                        <input type="date" id="syncFromDate">
+                    </div>
+
+                    <button class="btn btn-success" id="syncBtn" onclick="syncGmail()">
+                        <span aria-hidden="true">&#x1F504;</span> Sync Gmail
+                    </button>
+
+                    <button class="btn btn-warning" onclick="exportData()">
+                        <span aria-hidden="true">&#x1F4E5;</span> Export CSV
+                    </button>
+
+                    <button
+                        class="btn btn-danger"
+                        id="bulkDeleteBtn"
+                        onclick="deleteSelectedExpenses()"
+                        style="display:none;">
+                        🗑 Delete Selected
+                    </button>
+                </div>
+
+                <div class="filters" role="search" aria-label="Filter expenses">
+                    <div class="filter-group">
+                        <label for="searchFilter">Search</label>
+                        <input type="text" id="searchFilter" placeholder="Search expenses..." oninput="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="categoryFilter">Category</label>
+                        <select id="categoryFilter" onchange="applyFilters()">
+                            <option value="">All Categories</option>
+                            <option value="Food">Food</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Groceries">Groceries</option>
+                            <option value="Banking">Banking</option>
+                            <option value="Transfer">Transfer</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Loan Payment">Loan Payment</option>
+                            <option value="Uncategorized">Uncategorized</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="fromDate">From Date</label>
+                        <input type="date" id="fromDate" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="toDate">To Date</label>
+                        <input type="date" id="toDate" onchange="applyFilters()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="sourceFilter">Source</label>
+                        <select id="sourceFilter" onchange="applyFilters()">
+                            <option value="">All Sources</option>
+                            <option value="manual">Manual</option>
+                            <option value="gmail">Gmail</option>
+                            <option value="loan_payment">Loan Payment</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Recent Expenses</h2>
+                        <span id="recordCount" style="color: var(--gray); font-size: 0.9rem;">0 records</span>
+                    </div>
+                    <div class="table-scroll">
+                        <div id="expensesTable">
+                            <div class="empty-state">
+                                <div class="empty-state-icon" aria-hidden="true">&#x1F4ED;</div>
+                                <h3>No expenses yet</h3>
+                                <p>Add expenses manually or sync with Gmail to get started</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="panelLoans" class="tab-panel hidden" role="tabpanel" aria-labelledby="tabBtnLoans">
+                <div class="action-bar" role="region" aria-label="Loan actions">
+                    <button class="btn btn-primary" onclick="openAddLoanModal()">
+                        <span aria-hidden="true">+</span> Add Loan
+                    </button>
+                </div>
+                <div id="loansGrid" class="loans-grid">
+                    <div class="empty-state">
+                        <div class="empty-state-icon" aria-hidden="true">&#x1F3E6;</div>
+                        <h3>No loans tracked yet</h3>
+                        <p>Add a bank loan or lease to start tracking what you owe</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="expenseModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Expense</h2>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="expenseForm" onsubmit="event.preventDefault(); saveExpense();">
+                    <input type="hidden" id="expenseId" aria-hidden="true">
+                    <div class="form-group">
+                        <label for="expenseDate">Date <span aria-label="required">*</span></label>
+                        <input type="date" id="expenseDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseMerchant">Merchant/Source <span aria-label="required">*</span></label>
+                        <input type="text" id="expenseMerchant" placeholder="e.g., PickMe, Amazon" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseAmount">Amount (LKR) <span aria-label="required">*</span></label>
+                        <input type="number" id="expenseAmount" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseCategory">Category <span aria-label="required">*</span></label>
+                        <select id="expenseCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Food">Food</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Groceries">Groceries</option>
+                            <option value="Banking">Banking</option>
+                            <option value="Transfer">Transfer</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Loan Payment">Loan Payment</option>
+                            <option value="Uncategorized">Uncategorized</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-row" onclick="document.getElementById('expenseSplitEnabled').click()">
+                        <input type="checkbox" id="expenseSplitEnabled" onclick="event.stopPropagation(); toggleSplitFields();">
+                        <label for="expenseSplitEnabled" onclick="event.stopPropagation();">Split this cost with someone</label>
+                    </div>
+                    <div class="split-fields hidden" id="splitFieldsWrap">
+                        <div class="form-group">
+                            <label for="splitWithName">Split with</label>
+                            <input type="text" id="splitWithName" placeholder="e.g., Kasun">
+                        </div>
+                        <div class="form-group">
+                            <label for="splitOwedAmount">Amount owed to you (LKR)</label>
+                            <input type="number" id="splitOwedAmount" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="checkbox-row" style="margin-bottom: 0;" onclick="document.getElementById('splitSettled').click()">
+                            <input type="checkbox" id="splitSettled" onclick="event.stopPropagation();">
+                            <label for="splitSettled" onclick="event.stopPropagation();">Already settled / paid back to you</label>
+                        </div>
+                    </div>
+                    <div class="checkbox-row" onclick="document.getElementById('expensePaid').click()">
+                        <input type="checkbox" id="expensePaid" checked onclick="event.stopPropagation();">
+                        <label for="expensePaid" onclick="event.stopPropagation();">Paid</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseDescription">Description</label>
+                        <textarea id="expenseDescription" rows="3" placeholder="Optional notes..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveExpense()">Save Expense</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="loanModal" role="dialog" aria-modal="true" aria-labelledby="loanModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="loanModalTitle">Add Loan</h2>
+                <button class="modal-close" onclick="closeLoanModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="loanForm" onsubmit="event.preventDefault(); saveLoan();">
+                    <input type="hidden" id="loanId" aria-hidden="true">
+                    <div class="form-group">
+                        <label for="loanName">Lender / Loan Name <span aria-label="required">*</span></label>
+                        <input type="text" id="loanName" placeholder="e.g., HNB Personal Loan" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanType">Type <span aria-label="required">*</span></label>
+                        <select id="loanType" required>
+                            <option value="Bank Loan">Bank Loan</option>
+                            <option value="Leasing">Leasing</option>
+                            <option value="Personal Loan">Personal Loan</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanPrincipal">Original Amount (LKR) <span aria-label="required">*</span></label>
+                        <input type="number" id="loanPrincipal" step="0.01" min="0" placeholder="0.00" required oninput="syncLoanRemainingDefault()">
+                    </div>
+                    <div class="form-group">
+                        <label for="loanRemaining">Remaining Balance (LKR) <span aria-label="required">*</span></label>
+                        <input type="number" id="loanRemaining" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanInstallment">Monthly Installment (LKR)</label>
+                        <input type="number" id="loanInstallment" step="0.01" min="0" placeholder="Optional">
+                    </div>
+                    <div class="form-group">
+                        <label for="loanInterestRate">Interest Rate (% p.a.)</label>
+                        <input type="number" id="loanInterestRate" step="0.01" min="0" placeholder="Optional">
+                    </div>
+                    <div class="form-group">
+                        <label for="loanDueDate">Next Due Date</label>
+                        <input type="date" id="loanDueDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="loanCardNetwork">Card Network</label>
+                        <select id="loanCardNetwork">
+                            <option value="">None / Not a card</option>
+                            <option value="visa">Visa</option>
+                            <option value="mastercard">Mastercard</option>
+                            <option value="amex">American Express</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanCardNumber">Card Number</label>
+                        <input type="text" id="loanCardNumber" placeholder="e.g., 5294 2436 4780 2468" maxlength="19" inputmode="numeric">
+                    </div>
+                    <div class="form-group">
+                        <label for="loanCardExpiry">Expiry Date (MM/YY)</label>
+                        <input type="text" id="loanCardExpiry" placeholder="e.g., 12/28" maxlength="5" pattern="[0-9]{2}/[0-9]{2}">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeLoanModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveLoan()">Save Loan</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="loanPaymentModal" role="dialog" aria-modal="true" aria-labelledby="loanPaymentModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="loanPaymentModalTitle">Log Payment</h2>
+                <button class="modal-close" onclick="closeLoanPaymentModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="loanPaymentForm" onsubmit="event.preventDefault(); saveLoanPayment();">
+                    <input type="hidden" id="loanPaymentLoanId" aria-hidden="true">
+                    <div class="form-group">
+                        <label for="loanPaymentDate">Date <span aria-label="required">*</span></label>
+                        <input type="date" id="loanPaymentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanPaymentAmount">Amount Paid (LKR) <span aria-label="required">*</span></label>
+                        <input type="number" id="loanPaymentAmount" step="0.01" min="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loanPaymentNote">Note</label>
+                        <input type="text" id="loanPaymentNote" placeholder="Optional">
+                    </div>
+                </form>
+                <p style="font-size: 0.8rem; color: var(--gray);">This will also be added to your expenses as a "Loan Payment" so it's reflected in your totals.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeLoanPaymentModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveLoanPayment()">Log Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <div class="loading-text" id="loadingText">Loading...</div>
+    </div>
+
+    <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
