@@ -7,7 +7,6 @@ import { loadBudget, loadDisplayName } from './settings.js';
 import { loadExpenses } from './expenses.js';
 import { loadLoans } from './loans.js';
 import { ensureUserProfile } from "./users.js";
-import { ensureDefaultWorkspace } from "./workspaces.js";
 
 window.signInWithGoogle = function() {
     showDebug('Sign-in button clicked...');
@@ -60,7 +59,6 @@ export async function showDashboard() {
 
     try {
     await ensureUserProfile();
-    await ensureDefaultWorkspace();
 } catch (error) {
     console.error("Failed to ensure user profile:", error);
 }
