@@ -6,6 +6,7 @@ import { showDebug } from './firebase-init.js';
 import { loadBudget, loadDisplayName } from './settings.js';
 import { loadExpenses } from './expenses.js';
 import { loadLoans } from './loans.js';
+import { ensureUserProfile } from "./users.js";
 
 window.signInWithGoogle = function() {
     showDebug('Sign-in button clicked...');
@@ -55,6 +56,8 @@ export function showAuth() {
 export async function showDashboard() {
     document.getElementById('landingSection').classList.add('hidden');
     document.getElementById('dashboardContent').classList.remove('hidden');
+
+    await ensureUserProfile();
 
     const avatarEl = document.getElementById('topbarAvatar');
     if (avatarEl && state.currentUser) {
