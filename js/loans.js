@@ -133,6 +133,7 @@ export async function loadLoans() {
 
             const data = {
                 userId: state.currentUser.uid,
+                workspaceId: `${state.currentUser.uid}_personal`,
                 name: document.getElementById('loanName').value.trim(),
                 type: document.getElementById('loanType').value,
                 principal: principal,
