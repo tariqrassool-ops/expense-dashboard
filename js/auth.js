@@ -7,6 +7,7 @@ import { loadBudget, loadDisplayName } from './settings.js';
 import { loadExpenses } from './expenses.js';
 import { loadLoans } from './loans.js';
 import { ensureUserProfile } from "./users.js";
+import { ensureDefaultWorkspace } from "./workspaces.js";
 import { migrateWorkspaceIds } from "./migrations.js";
 import { migratePersonalWorkspace } from "./workspaceMigration.js";
 
