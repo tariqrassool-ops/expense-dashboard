@@ -39,6 +39,8 @@ window.editBudget = async function() {
         workspaceId: `${state.currentUser.uid}_personal`
     },
     { merge: true }
+    );
+        
         state.currentBudget = val;
         // Dynamic import avoids a hard circular dependency with charts.js (which imports getBudget from here).
         const { updateStats } = await import('./charts.js');
