@@ -28,10 +28,9 @@ try {
 
     // Check for redirect result (after redirect sign-in)
     getRedirectResult(state.auth).then((result) => {
-        if (result && result.user) {
-            state.currentUser = result.user;
-            showDashboard();
-        }
+        if (error.code && error.code !== 'auth/null-user') {
+        showDebug('❌ Redirect result error: ' + error.message);
+    }
     }).catch((error) => {
         if (error.code && error.code !== 'auth/null-user') {
             showDebug('&#x274C; Redirect result error: ' + error.message);
