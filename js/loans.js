@@ -221,6 +221,7 @@ export async function loadLoans() {
                 // 1. Record the payment as an expense so it flows into your totals/charts
                 await addDoc(collection(state.db, 'expenses'), {
                     userId: state.currentUser.uid,
+                    workspaceId: `${state.currentUser.uid}_personal`,
                     date: date,
                     merchant: loan.name || 'Loan Payment',
                     amount: amount,
