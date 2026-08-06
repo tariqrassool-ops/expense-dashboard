@@ -1,9 +1,14 @@
 import {
     collection,
-    doc,
+    query,
+    where,
+    getDocs,
     getDoc,
-    setDoc,
     addDoc,
+    setDoc,
+    updateDoc,
+    doc,
+    writeBatch,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
@@ -27,40 +32,93 @@ export async function migratePersonalWorkspace() {
         return;
     }
 
-    // Create the new workspace
-    const workspaceRef = await addDoc(
-        collection(state.db, "workspaces"),
-        {
-            name: "Personal",
-            type: "personal",
-            ownerId: state.currentUser.uid,
-            createdAt: serverTimestamp()
-        }
-    );
+    // Create new workspace
+    const workspaceRef = await addDoc(collection(state.db, "workspaces"), {
+        name: "Personal",
+        type: "personal",
+        ownerId: state.currentUser.uid,
+        createdAt: serverTimestamp()
+    });
 
-    const workspaceId = workspaceRef.id;
+    const newWorkspaceId = workspaceRef.id;
 
     // Create membership
     await setDoc(
         doc(
             state.db,
             "workspaceMembers",
-            `${workspaceId}_${state.currentUser.uid}`
+            `${newWorkspaceId}_${state.currentUser.uid}`
         ),
         {
-            workspaceId,
+            workspaceId: newWorkspaceId,
             userId: state.currentUser.uid,
             role: "owner",
             joinedAt: serverTimestamp()
         }
     );
 
-    // Update the user profile
+    // Update user
+    await updateDoc(userRef, {
+        defaultWorkspaceId: newWorkspaceId
+    });
+
+    // --------------------
+    // Update expenses
+    // --------------------
+
+    let snapshot = await getDocs(
+        query(
+            collection(state.db, "expenses"),
+            where("userId", "==", state.currentUser.uid)
+        )
+    );
+
+    if (!snapshot.empty) {
+        const batch = writeBatch(state.db);
+
+        snapshot.forEach(document => {
+            batch.update(document.ref, {
+                workspaceId: newWorkspaceId
+            });
+        });
+
+        await batch.commit();
+    }
+
+    // --------------------
+    // Update loans
+    // --------------------
+
+    snapshot = await getDocs(
+        query(
+            collection(state.db, "loans"),
+            where("userId", "==", state.currentUser.uid)
+        )
+    );
+
+    if (!snapshot.empty) {
+        const batch = writeBatch(state.db);
+
+        snapshot.forEach(document => {
+            batch.update(document.ref, {
+                workspaceId: newWorkspaceId
+            });
+        });
+
+        await batch.commit();
+    }
+
+    // --------------------
+    // Update settings
+    // --------------------
+
     await setDoc(
-        userRef,
+        doc(state.db, "settings", state.currentUser.uid),
         {
-            defaultWorkspaceId: workspaceId
+            workspaceId: newWorkspaceId
         },
         { merge: true }
     );
+
+    console.log("Workspace migration complete.");
 }
