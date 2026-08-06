@@ -8,6 +8,7 @@ import { loadExpenses } from './expenses.js';
 import { loadLoans } from './loans.js';
 import { ensureUserProfile } from "./users.js";
 import { migrateWorkspaceIds } from "./migrations.js";
+import { migratePersonalWorkspace } from "./workspaceMigration.js";
 
 window.signInWithGoogle = function() {
     showDebug('Sign-in button clicked...');
@@ -61,6 +62,8 @@ export async function showDashboard() {
     try {
     await ensureUserProfile();
     await migrateWorkspaceIds();
+    await migratePersonalWorkspace();
+    await ensureDefaultWorkspace();
 } catch (error) {
     console.error("Failed to ensure user profile:", error);
 }
