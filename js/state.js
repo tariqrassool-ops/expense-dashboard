@@ -18,5 +18,6 @@ export const state = {
     gmailAccessToken: null,
     selectedExpenses: new Set(),
     currentBudget: DEFAULT_BUDGET,
-    currentDisplayName: 'there'
+    currentDisplayName: 'there',
+    appInitialized: false,
 };
