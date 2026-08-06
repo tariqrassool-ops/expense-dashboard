@@ -32,7 +32,13 @@ window.editBudget = async function() {
 
     showLoading('Saving budget...');
     try {
-        await setDoc(doc(state.db, 'settings', state.currentUser.uid), { monthlyBudget: val }, { merge: true });
+        await setDoc(
+    doc(state.db, 'settings', state.currentUser.uid),
+    {
+        monthlyBudget: val,
+        workspaceId: `${state.currentUser.uid}_personal`
+    },
+    { merge: true }
         state.currentBudget = val;
         // Dynamic import avoids a hard circular dependency with charts.js (which imports getBudget from here).
         const { updateStats } = await import('./charts.js');
@@ -77,7 +83,14 @@ window.editDisplayName = async function() {
 
     showLoading('Saving name...');
     try {
-        await setDoc(doc(state.db, 'settings', state.currentUser.uid), { displayName: val }, { merge: true });
+        await setDoc(
+    doc(state.db, 'settings', state.currentUser.uid),
+    {
+        displayName: val,
+        workspaceId: `${state.currentUser.uid}_personal`
+    },
+    { merge: true }
+);
         state.currentDisplayName = val;
         renderWelcomeName();
         showToast('Name updated!', 'success');
