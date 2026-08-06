@@ -26,8 +26,7 @@ window.signInWithGoogle = function() {
     signInWithPopup(state.auth, provider)
         .then((result) => {
             showDebug('&#x2705; Popup sign-in successful');
-            state.currentUser = result.user;
-            showDashboard();
+            // onAuthStateChanged will handle the dashboard
         })
         .catch((error) => {
             btn.disabled = false;
