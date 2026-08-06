@@ -51,6 +51,7 @@ export async function loadExpenses() {
 
             const data = {
                 userId: state.currentUser.uid,
+                workspaceId: `${state.currentUser.uid}_personal`, 
                 date: document.getElementById('expenseDate').value,
                 merchant: document.getElementById('expenseMerchant').value.trim(),
                 amount: amount,
