@@ -57,19 +57,21 @@ export function showAuth() {
 }
 
 export async function showDashboard() {
+
+    if (state.appInitialized) return;
+    state.appInitialized = true;
+
     document.getElementById('landingSection').classList.add('hidden');
     document.getElementById('dashboardContent').classList.remove('hidden');
 
     try {
-    await ensureUserProfile();
-    await migrateWorkspaceIds();
-    await migratePersonalWorkspace();
-    await ensureDefaultWorkspace();
-    await loadCurrentWorkspace();
-    console.log(state.currentWorkspace);
-} catch (error) {
-    console.error("Failed to ensure user profile:", error);
-}
+        await ensureUserProfile();
+        await migrateWorkspaceIds();
+        await migratePersonalWorkspace();
+        await ensureDefaultWorkspace();
+    } catch (error) {
+        console.error("Failed during startup:", error);
+    }
 
     const avatarEl = document.getElementById('topbarAvatar');
     if (avatarEl && state.currentUser) {
