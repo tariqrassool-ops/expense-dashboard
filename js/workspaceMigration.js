@@ -23,6 +23,12 @@ export async function migratePersonalWorkspace() {
     if (!userSnap.exists()) return;
 
     const user = userSnap.data();
+    console.log("MIGRATION USER:", user);
+    console.log("MIGRATION DEFAULT WORKSPACE:", user.defaultWorkspaceId);
+    console.log(
+    "NEEDS MIGRATION:",
+    !user.defaultWorkspaceId || user.defaultWorkspaceId.endsWith("_personal")
+);
 
     // Already migrated
     if (
