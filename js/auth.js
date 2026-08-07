@@ -69,6 +69,10 @@ export async function showDashboard() {
         await migrateWorkspaceIds();
         await migratePersonalWorkspace();
         await ensureDefaultWorkspace();
+
+        const workspaceId = await ensureDefaultWorkspace();
+        console.log("DEFAULT WORKSPACE ID:", workspaceId);
+        
     } catch (error) {
         console.error("Failed during startup:", error);
     }
