@@ -7,7 +7,6 @@ import { loadBudget, loadDisplayName } from './settings.js';
 import { loadExpenses } from './expenses.js';
 import { loadLoans } from './loans.js';
 import { ensureUserProfile } from "./users.js";
-import { ensureDefaultWorkspace } from "./workspaces.js";
 import { migrateWorkspaceIds } from "./migrations.js";
 import { migratePersonalWorkspace } from "./workspaceMigration.js";
 import { loadCurrentWorkspace } from "./workspaceService.js";
@@ -68,7 +67,6 @@ export async function showDashboard() {
         await ensureUserProfile();
         await migrateWorkspaceIds();
         await migratePersonalWorkspace();
-        await ensureDefaultWorkspace();
     } catch (error) {
         console.error("Failed during startup:", error);
     }
