@@ -35,7 +35,8 @@ export async function migratePersonalWorkspace() {
         user.defaultWorkspaceId &&
         !user.defaultWorkspaceId.endsWith("_personal")
     ) {
-        return;
+        state.currentWorkspaceId = user.defaultWorkspaceId;
+        return user.defaultWorkspaceId;
     }
 
     // Create new workspace
@@ -127,4 +128,8 @@ export async function migratePersonalWorkspace() {
     );
 
     console.log("Workspace migration complete.");
+
+    state.currentWorkspaceId = newWorkspaceId;
+
+    return newWorkspaceId;
 }
