@@ -66,7 +66,6 @@ export async function showDashboard() {
     try {
         await ensureUserProfile();
         await migrateWorkspaceIds();
-        await migratePersonalWorkspace();
 
         console.log("ACTIVE WORKSPACE ID:", state.currentWorkspaceId);
     } catch (error) {
