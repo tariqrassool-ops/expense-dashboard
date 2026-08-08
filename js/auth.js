@@ -67,6 +67,9 @@ export async function showDashboard() {
         await ensureUserProfile();
         await migrateWorkspaceIds();
         await migratePersonalWorkspace();
+
+        console.log("ACTIVE WORKSPACE ID:", state.currentWorkspaceId);
+        
     } catch (error) {
         console.error("Failed during startup:", error);
     }
