@@ -1621,3 +1621,59 @@
 .workspace-delete-btn:hover {
     background: rgba(220,53,69,0.15);
 }
+
+/* ===================== MULTI-PERSON SPLIT ===================== */
+.split-participant-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.split-participant-row select {
+    flex: 1.3;
+    min-width: 0;
+}
+.split-participant-row input[type="text"] {
+    flex: 1;
+    min-width: 0;
+}
+.split-participant-row input[type="number"] {
+    flex: 0 0 90px;
+    min-width: 0;
+}
+.split-participant-row select,
+.split-participant-row input {
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--dark);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+}
+.split-remove-btn {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+}
+.split-remove-btn:hover {
+    color: #c0392b;
+    border-color: rgba(220,53,69,0.35);
+}
+.split-fields-actions {
+    display: flex;
+    gap: 8px;
+    margin: 4px 0 10px;
+}
+.split-total-line {
+    font-size: 0.78rem;
+    color: var(--gray);
+    margin: 0 0 12px;
+}
