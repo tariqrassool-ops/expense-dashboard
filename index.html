@@ -49,6 +49,13 @@
                     <div class="welcome-sub"><span class="dot" aria-hidden="true"></span> Here's what's happening with your expenses</div>
                 </div>
                 <div class="app-topbar-actions">
+                    <div class="workspace-switcher-wrap" id="workspaceSwitcherWrap">
+                        <button type="button" class="workspace-switcher-btn" id="workspaceSwitcherBtn" onclick="toggleWorkspaceSwitcher()" aria-haspopup="true">
+                            <span id="workspaceSwitcherLabel">Workspace</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div class="workspace-switcher-menu hidden" id="workspaceSwitcherMenu"></div>
+                    </div>
                     <div class="topbar-search-wrap hidden" id="topbarSearchWrap">
                         <input type="text" id="topbarSearchInput" placeholder="Search expenses..." aria-label="Search expenses" oninput="topbarSearch(this.value)">
                     </div>
@@ -430,6 +437,50 @@
             <div class="modal-footer">
                 <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeLoanPaymentModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="saveLoanPayment()">Log Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="workspaceModal" role="dialog" aria-modal="true" aria-labelledby="workspaceModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="workspaceModalTitle">Manage Workspaces</h2>
+                <button class="modal-close" onclick="closeWorkspaceModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.85rem; color: var(--gray); margin-bottom: 4px;">Current workspace</p>
+                <p style="font-weight: 600; margin-bottom: 18px;" id="workspaceModalCurrentName">Workspace</p>
+
+                <div class="form-group">
+                    <label for="inviteEmailInput">Invite someone by email</label>
+                    <input type="email" id="inviteEmailInput" placeholder="name@example.com">
+                    <p style="font-size: 0.75rem; color: var(--gray); margin-top: 6px;">They'll see the invite next time they log in — no account needed yet. Anyone who accepts can see every expense in this workspace.</p>
+                </div>
+
+                <div style="margin: 22px 0; border-top: 1px solid var(--border);"></div>
+
+                <div class="form-group">
+                    <label for="newWorkspaceName">Create a new shared workspace</label>
+                    <input type="text" id="newWorkspaceName" placeholder="e.g. Roommates, Household">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeWorkspaceModal()">Close</button>
+                <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="createWorkspace()">Create Workspace</button>
+                <button class="btn btn-primary" onclick="sendWorkspaceInvite()">Send Invite</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="invitesModal" role="dialog" aria-modal="true" aria-labelledby="invitesModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="invitesModalTitle">Workspace Invites</h2>
+                <button class="modal-close" onclick="closeInvitesModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body" id="invitesList"></div>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeInvitesModal()">Close</button>
             </div>
         </div>
     </div>
