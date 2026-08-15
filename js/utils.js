@@ -17,6 +17,22 @@ export function escapeCsv(text) {
     return text;
 }
 
+// Normalizes an expense's split into a list of participants, so both the
+// legacy single-person format (withName/owedToYou) and the current
+// multi-person `participants` array can be read identically everywhere.
+export function getSplitParticipants(split) {
+    if (!split) return [];
+    if (Array.isArray(split.participants)) return split.participants;
+    if (split.withName) {
+        return [{ type: 'external', name: split.withName, amount: split.owedToYou || 0 }];
+    }
+    return [];
+}
+
+export function getSplitTotal(split) {
+    return getSplitParticipants(split).reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+}
+
 export function showLoading(text) {
     document.getElementById('loadingText').textContent = text;
     document.getElementById('loadingOverlay').classList.add('active');
