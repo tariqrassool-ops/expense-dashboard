@@ -4,8 +4,9 @@
 import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 import { state } from './state.js';
-import { showLoading, hideLoading, showToast, formatDate, escapeHtml } from './utils.js';
+import { showLoading, hideLoading, showToast, formatDate, escapeHtml, getSplitParticipants, getSplitTotal } from './utils.js';
 import { updateStats, updateCharts } from './charts.js';
+import { getSplitDraft } from './modal.js';
 
         // ===================== DATA =====================
 export async function loadExpenses() {
@@ -35,16 +36,22 @@ export async function loadExpenses() {
             const id = document.getElementById('expenseId').value;
             const amount = parseFloat(document.getElementById('expenseAmount').value);
             const splitEnabled = document.getElementById('expenseSplitEnabled').checked;
-            const splitWithName = document.getElementById('splitWithName').value.trim();
-            const splitOwed = parseFloat(document.getElementById('splitOwedAmount').value);
 
+            let splitParticipants = [];
             if (splitEnabled) {
-                if (!splitWithName || isNaN(splitOwed) || splitOwed <= 0) {
-                    showToast('Please enter who you split with and a valid amount owed to you', 'error');
+                // Only keep rows that actually have a name and a positive amount —
+                // an empty trailing row shouldn't block saving.
+                splitParticipants = getSplitDraft()
+                    .map(p => ({ ...p, name: (p.name || '').trim(), amount: Number(p.amount) || 0 }))
+                    .filter(p => p.name && p.amount > 0);
+
+                if (splitParticipants.length === 0) {
+                    showToast('Please add at least one person to split with, with a valid amount', 'error');
                     return;
                 }
-                if (splitOwed >= amount) {
-                    showToast('Amount owed to you must be less than the total expense amount', 'error');
+                const owedTotal = splitParticipants.reduce((sum, p) => sum + p.amount, 0);
+                if (owedTotal >= amount) {
+                    showToast('The total split amount must be less than the full expense amount', 'error');
                     return;
                 }
             }
@@ -61,8 +68,7 @@ export async function loadExpenses() {
                 paid: document.getElementById('expensePaid').checked,
                 split: splitEnabled ? {
                     enabled: true,
-                    withName: splitWithName,
-                    owedToYou: splitOwed,
+                    participants: splitParticipants,
                     settled: document.getElementById('splitSettled').checked
                 } : null,
                 createdAt: serverTimestamp(),
@@ -182,12 +188,15 @@ export async function loadExpenses() {
 
                 let splitHtml = '';
                 if (expense.split && expense.split.enabled) {
+                    const participants = getSplitParticipants(expense.split);
                     const settled = !!expense.split.settled;
-                    const withName = escapeHtml(expense.split.withName || 'someone');
-                    const owed = (expense.split.owedToYou || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    const owed = getSplitTotal(expense.split).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    const who = participants.length === 1
+                        ? escapeHtml(participants[0].name || 'someone')
+                        : participants.length + ' people';
                     splitHtml = '<div><button type="button" class="split-badge ' + (settled ? 'settled' : 'unsettled') + '" ' +
                         'onclick="toggleSplitSettled(\'' + expense.id + '\')" title="Click to mark as ' + (settled ? 'unsettled' : 'settled') + '">' +
-                        (settled ? '&#x2713; Settled — ' : '&#x23F3; Owed by ') + withName + ' · LKR ' + owed +
+                        (settled ? '&#x2713; Settled — ' : '&#x23F3; Owed by ') + who + ' · LKR ' + owed +
                         '</button></div>';
                 }
 
