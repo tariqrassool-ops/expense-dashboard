@@ -15,6 +15,7 @@ export const state = {
     currentWorkspace: null,
     workspaces: [],
     pendingInvites: [],
+    currentWorkspaceMembers: [],
     allExpenses: [],
     allLoans: [],
     gmailAccessToken: null,
