@@ -36,7 +36,7 @@ window.editBudget = async function() {
     doc(state.db, 'settings', state.currentUser.uid),
     {
         monthlyBudget: val,
-        workspaceId: `${state.currentUser.uid}_personal`
+        workspaceId: state.currentWorkspaceId
     },
     { merge: true }
     );
@@ -89,7 +89,7 @@ window.editDisplayName = async function() {
     doc(state.db, 'settings', state.currentUser.uid),
     {
         displayName: val,
-        workspaceId: `${state.currentUser.uid}_personal`
+        workspaceId: state.currentWorkspaceId
     },
     { merge: true }
 );
