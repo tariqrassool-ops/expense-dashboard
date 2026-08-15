@@ -11,7 +11,7 @@ export async function loadLoans() {
             try {
                 const q = query(
                     collection(state.db, 'loans'),
-                    where('userId', '==', state.currentUser.uid)
+                    where('workspaceId', '==', state.currentWorkspaceId)
                 );
                 const snapshot = await getDocs(q);
                 state.allLoans = [];
@@ -133,7 +133,7 @@ export async function loadLoans() {
 
             const data = {
                 userId: state.currentUser.uid,
-                workspaceId: `${state.currentUser.uid}_personal`,
+                workspaceId: state.currentWorkspaceId,
                 name: document.getElementById('loanName').value.trim(),
                 type: document.getElementById('loanType').value,
                 principal: principal,
@@ -221,7 +221,7 @@ export async function loadLoans() {
                 // 1. Record the payment as an expense so it flows into your totals/charts
                 await addDoc(collection(state.db, 'expenses'), {
                     userId: state.currentUser.uid,
-                    workspaceId: `${state.currentUser.uid}_personal`,
+                    workspaceId: state.currentWorkspaceId,
                     date: date,
                     merchant: loan.name || 'Loan Payment',
                     amount: amount,
