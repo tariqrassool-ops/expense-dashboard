@@ -1,4 +1,4 @@
-        :root {
+:root {
             /* Core palette — jet black + modern violet fintech */
             --bg: #000000;
             --white: #120b1c;         /* surface / card background */
@@ -1466,3 +1466,111 @@
     }
 }
 
+
+/* ===================== WORKSPACE SWITCHER ===================== */
+.workspace-switcher-wrap {
+    position: relative;
+}
+.workspace-switcher-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 19px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--dark);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    max-width: 180px;
+}
+.workspace-switcher-btn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.workspace-switcher-btn:hover {
+    border-color: rgba(155,88,222,0.35);
+    background: rgba(155,88,222,0.06);
+}
+.workspace-switcher-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 220px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(20,10,35,0.14);
+    padding: 6px;
+    z-index: 50;
+}
+.workspace-switcher-menu.hidden {
+    display: none;
+}
+.workspace-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 10px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--dark);
+    text-align: left;
+    cursor: pointer;
+    font-family: var(--font-body);
+}
+.workspace-menu-item:hover {
+    background: rgba(155,88,222,0.08);
+}
+.workspace-menu-item.active {
+    color: var(--primary);
+    font-weight: 600;
+}
+.workspace-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: rgba(155,88,222,0.12);
+    padding: 2px 7px;
+    border-radius: 999px;
+}
+.workspace-menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 6px 4px;
+}
+
+/* ===================== INVITES ===================== */
+.invite-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+.invite-card-text {
+    font-size: 0.85rem;
+    color: var(--dark);
+    flex: 1;
+    min-width: 180px;
+}
+.invite-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
