@@ -131,7 +131,8 @@ window.acceptInvite = async function(inviteId) {
                 workspaceId: invite.workspaceId,
                 userId: state.currentUser.uid,
                 role: 'member',
-                joinedAt: serverTimestamp()
+                joinedAt: serverTimestamp(),
+                viaInviteId: inviteId
             }
         );
         await updateDoc(doc(state.db, "invites", inviteId), { status: 'accepted' });
