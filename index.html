@@ -311,14 +311,12 @@
                         <label for="expenseSplitEnabled" onclick="event.stopPropagation();">Split this cost with someone</label>
                     </div>
                     <div class="split-fields hidden" id="splitFieldsWrap">
-                        <div class="form-group">
-                            <label for="splitWithName">Split with</label>
-                            <input type="text" id="splitWithName" placeholder="e.g., Kasun">
+                        <div id="splitParticipantsList"></div>
+                        <div class="split-fields-actions">
+                            <button type="button" class="btn" style="padding: 6px 12px; font-size: 0.78rem; background: var(--light-gray); color: var(--dark);" onclick="addSplitParticipant()">+ Add person</button>
+                            <button type="button" class="btn" style="padding: 6px 12px; font-size: 0.78rem; background: var(--light-gray); color: var(--dark);" onclick="splitEvenly()">Split evenly</button>
                         </div>
-                        <div class="form-group">
-                            <label for="splitOwedAmount">Amount owed to you (LKR)</label>
-                            <input type="number" id="splitOwedAmount" step="0.01" min="0" placeholder="0.00">
-                        </div>
+                        <p class="split-total-line" id="splitTotalLine"></p>
                         <div class="checkbox-row" style="margin-bottom: 0;" onclick="document.getElementById('splitSettled').click()">
                             <input type="checkbox" id="splitSettled" onclick="event.stopPropagation();">
                             <label for="splitSettled" onclick="event.stopPropagation();">Already settled / paid back to you</label>
