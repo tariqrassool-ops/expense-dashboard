@@ -60,6 +60,8 @@ export async function migratePersonalWorkspace() {
             workspaceId: newWorkspaceId,
             userId: state.currentUser.uid,
             role: "owner",
+            displayName: state.currentUser.displayName || state.currentUser.email || "Owner",
+            email: state.currentUser.email || "",
             joinedAt: serverTimestamp()
         }
     );
