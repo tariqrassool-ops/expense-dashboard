@@ -1,5 +1,4 @@
 // ===================== TOPBAR ACTIONS =====================
-import { showToast } from './utils.js';
 
 window.toggleTopbarSearch = function() {
     const wrap = document.getElementById('topbarSearchWrap');
@@ -19,7 +18,5 @@ window.topbarSearch = function(value) {
     }
 };
 
-window.showNotifications = function() {
-    document.getElementById('notifBadge').classList.add('hidden');
-    showToast("You're all caught up — no new notifications", 'info');
-};
+// showNotifications is now defined in invites.js — it opens the real
+// pending-invites modal instead of this placeholder toast.
