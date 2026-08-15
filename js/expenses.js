@@ -13,7 +13,7 @@ export async function loadExpenses() {
             try {
                 const q = query(
                     collection(state.db, 'expenses'),
-                    where('userId', '==', state.currentUser.uid)
+                    where('workspaceId', '==', state.currentWorkspaceId)
                 );
                 const snapshot = await getDocs(q);
 
@@ -51,7 +51,7 @@ export async function loadExpenses() {
 
             const data = {
                 userId: state.currentUser.uid,
-                workspaceId: `${state.currentUser.uid}_personal`, 
+                workspaceId: state.currentWorkspaceId,
                 date: document.getElementById('expenseDate').value,
                 merchant: document.getElementById('expenseMerchant').value.trim(),
                 amount: amount,
