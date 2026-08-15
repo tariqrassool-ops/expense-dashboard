@@ -22,6 +22,29 @@ import { showToast, showLoading, hideLoading, escapeHtml } from "./utils.js";
 import { loadExpenses } from "./expenses.js";
 import { loadLoans } from "./loans.js";
 
+// Loads the roster of the currently active workspace — used to populate
+// the "split with a real member" picker. Reads directly from
+// workspaceMembers (which denormalizes each member's name/email onto
+// their own record) rather than the users collection, since a user's
+// profile doc isn't readable by anyone but themselves under current rules.
+export async function loadWorkspaceMembers() {
+    if (!state.currentWorkspaceId) {
+        state.currentWorkspaceMembers = [];
+        return;
+    }
+
+    const snap = await getDocs(
+        query(
+            collection(state.db, "workspaceMembers"),
+            where("workspaceId", "==", state.currentWorkspaceId)
+        )
+    );
+
+    state.currentWorkspaceMembers = snap.docs
+        .map(d => d.data())
+        .filter(m => m.userId !== state.currentUser?.uid);
+}
+
 export async function loadUserWorkspaces() {
     if (!state.currentUser) return;
 
@@ -64,6 +87,7 @@ export async function switchWorkspace(workspaceId) {
     try {
         await loadExpenses();
         await loadLoans();
+        await loadWorkspaceMembers();
         renderWorkspaceSwitcher();
         const menu = document.getElementById('workspaceSwitcherMenu');
         if (menu) menu.classList.add('hidden');
@@ -252,6 +276,8 @@ window.createWorkspace = async function() {
                 workspaceId: wsRef.id,
                 userId: state.currentUser.uid,
                 role: 'owner',
+                displayName: state.currentUser.displayName || state.currentUser.email || 'Owner',
+                email: state.currentUser.email || '',
                 joinedAt: serverTimestamp()
             }
         );
