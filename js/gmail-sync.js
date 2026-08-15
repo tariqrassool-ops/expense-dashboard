@@ -51,6 +51,7 @@ for (const [email, config] of Object.entries(EMAIL_SOURCES)) {
                         if (parsed && parsed.amount > 0) {
                             newExpenses.push({
                                 userId: state.currentUser.uid,
+                                workspaceId: state.currentWorkspaceId,
                                 ...parsed,
                                 gmailMessageId: message.id,
                                 source: 'gmail',
@@ -122,4 +123,3 @@ for (const [email, config] of Object.entries(EMAIL_SOURCES)) {
             if (!response.ok) throw { status: response.status, message: 'Failed to fetch message' };
             return await response.json();
         }
-
