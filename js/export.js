@@ -1,6 +1,6 @@
 // ===================== EXPORT =====================
 import { getFilteredExpenses } from './expenses.js';
-import { showToast, escapeCsv } from './utils.js';
+import { showToast, escapeCsv, getSplitParticipants, getSplitTotal } from './utils.js';
 
 window.exportData = function() {
     const filtered = getFilteredExpenses();
@@ -9,8 +9,11 @@ window.exportData = function() {
     let csv = 'Date,Merchant,Category,Amount,Description,Source,Split With,Owed To You,Settled\n';
     filtered.forEach(e => {
         const split = e.split && e.split.enabled ? e.split : null;
+        const participants = split ? getSplitParticipants(split) : [];
+        const names = participants.map(p => p.name).join('; ');
+        const owedTotal = split ? getSplitTotal(split) : 0;
         csv += e.date + ',' + escapeCsv(e.merchant || '') + ',' + (e.category || '') + ',' + (e.amount || 0) + ',' + escapeCsv(e.description || '') + ',' + (e.source || '') + ',' +
-            escapeCsv(split ? split.withName || '' : '') + ',' + (split ? (split.owedToYou || 0) : '') + ',' + (split ? (split.settled ? 'Yes' : 'No') : '') + '\n';
+            escapeCsv(names) + ',' + (split ? owedTotal : '') + ',' + (split ? (split.settled ? 'Yes' : 'No') : '') + '\n';
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
