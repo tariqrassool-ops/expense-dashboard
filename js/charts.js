@@ -3,7 +3,7 @@
 // monthly trend line, spending heatmap, and the stat-card / chart
 // data crunching that feeds them (updateStats / updateCharts).
 import { state } from './state.js';
-import { escapeHtml, formatDate } from './utils.js';
+import { escapeHtml, formatDate, getSplitParticipants, getSplitTotal } from './utils.js';
 import { getBudget } from './settings.js';
 
         // ===================== SHARED: COLOR HELPERS & BAR ANIMATION =====================
@@ -352,7 +352,7 @@ export function renderSpendingHeatmap() {
 export function netAmount(e) {
             const amt = e.amount || 0;
             if (e.split && e.split.enabled) {
-                const owed = e.split.owedToYou || 0;
+                const owed = getSplitTotal(e.split);
                 return Math.max(amt - owed, 0);
             }
             return amt;
@@ -476,8 +476,14 @@ export function updateStats() {
 
             // Owed to You — sum of unsettled split shares, across all split expenses
             const unsettled = state.allExpenses.filter(e => e.split && e.split.enabled && !e.split.settled);
-            const owedTotal = unsettled.reduce((sum, e) => sum + (e.split.owedToYou || 0), 0);
-            const owedPeople = new Set(unsettled.map(e => (e.split.withName || 'Unknown').trim().toLowerCase())).size;
+            const owedTotal = unsettled.reduce((sum, e) => sum + getSplitTotal(e.split), 0);
+            const owedPeopleKeys = new Set();
+            unsettled.forEach(e => {
+                getSplitParticipants(e.split).forEach(p => {
+                    owedPeopleKeys.add(p.type === 'member' && p.uid ? 'member:' + p.uid : 'name:' + (p.name || 'Unknown').trim().toLowerCase());
+                });
+            });
+            const owedPeople = owedPeopleKeys.size;
             animateCounter(document.getElementById('owedToYou'), owedTotal, v => 'LKR ' + formatCompactAmount(v));
             document.getElementById('owedToYouDetail').textContent = unsettled.length > 0
                 ? unsettled.length + ' unsettled split' + (unsettled.length === 1 ? '' : 's') + ' · ' + owedPeople + ' ' + (owedPeople === 1 ? 'person' : 'people')
@@ -605,4 +611,3 @@ export function loanHeatColor(owedPct) {
             const hue = 130 * (1 - t); // 130 = green, ~65 = amber, 0 = red
             return hslToHex(hue, 68, 46);
         }
-
