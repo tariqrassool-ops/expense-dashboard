@@ -131,6 +131,8 @@ window.acceptInvite = async function(inviteId) {
                 workspaceId: invite.workspaceId,
                 userId: state.currentUser.uid,
                 role: 'member',
+                displayName: state.currentUser.displayName || state.currentUser.email || 'Member',
+                email: state.currentUser.email || '',
                 joinedAt: serverTimestamp(),
                 viaInviteId: inviteId
             }
