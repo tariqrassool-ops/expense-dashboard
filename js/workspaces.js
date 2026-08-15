@@ -65,3 +65,38 @@ export async function ensureDefaultWorkspace() {
     
     return workspaceId;
 }
+
+export async function loadCurrentWorkspace() {
+    if (!state.currentUser) return;
+
+    const userRef = doc(state.db, "users", state.currentUser.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+        console.error("User profile not found.");
+        return;
+    }
+
+    const workspaceId = userSnap.data().defaultWorkspaceId;
+
+    if (!workspaceId) {
+        console.error("No default workspace ID found.");
+        return;
+    }
+
+    const workspaceRef = doc(state.db, "workspaces", workspaceId);
+    const workspaceSnap = await getDoc(workspaceRef);
+
+    if (!workspaceSnap.exists()) {
+        console.error("Default workspace does not exist:", workspaceId);
+        return;
+    }
+
+    state.currentWorkspaceId = workspaceId;
+    state.currentWorkspace = {
+        id: workspaceSnap.id,
+        ...workspaceSnap.data()
+    };
+
+    console.log("ACTIVE WORKSPACE ID:", state.currentWorkspaceId);
+}
