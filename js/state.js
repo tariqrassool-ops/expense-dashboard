@@ -13,6 +13,8 @@ export const state = {
     currentUser: null,
     currentWorkspaceId: null,
     currentWorkspace: null,
+    workspaces: [],
+    pendingInvites: [],
     allExpenses: [],
     allLoans: [],
     gmailAccessToken: null,
