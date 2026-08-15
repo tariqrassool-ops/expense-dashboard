@@ -9,13 +9,14 @@ import { state } from "./state.js";
 
 export async function ensureUserProfile() {
     if (!state.currentUser) return;
-    
-    const workspaceId = `${state.currentUser.uid}_personal`;
-    
+
     const ref = doc(state.db, "users", state.currentUser.uid);
     const snapshot = await getDoc(ref);
 
     if (!snapshot.exists()) {
+        // First-ever login: seed a placeholder default workspace ID.
+        // migratePersonalWorkspace() will replace this with a real
+        // workspace on its first run.
         await setDoc(ref, {
             uid: state.currentUser.uid,
             email: state.currentUser.email,
@@ -24,16 +25,17 @@ export async function ensureUserProfile() {
             createdAt: serverTimestamp(),
             lastLoginAt: serverTimestamp(),
             onboardingComplete: false,
-            defaultWorkspaceId: workspaceId
+            defaultWorkspaceId: `${state.currentUser.uid}_personal`
         });
     } else {
+        // Existing user: just bump lastLoginAt. Never touch
+        // defaultWorkspaceId here — it's owned by migratePersonalWorkspace()
+        // once a real workspace exists, and overwriting it on every login
+        // was causing a brand-new "Personal" workspace to be created each time.
         await setDoc(
-    ref,
-    {
-        lastLoginAt: serverTimestamp(),
-        defaultWorkspaceId: workspaceId
-    },
-    { merge: true }
-);
-}
+            ref,
+            { lastLoginAt: serverTimestamp() },
+            { merge: true }
+        );
+    }
 }
