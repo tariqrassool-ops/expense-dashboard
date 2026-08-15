@@ -10,6 +10,7 @@ import { ensureUserProfile } from "./users.js";
 import { migrateWorkspaceIds } from "./migrations.js";
 import { migratePersonalWorkspace } from "./workspaceMigration.js";
 import { loadCurrentWorkspace } from "./workspaceService.js";
+import { loadCurrentWorkspace } from "./workspaces.js";
 
 window.signInWithGoogle = function() {
     showDebug('Sign-in button clicked...');
@@ -66,6 +67,7 @@ export async function showDashboard() {
     try {
         await ensureUserProfile();
         await migrateWorkspaceIds();
+        import { loadCurrentWorkspace } from "./workspaces.js";
 
         console.log("ACTIVE WORKSPACE ID:", state.currentWorkspaceId);
     } catch (error) {
