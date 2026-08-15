@@ -49,9 +49,11 @@ window.closeModal = function() {
     document.getElementById('expenseModal').classList.remove('active');
 };
 
-// Keyboard shortcuts
+// Keyboard shortcuts — Escape closes whichever modal is currently open.
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') window.closeModal();
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+    }
 });
 
 // Close modal on overlay click
