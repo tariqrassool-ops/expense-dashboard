@@ -13,6 +13,8 @@ import './auth.js';
 import './topbar.js';
 import './tabs.js';
 import './modal.js';
+import './workspaces.js';
+import './invites.js';
 import './expenses.js';
 import './gmail-sync.js';
 import './loans.js';
