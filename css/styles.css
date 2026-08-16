@@ -1677,3 +1677,56 @@
     color: var(--gray);
     margin: 0 0 12px;
 }
+
+/* ===================== CATEGORY / VENDOR CHIPS ===================== */
+.category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 6px 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    margin: 0 6px 6px 0;
+}
+.category-chip button {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background: var(--light-gray);
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 0.85rem;
+    line-height: 1;
+}
+.category-chip button:hover {
+    background: rgba(220,53,69,0.15);
+    color: #c0392b;
+}
+
+/* ===================== ONBOARDING WIZARD ===================== */
+.onboarding-modal {
+    max-width: 480px;
+}
+.onboarding-progress {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 24px 10px;
+}
+.onboarding-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.15s;
+}
+.onboarding-dot.active {
+    background: var(--primary);
+    width: 18px;
+    border-radius: 4px;
+}
+.onboarding-dot.done {
+    background: rgba(155,88,222,0.4);
+}
