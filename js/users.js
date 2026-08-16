@@ -8,7 +8,7 @@ import {
 import { state } from "./state.js";
 
 export async function ensureUserProfile() {
-    if (!state.currentUser) return;
+    if (!state.currentUser) return true;
 
     const ref = doc(state.db, "users", state.currentUser.uid);
     const snapshot = await getDoc(ref);
@@ -27,15 +27,27 @@ export async function ensureUserProfile() {
             onboardingComplete: false,
             defaultWorkspaceId: `${state.currentUser.uid}_personal`
         });
-    } else {
-        // Existing user: just bump lastLoginAt. Never touch
-        // defaultWorkspaceId here — it's owned by migratePersonalWorkspace()
-        // once a real workspace exists, and overwriting it on every login
-        // was causing a brand-new "Personal" workspace to be created each time.
-        await setDoc(
-            ref,
-            { lastLoginAt: serverTimestamp() },
-            { merge: true }
-        );
+        return true;
     }
+
+    // Existing user: just bump lastLoginAt. Never touch
+    // defaultWorkspaceId here — it's owned by migratePersonalWorkspace()
+    // once a real workspace exists, and overwriting it on every login
+    // was causing a brand-new "Personal" workspace to be created each time.
+    await setDoc(
+        ref,
+        { lastLoginAt: serverTimestamp() },
+        { merge: true }
+    );
+
+    return snapshot.data().onboardingComplete !== true;
+}
+
+export async function markOnboardingComplete() {
+    if (!state.currentUser) return;
+    await setDoc(
+        doc(state.db, "users", state.currentUser.uid),
+        { onboardingComplete: true },
+        { merge: true }
+    );
 }
