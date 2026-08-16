@@ -1713,7 +1713,7 @@
     display: flex;
     justify-content: center;
     gap: 6px;
-    padding: 0 24px 10px;
+    padding: 16px 24px;
 }
 .onboarding-dot {
     width: 7px;
