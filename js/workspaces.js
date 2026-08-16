@@ -57,10 +57,30 @@ export async function loadUserWorkspaces() {
 
     const workspaces = [];
     for (const memberDoc of memberSnap.docs) {
-        const { workspaceId, role } = memberDoc.data();
-        const wsSnap = await getDoc(doc(state.db, "workspaces", workspaceId));
+        const data = memberDoc.data();
+
+        // Backfill: membership records created before displayName/email were
+        // tracked won't have them, which is what makes the split picker show
+        // a generic "Member" for those people. Fix your own record forward
+        // the moment you're back — everyone else gets fixed the same way on
+        // their own next login.
+        if (!data.displayName) {
+            try {
+                const fallbackName = state.currentUser.displayName || state.currentUser.email || 'Member';
+                await updateDoc(memberDoc.ref, {
+                    displayName: fallbackName,
+                    email: state.currentUser.email || ''
+                });
+                data.displayName = fallbackName;
+                data.email = state.currentUser.email || '';
+            } catch (e) {
+                console.warn('Could not backfill member profile info:', e);
+            }
+        }
+
+        const wsSnap = await getDoc(doc(state.db, "workspaces", data.workspaceId));
         if (wsSnap.exists()) {
-            workspaces.push({ id: wsSnap.id, role, ...wsSnap.data() });
+            workspaces.push({ id: wsSnap.id, role: data.role, ...wsSnap.data() });
         }
     }
 
@@ -85,6 +105,7 @@ export async function switchWorkspace(workspaceId) {
 
     showLoading('Switching workspace...');
     try {
+        await updateDoc(doc(state.db, 'users', state.currentUser.uid), { defaultWorkspaceId: workspaceId });
         await loadExpenses();
         await loadLoans();
         await loadWorkspaceMembers();
