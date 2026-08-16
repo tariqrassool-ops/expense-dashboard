@@ -4,9 +4,7 @@ import {
     where,
     getDocs,
     getDoc,
-    addDoc,
     setDoc,
-    updateDoc,
     doc,
     writeBatch,
     serverTimestamp
@@ -23,12 +21,6 @@ export async function migratePersonalWorkspace() {
     if (!userSnap.exists()) return;
 
     const user = userSnap.data();
-    console.log("MIGRATION USER:", user);
-    console.log("MIGRATION DEFAULT WORKSPACE:", user.defaultWorkspaceId);
-    console.log(
-    "NEEDS MIGRATION:",
-    !user.defaultWorkspaceId || user.defaultWorkspaceId.endsWith("_personal")
-);
 
     // Already migrated
     if (
@@ -39,37 +31,31 @@ export async function migratePersonalWorkspace() {
         return user.defaultWorkspaceId;
     }
 
-    // Create new workspace
-    const workspaceRef = await addDoc(collection(state.db, "workspaces"), {
+    // Create the workspace, its owner membership, and the user's
+    // defaultWorkspaceId pointer in a single atomic batch — either all
+    // three land together, or none do, so there's never a half-created
+    // workspace with no owner membership.
+    const workspaceRef = doc(collection(state.db, "workspaces"));
+    const newWorkspaceId = workspaceRef.id;
+    const memberRef = doc(state.db, "workspaceMembers", `${newWorkspaceId}_${state.currentUser.uid}`);
+
+    const batch = writeBatch(state.db);
+    batch.set(workspaceRef, {
         name: "Personal",
         type: "personal",
         ownerId: state.currentUser.uid,
         createdAt: serverTimestamp()
     });
-
-    const newWorkspaceId = workspaceRef.id;
-
-    // Create membership
-    await setDoc(
-        doc(
-            state.db,
-            "workspaceMembers",
-            `${newWorkspaceId}_${state.currentUser.uid}`
-        ),
-        {
-            workspaceId: newWorkspaceId,
-            userId: state.currentUser.uid,
-            role: "owner",
-            displayName: state.currentUser.displayName || state.currentUser.email || "Owner",
-            email: state.currentUser.email || "",
-            joinedAt: serverTimestamp()
-        }
-    );
-
-    // Update user
-    await updateDoc(userRef, {
-        defaultWorkspaceId: newWorkspaceId
+    batch.set(memberRef, {
+        workspaceId: newWorkspaceId,
+        userId: state.currentUser.uid,
+        role: "owner",
+        displayName: state.currentUser.displayName || state.currentUser.email || "Owner",
+        email: state.currentUser.email || "",
+        joinedAt: serverTimestamp()
     });
+    batch.update(userRef, { defaultWorkspaceId: newWorkspaceId });
+    await batch.commit();
 
     // --------------------
     // Update expenses
@@ -128,8 +114,6 @@ export async function migratePersonalWorkspace() {
         },
         { merge: true }
     );
-
-    console.log("Workspace migration complete.");
 
     state.currentWorkspaceId = newWorkspaceId;
 
