@@ -5,7 +5,7 @@
 import {
     collection,
     doc,
-    addDoc,
+    getDoc,
     setDoc,
     updateDoc,
     getDocs,
@@ -54,9 +54,22 @@ window.sendWorkspaceInvite = async function() {
         return;
     }
 
+    // Deterministic ID (one doc per workspace+email pair) so clicking Send
+    // Invite twice reuses the same record instead of creating duplicates.
+    const inviteId = `${state.currentWorkspaceId}_${email}`;
+    const inviteRef = doc(state.db, "invites", inviteId);
+
     showLoading('Sending invite...');
     try {
-        await addDoc(collection(state.db, "invites"), {
+        const existing = await getDoc(inviteRef);
+        if (existing.exists() && existing.data().status === 'pending') {
+            hideLoading();
+            const resend = confirm(`${email} already has a pending invite to this workspace. Resend it?`);
+            if (!resend) return;
+            showLoading('Resending invite...');
+        }
+
+        await setDoc(inviteRef, {
             workspaceId: state.currentWorkspaceId,
             workspaceName: state.currentWorkspace?.name || 'Workspace',
             invitedEmail: email,
