@@ -183,6 +183,7 @@ async function renderWorkspaceModalList() {
 
     container.innerHTML = rows.map(w => {
         const canDelete = w.role === 'owner' && state.workspaces.length > 1;
+        const canLeave = w.role !== 'owner';
         return `
         <div class="workspace-row${w.id === state.currentWorkspaceId ? ' active' : ''}">
             <div class="workspace-row-info">
@@ -196,12 +197,123 @@ async function renderWorkspaceModalList() {
                     ${w.role}
                 </div>
             </div>
-            ${canDelete
-                ? `<button type="button" class="workspace-delete-btn" onclick="deleteWorkspace('${w.id}')">Delete</button>`
+            <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button type="button" class="workspace-delete-btn workspace-neutral-btn" onclick="toggleMembersList('${w.id}')">Members</button>
+                ${canLeave ? `<button type="button" class="workspace-delete-btn" onclick="leaveWorkspace('${w.id}')">Leave</button>` : ''}
+                ${canDelete ? `<button type="button" class="workspace-delete-btn" onclick="deleteWorkspace('${w.id}')">Delete</button>` : ''}
+            </div>
+        </div>
+        <div class="workspace-members-list hidden" id="members-${w.id}"></div>`;
+    }).join('');
+}
+
+// ===================== MEMBERS =====================
+
+const memberRosterCache = {};
+
+async function getWorkspaceRoster(workspaceId, forceRefresh = false) {
+    if (!forceRefresh && memberRosterCache[workspaceId]) return memberRosterCache[workspaceId];
+
+    const snap = await getDocs(
+        query(collection(state.db, 'workspaceMembers'), where('workspaceId', '==', workspaceId))
+    );
+    const roster = snap.docs.map(d => d.data());
+    memberRosterCache[workspaceId] = roster;
+    return roster;
+}
+
+async function renderMembersList(workspaceId) {
+    const el = document.getElementById(`members-${workspaceId}`);
+    if (!el) return;
+
+    el.innerHTML = '<p style="font-size: 0.75rem; color: var(--gray);">Loading members...</p>';
+
+    const roster = await getWorkspaceRoster(workspaceId, true);
+    const myWorkspace = state.workspaces.find(w => w.id === workspaceId);
+    const myRole = myWorkspace ? myWorkspace.role : null;
+
+    el.innerHTML = roster.map(m => {
+        const isSelf = m.userId === state.currentUser.uid;
+        const canRemove = myRole === 'owner' && !isSelf;
+        return `
+        <div class="workspace-member-row">
+            <span>
+                ${escapeHtml(m.displayName || m.email || 'Member')}
+                ${isSelf ? '<em style="opacity:0.6; font-style: normal;"> (you)</em>' : ''}
+                <span class="workspace-tag" style="text-transform: capitalize;">${escapeHtml(m.role)}</span>
+            </span>
+            ${canRemove
+                ? `<button type="button" class="workspace-delete-btn" onclick="removeMember('${workspaceId}','${m.userId}')">Remove</button>`
                 : ''}
         </div>`;
     }).join('');
 }
+
+window.toggleMembersList = async function(workspaceId) {
+    const el = document.getElementById(`members-${workspaceId}`);
+    if (!el) return;
+
+    if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        await renderMembersList(workspaceId);
+    } else {
+        el.classList.add('hidden');
+    }
+};
+
+// Owner-only: removes someone else from the workspace. They lose access
+// immediately (the isWorkspaceMember() check in the rules starts failing
+// for them on their next read).
+window.removeMember = async function(workspaceId, memberUserId) {
+    if (memberUserId === state.currentUser.uid) return;
+    if (!confirm("Remove this person from the workspace? They'll lose access immediately.")) return;
+
+    showLoading('Removing member...');
+    try {
+        await deleteDoc(doc(state.db, 'workspaceMembers', `${workspaceId}_${memberUserId}`));
+        await renderMembersList(workspaceId);
+        showToast('Member removed', 'success');
+    } catch (e) {
+        showToast('Failed to remove member: ' + e.message, 'error');
+    } finally {
+        hideLoading();
+    }
+};
+
+// Any non-owner can leave a shared workspace on their own. Unlike deleting
+// a workspace, this doesn't require it to be empty — you're just exiting,
+// the workspace and everyone else's data are untouched.
+window.leaveWorkspace = async function(workspaceId) {
+    const ws = state.workspaces.find(w => w.id === workspaceId);
+    if (!ws) return;
+
+    if (ws.role === 'owner') {
+        showToast("As the owner, delete the workspace instead of leaving it", 'error');
+        return;
+    }
+    if (!confirm(`Leave "${ws.name}"? You'll lose access to its expenses unless invited back.`)) return;
+
+    showLoading('Leaving workspace...');
+    try {
+        await deleteDoc(doc(state.db, 'workspaceMembers', `${workspaceId}_${state.currentUser.uid}`));
+
+        const wasActive = workspaceId === state.currentWorkspaceId;
+        await loadUserWorkspaces();
+
+        if (wasActive && state.workspaces.length > 0) {
+            const next = state.workspaces[0];
+            await updateDoc(doc(state.db, 'users', state.currentUser.uid), { defaultWorkspaceId: next.id });
+            await switchWorkspace(next.id);
+        }
+
+        await renderWorkspaceModalList();
+        showToast(`Left "${ws.name}"`, 'success');
+    } catch (e) {
+        showToast('Failed to leave workspace: ' + e.message, 'error');
+    } finally {
+        hideLoading();
+    }
+};
 
 // Deletes a workspace, but only if you own it, it's not your last one, and
 // it has zero expenses/loans in it — refuses otherwise rather than risking
