@@ -43,24 +43,6 @@ function parsePickMeEmail(subject, body, date) {
         .replace(/\s+/g, ' ')
         .toLowerCase();
 
-    console.log("==========================================");
-console.log("PICKME EMAIL DEBUG");
-console.log("Subject:", subject);
-
-console.log("RAW BODY:");
-console.log(body);
-
-console.log("CLEAN BODY:");
-console.log(cleanBody);
-
-console.log("Contains Marketplace:", cleanBody.includes("marketplace"));
-console.log("Contains Merchant Price Amendment:", cleanBody.includes("merchant price amendment"));
-console.log("Contains Packaging Charge:", cleanBody.includes("packaging charge"));
-console.log("Contains Food:", cleanBody.includes("food"));
-console.log("Contains food@pickme.lk:", cleanBody.includes("food@pickme.lk"));
-console.log("Contains market@pickme.lk:", cleanBody.includes("market@pickme.lk"));
-console.log("==========================================");
-
     // -----------------------------
     // Category Detection
     // -----------------------------
@@ -116,16 +98,12 @@ const amounts = [...normalizedBody.matchAll(
     /(?:LKR|Rs\.?)\s*([+-]?\d[\d,]*\.\d{2})/gi
 )].map(m => parseFloat(m[1].replace(/,/g, '')));
 
-console.log("ALL AMOUNTS FOUND:", amounts);
-
 let amount = 0;
 
 // PickMe receipts always repeat the final charged amount as the LAST amount
 if (amounts.length > 0) {
     amount = amounts[amounts.length - 1];
 }
-
-console.log("FINAL AMOUNT:", amount);
 
     // -----------------------------
     // Merchant Extraction
@@ -177,8 +155,5 @@ const result = {
     description: subject
 };
 
-console.log("PARSED PICKME RESULT:", result);
-
 return result;
 }
-        
