@@ -10,6 +10,9 @@ import { ensureUserProfile } from "./users.js";
 import { migratePersonalWorkspace } from "./workspaceMigration.js";
 import { loadUserWorkspaces, loadWorkspaceMembers } from "./workspaces.js";
 import { loadPendingInvites } from "./invites.js";
+import { loadCategories } from "./categories.js";
+import { loadMerchantWatchlist } from "./vendors.js";
+import { openOnboarding } from "./onboarding.js";
 
 window.signInWithGoogle = function() {
     showDebug('Sign-in button clicked...');
@@ -63,11 +66,14 @@ export async function showDashboard() {
     document.getElementById('landingSection').classList.add('hidden');
     document.getElementById('dashboardContent').classList.remove('hidden');
 
+    let needsOnboarding = false;
     try {
-        await ensureUserProfile();
+        needsOnboarding = await ensureUserProfile();
         await migratePersonalWorkspace();
         await loadUserWorkspaces();
         await loadWorkspaceMembers();
+        await loadCategories();
+        await loadMerchantWatchlist();
         await loadPendingInvites();
 
         console.log("ACTIVE WORKSPACE ID:", state.currentWorkspaceId);
@@ -86,4 +92,8 @@ export async function showDashboard() {
     await loadDisplayName();
     loadExpenses();
     loadLoans();
+
+    if (needsOnboarding) {
+        openOnboarding();
+    }
 }
