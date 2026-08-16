@@ -8,10 +8,9 @@ import {
     getDoc,
     getDocs,
     getCountFromServer,
-    addDoc,
-    setDoc,
     updateDoc,
     deleteDoc,
+    writeBatch,
     query,
     where,
     serverTimestamp
@@ -398,24 +397,25 @@ window.createWorkspace = async function() {
 
     showLoading('Creating workspace...');
     try {
-        const wsRef = await addDoc(collection(state.db, "workspaces"), {
+        const wsRef = doc(collection(state.db, "workspaces"));
+        const memberRef = doc(state.db, "workspaceMembers", `${wsRef.id}_${state.currentUser.uid}`);
+
+        const batch = writeBatch(state.db);
+        batch.set(wsRef, {
             name,
             type: 'shared',
             ownerId: state.currentUser.uid,
             createdAt: serverTimestamp()
         });
-
-        await setDoc(
-            doc(state.db, "workspaceMembers", `${wsRef.id}_${state.currentUser.uid}`),
-            {
-                workspaceId: wsRef.id,
-                userId: state.currentUser.uid,
-                role: 'owner',
-                displayName: state.currentUser.displayName || state.currentUser.email || 'Owner',
-                email: state.currentUser.email || '',
-                joinedAt: serverTimestamp()
-            }
-        );
+        batch.set(memberRef, {
+            workspaceId: wsRef.id,
+            userId: state.currentUser.uid,
+            role: 'owner',
+            displayName: state.currentUser.displayName || state.currentUser.email || 'Owner',
+            email: state.currentUser.email || '',
+            joinedAt: serverTimestamp()
+        });
+        await batch.commit();
 
         input.value = '';
         await loadUserWorkspaces();
