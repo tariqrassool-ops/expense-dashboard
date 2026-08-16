@@ -21,6 +21,7 @@ import { state } from "./state.js";
 import { showToast, showLoading, hideLoading, escapeHtml } from "./utils.js";
 import { loadExpenses } from "./expenses.js";
 import { loadLoans } from "./loans.js";
+import { loadCategories } from "./categories.js";
 
 // Loads the roster of the currently active workspace — used to populate
 // the "split with a real member" picker. Reads directly from
@@ -109,6 +110,7 @@ export async function switchWorkspace(workspaceId) {
         await loadExpenses();
         await loadLoans();
         await loadWorkspaceMembers();
+        await loadCategories();
         renderWorkspaceSwitcher();
         const menu = document.getElementById('workspaceSwitcherMenu');
         if (menu) menu.classList.add('hidden');
