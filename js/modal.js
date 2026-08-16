@@ -1,6 +1,8 @@
 // ===================== MODAL =====================
 import { state } from './state.js';
 import { getSplitParticipants } from './utils.js';
+import { populateCategorySelect } from './categories.js';
+import { matchVendorCategory } from './vendors.js';
 
 // Holds the split participants for whichever expense is currently open in
 // the modal. Rebuilt on open/edit, mutated as the person adds/edits rows,
@@ -16,6 +18,7 @@ window.openAddModal = function() {
     document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('expenseMerchant').value = '';
     document.getElementById('expenseAmount').value = '';
+    populateCategorySelect();
     document.getElementById('expenseCategory').value = '';
     document.getElementById('expenseDescription').value = '';
     document.getElementById('expenseSplitEnabled').checked = false;
@@ -37,7 +40,19 @@ window.editExpense = function(id) {
     document.getElementById('expenseDate').value = expense.date;
     document.getElementById('expenseMerchant').value = expense.merchant || '';
     document.getElementById('expenseAmount').value = expense.amount || '';
-    document.getElementById('expenseCategory').value = expense.category || '';
+    populateCategorySelect();
+    const categorySelect = document.getElementById('expenseCategory');
+    categorySelect.value = expense.category || '';
+    if (expense.category && categorySelect.value !== expense.category) {
+        // The category this expense was saved with no longer exists in the
+        // workspace's list — keep it selectable so editing doesn't silently
+        // wipe it out.
+        const opt = document.createElement('option');
+        opt.value = expense.category;
+        opt.textContent = expense.category + ' (removed)';
+        categorySelect.appendChild(opt);
+        categorySelect.value = expense.category;
+    }
     document.getElementById('expenseDescription').value = expense.description || '';
 
     const split = expense.split;
@@ -178,6 +193,19 @@ window.splitEvenly = function() {
 
 // Recalculate the "your share" line live as the total amount changes.
 document.getElementById('expenseAmount')?.addEventListener('input', updateSplitTotalLine);
+
+// Auto-suggest a category from the vendor watchlist as the merchant name
+// is typed, but only while the category field is still empty — never
+// overwrites a choice the person already made.
+document.getElementById('expenseMerchant')?.addEventListener('input', (e) => {
+    const categorySelect = document.getElementById('expenseCategory');
+    if (categorySelect && !categorySelect.value) {
+        const match = matchVendorCategory(e.target.value);
+        if (match && state.categories.includes(match)) {
+            categorySelect.value = match;
+        }
+    }
+});
 
 // Keyboard shortcuts — Escape closes whichever modal is currently open.
 document.addEventListener('keydown', (e) => {
