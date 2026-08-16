@@ -49,6 +49,7 @@
                     <div class="welcome-sub"><span class="dot" aria-hidden="true"></span> Here's what's happening with your expenses</div>
                 </div>
                 <div class="app-topbar-actions">
+                    <button type="button" class="icon-btn" id="appSettingsBtn" aria-label="Categories & Vendors" title="Categories & Vendors" onclick="openAppSettingsModal()">&#9881;&#65039;</button>
                     <div class="workspace-switcher-wrap" id="workspaceSwitcherWrap">
                         <button type="button" class="workspace-switcher-btn" id="workspaceSwitcherBtn" onclick="toggleWorkspaceSwitcher()" aria-haspopup="true">
                             <span id="workspaceSwitcherLabel">Workspace</span>
@@ -296,14 +297,6 @@
                         <label for="expenseCategory">Category <span aria-label="required">*</span></label>
                         <select id="expenseCategory" required>
                             <option value="">Select Category</option>
-                            <option value="Food">Food</option>
-                            <option value="Travel">Travel</option>
-                            <option value="Groceries">Groceries</option>
-                            <option value="Banking">Banking</option>
-                            <option value="Transfer">Transfer</option>
-                            <option value="Utilities">Utilities</option>
-                            <option value="Loan Payment">Loan Payment</option>
-                            <option value="Uncategorized">Uncategorized</option>
                         </select>
                     </div>
                     <div class="checkbox-row" onclick="document.getElementById('expenseSplitEnabled').click()">
@@ -483,6 +476,50 @@
             <div class="modal-footer">
                 <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeInvitesModal()">Close</button>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="appSettingsModal" role="dialog" aria-modal="true" aria-labelledby="appSettingsTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="appSettingsTitle">Categories &amp; Vendors</h2>
+                <button class="modal-close" onclick="closeAppSettingsModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-weight: 600; margin-bottom: 6px;">Categories</p>
+                <p style="font-size: 0.8rem; color: var(--gray); margin-bottom: 10px;">Shared across everyone in this workspace.</p>
+                <div id="categoryManagerList" style="margin-bottom: 10px;"></div>
+                <div class="form-group" style="display:flex; gap:8px; margin-bottom: 22px;">
+                    <input type="text" id="settingsCategoryInput" placeholder="e.g. Entertainment" style="flex:1;">
+                    <button type="button" class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="addCategoryFromInput('settingsCategoryInput','categoryManagerList')">Add</button>
+                </div>
+
+                <div style="margin: 0 0 18px; border-top: 1px solid var(--border);"></div>
+
+                <p style="font-weight: 600; margin-bottom: 6px;">Vendor Watchlist</p>
+                <p style="font-size: 0.8rem; color: var(--gray); margin-bottom: 10px;">Just yours — used to auto-suggest a category when you type one of these names into an expense.</p>
+                <div id="vendorManagerList" style="margin-bottom: 10px;"></div>
+                <div class="form-group" style="display:flex; gap:8px;">
+                    <input type="text" id="settingsVendorName" placeholder="e.g. Netflix" style="flex:1.2;">
+                    <select id="settingsVendorCategory" style="flex:1;"><option value="">Category</option></select>
+                    <button type="button" class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="addVendorFromInputs('settingsVendorName','settingsVendorCategory','vendorManagerList')">Add</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--light-gray); color: var(--dark);" onclick="closeAppSettingsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="onboardingModal" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+        <div class="modal onboarding-modal">
+            <div class="modal-header">
+                <h2 id="onboardingTitle">Welcome</h2>
+                <button class="modal-close" onclick="skipOnboarding()" aria-label="Skip setup">&times;</button>
+            </div>
+            <div class="onboarding-progress" id="onboardingProgress"></div>
+            <div class="modal-body" id="onboardingBody"></div>
+            <div class="modal-footer" id="onboardingFooter"></div>
         </div>
     </div>
 
