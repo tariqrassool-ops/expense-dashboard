@@ -208,10 +208,19 @@ document.getElementById('expenseMerchant')?.addEventListener('input', (e) => {
 });
 
 // Keyboard shortcuts — Escape closes whichever modal is currently open.
+// The onboarding modal is a special case: it needs to actually mark
+// onboarding complete when dismissed, not just hide, or it'll keep
+// reappearing on every future login.
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+    if (e.key !== 'Escape') return;
+
+    const onboarding = document.getElementById('onboardingModal');
+    if (onboarding && onboarding.classList.contains('active')) {
+        window.skipOnboarding();
+        return;
     }
+
+    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
 });
 
 // Close modal on overlay click
