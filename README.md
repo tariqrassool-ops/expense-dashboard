@@ -1,4 +1,4 @@
-# Expense Dashboard
+# Ledger
 
 A multi-user expense dashboard with Google sign-in, Firestore storage, Gmail
 receipt sync, shared workspaces with invite-based collaboration, multi-person
