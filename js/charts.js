@@ -53,7 +53,10 @@ export function animateBarFills(containerId) {
         // ===================== CATEGORY BREAKDOWN DONUT (thin ring, distinct category colors, glow, animated draw-in) =====================
         // Curated categorical palette so each slice reads as its own color (teal / blue / slate / green / violet / amber...)
         // instead of one continuous hue sweep — matches the thin, multi-color reference design.
-        const DONUT_PALETTE = ['#2dd4bf', '#38bdf8', '#94a3b8', '#4ade80', '#a78bfa', '#fbbf24', '#f472b6', '#fb923c'];
+        // Darker/more saturated than the old palette on purpose — those were tuned to pop
+        // against a near-black card and read as washed-out pastels on the cream paper card.
+        // No violet, so it doesn't compete with the navy-ink brand accent.
+        const DONUT_PALETTE = ['#0F766E', '#1D4ED8', '#475569', '#15803D', '#B45309', '#BE185D', '#C2410C', '#0E7490'];
 export function renderCategoryDonut(sortedCats, total) {
             const donutEl = document.getElementById('categoryDonut');
             if (!total || total <= 0) {
@@ -169,19 +172,19 @@ export function renderBudgetGauge(pct, isOver) {
                     '<svg id="gaugeSvgEl" class="gauge-svg" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="Monthly budget gauge">' +
                     '<defs>' +
                         '<linearGradient id="' + gaugeGradId + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
-                            '<stop offset="0%" stop-color="#cbb4f7"/>' +
-                            '<stop offset="100%" stop-color="#9b58de"/>' +
+                            '<stop offset="0%" stop-color="#B9C4DC"/>' +
+                            '<stop offset="100%" stop-color="#21386B"/>' +
                         '</linearGradient>' +
                         '<linearGradient id="' + gaugeGradId + '_over" x1="0%" y1="0%" x2="100%" y2="100%">' +
-                            '<stop offset="0%" stop-color="#e8776a"/>' +
-                            '<stop offset="100%" stop-color="#5c1f1f"/>' +
+                            '<stop offset="0%" stop-color="#D9A08C"/>' +
+                            '<stop offset="100%" stop-color="#A03434"/>' +
                         '</linearGradient>' +
                         '<filter id="' + gaugeGradId + '_glow" x="-60%" y="-60%" width="220%" height="220%">' +
                             '<feGaussianBlur stdDeviation="4.5" result="blur"/>' +
                             '<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>' +
                         '</filter>' +
                     '</defs>' +
-                    '<circle class="gauge-track" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="' + strokeW + '" stroke-linecap="round" ' +
+                    '<circle class="gauge-track" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="rgba(23,20,15,0.08)" stroke-width="' + strokeW + '" stroke-linecap="round" ' +
                         'stroke-dasharray="' + trackLen + ' ' + circumference + '" transform="rotate(' + rotate + ' ' + cx + ' ' + cy + ')"></circle>' +
                     '<circle id="gaugeValueArc" class="gauge-value-arc" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="url(#' + gaugeGradId + ')" stroke-width="' + strokeW + '" stroke-linecap="round" ' +
                         'stroke-dasharray="' + valueLen + ' ' + circumference + '" stroke-dashoffset="' + valueLen + '" transform="rotate(' + rotate + ' ' + cx + ' ' + cy + ')" filter="url(#' + gaugeGradId + '_glow)" data-grad="' + gaugeGradId + '"></circle>' +
@@ -251,27 +254,27 @@ export function renderMonthlyTrendChart(monthOrder, monthTotals) {
             let svg = '<svg class="trend-svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Monthly spending trend">';
             svg += '<defs>' +
                 '<linearGradient id="' + gid + '_fill" x1="0" y1="0" x2="0" y2="1">' +
-                    '<stop offset="0%" stop-color="#9b58de" stop-opacity="0.4"/>' +
-                    '<stop offset="55%" stop-color="#9b58de" stop-opacity="0.12"/>' +
-                    '<stop offset="100%" stop-color="#9b58de" stop-opacity="0"/>' +
+                    '<stop offset="0%" stop-color="#21386B" stop-opacity="0.4"/>' +
+                    '<stop offset="55%" stop-color="#21386B" stop-opacity="0.12"/>' +
+                    '<stop offset="100%" stop-color="#21386B" stop-opacity="0"/>' +
                 '</linearGradient>' +
                 '<linearGradient id="' + gid + '_line" x1="0" y1="0" x2="1" y2="0">' +
-                    '<stop offset="0%" stop-color="#cbb4f7"/>' +
-                    '<stop offset="100%" stop-color="#9b58de"/>' +
+                    '<stop offset="0%" stop-color="#B9C4DC"/>' +
+                    '<stop offset="100%" stop-color="#21386B"/>' +
                 '</linearGradient>' +
                 '<filter id="' + gid + '_glow" x="-30%" y="-80%" width="160%" height="260%">' +
                     '<feGaussianBlur stdDeviation="3.2" result="b"/>' +
                     '<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>' +
                 '</filter>' +
             '</defs>';
-            svg += '<line x1="' + padX + '" y1="' + avgY + '" x2="' + (W - padX) + '" y2="' + avgY + '" stroke="#5c5170" stroke-width="1.5" stroke-dasharray="5 5"/>';
+            svg += '<line x1="' + padX + '" y1="' + avgY + '" x2="' + (W - padX) + '" y2="' + avgY + '" stroke="#918C7C" stroke-width="1.5" stroke-dasharray="5 5"/>';
             svg += '<path class="trend-area" d="' + areaPath + '" fill="url(#' + gid + '_fill)" stroke="none" style="opacity:0;transition:opacity 0.9s ease 0.35s;"/>';
             svg += '<path id="trendLinePath" d="' + linePath + '" fill="none" stroke="url(#' + gid + '_line)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" filter="url(#' + gid + '_glow)"/>';
             points.forEach((p, i) => {
                 const isEnd = i === points.length - 1;
                 const isStart = i === 0;
                 const r = isEnd ? 4.5 : (isStart ? 3.5 : 2.5);
-                svg += '<circle class="trend-pt" cx="' + p.x + '" cy="' + p.y + '" r="' + r + '" fill="' + (isEnd || isStart ? '#9b58de' : '#120b1c') + '" stroke="#9b58de" stroke-width="' + (isEnd || isStart ? 0 : 1.5) + '" style="opacity:0;transition:opacity 0.4s ease ' + (0.5 + i * 0.06) + 's;"' + (isEnd ? ' class="trend-pt pulseGlow"' : '') + '/>';
+                svg += '<circle class="trend-pt" cx="' + p.x + '" cy="' + p.y + '" r="' + r + '" fill="' + (isEnd || isStart ? '#21386B' : '#FBFAF6') + '" stroke="#21386B" stroke-width="' + (isEnd || isStart ? 0 : 1.5) + '" style="opacity:0;transition:opacity 0.4s ease ' + (0.5 + i * 0.06) + 's;"' + (isEnd ? ' class="trend-pt pulseGlow"' : '') + '/>';
             });
             svg += '</svg>';
 
@@ -600,8 +603,8 @@ export function hslToHex(h, s, l) {
             return '#' + toHex(f(0)) + toHex(f(8)) + toHex(f(4));
         }
 export function categoryShade(index, count) {
-            const hue = 270, sat = 60;
-            const minL = 34, maxL = 76;
+            const hue = 221, sat = 52; // navy ink — matches --primary (#21386B)
+            const minL = 30, maxL = 72;
             const t = count > 1 ? index / (count - 1) : 0;
             return hslToHex(hue, sat, minL + t * (maxL - minL));
         }
