@@ -178,34 +178,33 @@
         .from(stage, { autoAlpha:0, x:fromX, scale:0.92, duration:0.75, ease:'power3.out' }, '-=0.7');
     });
 
-    /* Chapter 01 — Calculate: pin the chapter when its content reaches the viewport center and give the sequence a full viewport of scroll distance. */
-    /* This keeps the animated product visual centered while the user scrubs a much longer, detail-oriented sequence. */
+    /* Chapters 1–6: each mockup plays its reveal sequence once, when the chapter
+       scrolls into view, and then stays fully visible. (Previously these used a
+       pin+scrub pattern tied to precise scroll position — reliable in theory, but
+       any pinning hiccup, zoom level, or scroll speed variance could leave a chapter
+       stuck showing its "before" state — an empty box — instead of its "after" state.
+       A one-shot reveal has no such window: once triggered, it always finishes.) */
+
     /* Chapter 01 — Calculate: line items print one by one -> total ticks up */
     (function(){
       var l1 = document.getElementById('c1L1');
       var l2 = document.getElementById('c1L2');
       var l3 = document.getElementById('c1L3');
       var totalAmt = document.getElementById('c1TotalAmt');
-      var stage = document.querySelector('#chapter-1 .chapter-stage');
       if (!l1) return;
       gsap.set([l1,l2,l3], { autoAlpha:0, x:-20 });
       var counter = { val:0 };
 
-      ScrollTrigger.create({
-        trigger:'#chapter-1', start:'center center', end:'+=100%', pin:true, scrub:0.8, anticipatePin:1,
-        onUpdate:function(self){
-          var p = self.progress;
-          scrubStage(stage, p);
-          var p1 = mapProg(p,0.04,0.22), p2 = mapProg(p,0.20,0.40), p3 = mapProg(p,0.38,0.58);
-          gsap.set(l1, { autoAlpha:p1, x:-20*(1-p1) });
-          gsap.set(l2, { autoAlpha:p2, x:-20*(1-p2) });
-          gsap.set(l3, { autoAlpha:p3, x:-20*(1-p3) });
-          var cp = mapProg(p,0.62,0.94);
-          counter.val = 38.00 * cp;
-          totalAmt.textContent = 'Rs ' + counter.val.toFixed(2);
-          gsap.set(totalAmt, { scale: 1 + 0.1*triPulse(p,0.95,0.08) });
-        }
-      });
+      gsap.timeline({ scrollTrigger:{ trigger:'#chapter-1', start:'top 65%' } })
+        .to(l1, { autoAlpha:1, x:0, duration:0.4, ease:'power2.out' })
+        .to(l2, { autoAlpha:1, x:0, duration:0.4, ease:'power2.out' }, '+=0.1')
+        .to(l3, { autoAlpha:1, x:0, duration:0.4, ease:'power2.out' }, '+=0.1')
+        .to(counter, {
+          val:38.00, duration:0.6, ease:'power2.out',
+          onUpdate:function(){ totalAmt.textContent = 'Rs ' + counter.val.toFixed(2); }
+        }, '+=0.15')
+        .to(totalAmt, { scale:1.08, duration:0.15, ease:'power2.out' }, '<')
+        .to(totalAmt, { scale:1, duration:0.2, ease:'power2.in' });
     })();
 
     /* Chapter 02 — Capture: email -> arrow draws -> entry stamps in */
@@ -213,56 +212,36 @@
       var email = document.getElementById('c2Email');
       var arrow = document.getElementById('c2Arrow');
       var row = document.getElementById('c2Row');
-      var stage = document.querySelector('#chapter-2 .chapter-stage');
       if (!email) return;
       gsap.set(arrow, { autoAlpha:0, y:-18 });
       gsap.set(row, { autoAlpha:0, y:34, scale:0.82 });
       gsap.set(email, { autoAlpha:0, y:-24, scale:0.9 });
 
-      ScrollTrigger.create({
-        trigger:'#chapter-2', start:'center center', end:'+=100%', pin:true, scrub:0.8, anticipatePin:1,
-        onUpdate:function(self){
-          var p = self.progress;
-          scrubStage(stage, p);
-          var ep = mapProg(p,0.04,0.20);
-          gsap.set(email, { autoAlpha: ep, y: -24 * (1 - ep), scale:0.9+0.1*ep });
-          var ap = mapProg(p,0.24,0.44);
-          gsap.set(arrow, { autoAlpha: ap, y: -18 * (1 - ap) });
-          var rp = mapProg(p,0.48,0.76);
-          gsap.set(row, { autoAlpha:rp, y:34*(1-rp), scale:0.82+0.18*rp });
-        }
-      });
+      gsap.timeline({ scrollTrigger:{ trigger:'#chapter-2', start:'top 65%' } })
+        .to(email, { autoAlpha:1, y:0, scale:1, duration:0.5, ease:'power3.out' })
+        .to(arrow, { autoAlpha:1, y:0, duration:0.4, ease:'power2.out' }, '+=0.1')
+        .to(row, { autoAlpha:1, y:0, scale:1, duration:0.5, ease:'power3.out' }, '+=0.1');
     })();
 
     /* Chapter 03 — Security: scan sweeps the inbox, only receipts get pulled, badge locks in */
     (function(){
       var rows = ['c3R1','c3R2','c3R3','c3R4'].map(function(id){ return document.getElementById(id); }).filter(Boolean);
       var badge = document.getElementById('c3Badge');
-      var stage = document.querySelector('#chapter-3 .chapter-stage');
       if (!rows.length) return;
       gsap.set(rows, { autoAlpha:0.5, y:12 });
       gsap.set(badge, { autoAlpha:0, scale:0.7, y:10 });
-      var ranges = [[0.06,0.20],[0.22,0.36],[0.38,0.52],[0.54,0.68]];
 
-      ScrollTrigger.create({
-        trigger:'#chapter-3', start:'center center', end:'+=100%', pin:true, scrub:0.8, anticipatePin:1,
-        onUpdate:function(self){
-          var p = self.progress;
-          scrubStage(stage, p);
-          rows.forEach(function(row, i){
-            var rp = mapProg(p, ranges[i][0], ranges[i][1]);
-            gsap.set(row, { autoAlpha: 0.5 + 0.5*rp, y: 12*(1-rp) });
-            if (rp >= 1){
-              row.classList.toggle('sec-hit', row.dataset.kind === 'receipt');
-              row.classList.toggle('sec-dim', row.dataset.kind === 'personal');
-            } else {
-              row.classList.remove('sec-hit','sec-dim');
-            }
-          });
-          var bp = mapProg(p,0.76,0.94);
-          gsap.set(badge, { autoAlpha:bp, scale:0.7+0.3*bp, y:10*(1-bp) });
-        }
+      var tl = gsap.timeline({ scrollTrigger:{ trigger:'#chapter-3', start:'top 65%' } });
+      rows.forEach(function(row, i){
+        tl.to(row, {
+          autoAlpha:1, y:0, duration:0.35, ease:'power2.out',
+          onComplete:function(){
+            row.classList.toggle('sec-hit', row.dataset.kind === 'receipt');
+            row.classList.toggle('sec-dim', row.dataset.kind === 'personal');
+          }
+        }, i === 0 ? 0 : '+=0.12');
       });
+      tl.to(badge, { autoAlpha:1, scale:1, y:0, duration:0.4, ease:'power2.out' }, '+=0.15');
     })();
 
     /* Chapter 04 — Categorize: row plain -> stamp lands -> settle flash */
@@ -270,23 +249,17 @@
       var stamp = document.getElementById('c4Stamp');
       var row = document.getElementById('c4Row');
       var amt = document.getElementById('c4Amt');
-      var stage = document.querySelector('#chapter-4 .chapter-stage');
       if (!stamp) return;
       gsap.set(stamp, { autoAlpha:0, scale:2.2, rotate:14 });
       gsap.set(row, { scale:0.94 });
 
-      ScrollTrigger.create({
-        trigger:'#chapter-4', start:'center center', end:'+=100%', pin:true, scrub:0.8, anticipatePin:1,
-        onUpdate:function(self){
-          var p = self.progress;
-          scrubStage(stage, p);
-          var sp = mapProg(p,0.26,0.52);
-          gsap.set(stamp, { autoAlpha:sp, scale:2.2-1.2*sp, rotate:14-18*sp });
-          var pulse = triPulse(p, 0.72, 0.20);
-          gsap.set(row, { backgroundColor:'rgba(33,56,107,' + (0.14*pulse) + ')', scale:0.94+0.06*pulse });
-          gsap.set(amt, { scale:1 + 0.16*pulse });
-        }
-      });
+      gsap.timeline({ scrollTrigger:{ trigger:'#chapter-4', start:'top 65%' } })
+        .to(row, { scale:1, duration:0.3, ease:'power2.out' })
+        .to(stamp, { autoAlpha:1, scale:1, rotate:0, duration:0.5, ease:'back.out(1.6)' }, '-=0.1')
+        .to(row, { backgroundColor:'rgba(33,56,107,0.14)', duration:0.2, ease:'power2.out' }, '-=0.1')
+        .to(amt, { scale:1.16, duration:0.2, ease:'power2.out' }, '<')
+        .to(row, { backgroundColor:'rgba(33,56,107,0)', duration:0.3, ease:'power2.in' })
+        .to(amt, { scale:1, duration:0.2, ease:'power2.in' }, '<');
     })();
 
     /* Chapter 05 — Split: one entry -> carbon-copy peels into two columns */
@@ -295,25 +268,16 @@
       var cols = document.getElementById('c5Cols');
       var you = document.getElementById('c5You');
       var sam = document.getElementById('c5Sam');
-      var stage = document.querySelector('#chapter-5 .chapter-stage');
       if (!unified) return;
       gsap.set(cols, { autoAlpha:0 });
       gsap.set(you, { x:90, autoAlpha:0, rotate:6 });
       gsap.set(sam, { x:-90, autoAlpha:0, rotate:-6 });
 
-      ScrollTrigger.create({
-        trigger:'#chapter-5', start:'center center', end:'+=100%', pin:true, scrub:0.8, anticipatePin:1,
-        onUpdate:function(self){
-          var p = self.progress;
-          scrubStage(stage, p);
-          var fadeOut = mapProg(p,0.16,0.44);
-          var fadeIn = mapProg(p,0.42,0.74);
-          gsap.set(unified, { autoAlpha:1-fadeOut, scale:1-0.1*fadeOut, y:-16*fadeOut });
-          gsap.set(cols, { autoAlpha:fadeIn });
-          gsap.set(you, { autoAlpha:fadeIn, x:90*(1-fadeIn), rotate:6*(1-fadeIn) });
-          gsap.set(sam, { autoAlpha:fadeIn, x:-90*(1-fadeIn), rotate:-6*(1-fadeIn) });
-        }
-      });
+      gsap.timeline({ scrollTrigger:{ trigger:'#chapter-5', start:'top 65%' } })
+        .to(unified, { autoAlpha:0, scale:0.9, y:-16, duration:0.35, ease:'power2.in', delay:0.4 })
+        .set(cols, { autoAlpha:1 })
+        .to(you, { autoAlpha:1, x:0, rotate:0, duration:0.45, ease:'power3.out' }, '-=0.1')
+        .to(sam, { autoAlpha:1, x:0, rotate:0, duration:0.45, ease:'power3.out' }, '<');
     })();
 
     /* Chapter 06 — Reconcile: label -> figure counts up -> note carries forward */
@@ -321,28 +285,20 @@
       var label = document.getElementById('c6Label');
       var figure = document.getElementById('c6Figure');
       var note = document.getElementById('c6Note');
-      var stage = document.querySelector('#chapter-6 .chapter-stage');
       if (!label) return;
       gsap.set(label, { autoAlpha:0, y:-14 });
       gsap.set(figure, { autoAlpha:0, scale:0.6 });
       gsap.set(note, { autoAlpha:0, y:10 });
       var counter = { val:0 };
 
-      ScrollTrigger.create({
-        trigger:'#chapter-6', start:'center center', end:'+=100%', pin:true, scrub:0.8, anticipatePin:1,
-        onUpdate:function(self){
-          var p = self.progress;
-          scrubStage(stage, p);
-          var lp = mapProg(p,0.04,0.20);
-          gsap.set(label, { autoAlpha:lp, y:-14*(1-lp) });
-          var cp = mapProg(p,0.26,0.70);
-          gsap.set(figure, { autoAlpha: cp > 0 ? 1 : 0, scale:0.6+0.4*cp });
-          counter.val = 18.20 * cp;
-          figure.textContent = 'Rs ' + counter.val.toFixed(2);
-          var np = mapProg(p,0.78,0.96);
-          gsap.set(note, { autoAlpha:np, y:10*(1-np) });
-        }
-      });
+      gsap.timeline({ scrollTrigger:{ trigger:'#chapter-6', start:'top 65%' } })
+        .to(label, { autoAlpha:1, y:0, duration:0.35, ease:'power2.out' })
+        .to(figure, { autoAlpha:1, scale:1, duration:0.4, ease:'back.out(1.6)' }, '-=0.1')
+        .to(counter, {
+          val:18.20, duration:0.6, ease:'power2.out',
+          onUpdate:function(){ figure.textContent = 'Rs ' + counter.val.toFixed(2); }
+        }, '<')
+        .to(note, { autoAlpha:1, y:0, duration:0.35, ease:'power2.out' }, '+=0.1');
     })();
 
     /* Insight dashboard — metrics count up and bars rise into view. */
