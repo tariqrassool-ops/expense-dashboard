@@ -19,7 +19,6 @@
 <body>
     <div id="landingSection" aria-label="Welcome">
 
-  <div class="paper-rules" aria-hidden="true"></div>
   <div class="paper-grain" aria-hidden="true"></div>
   <div class="paper-margin-line" aria-hidden="true"></div>
 
@@ -59,19 +58,30 @@
           </div>
           <div class="leaf receipt-leaf" id="leafFront" style="transform:rotate(-1.5deg); z-index:2;">
             <div class="rl-head"><span>RECENTLY ENTERED</span><span class="num" id="heroDate">23 AUG</span></div>
-            <div class="rl-row" data-sync-row>
-              <div class="rl-merchant">PickMe Rides <span class="rl-tag">TRAVEL</span></div>
-              <div class="rl-amt num">Rs 12.40</div>
+            <div class="activity-list" id="heroActivityList">
+              <div class="activity-item" data-sync-row data-merchant="PickMe Rides" data-cat="cat-travel" data-cat-label="TRAVEL" data-amount="12.40">
+                <div class="activity-left">
+                  <div class="activity-merchant">PickMe Rides</div>
+                  <span class="category-badge cat-travel">TRAVEL</span>
+                </div>
+                <div class="activity-amount num">Rs 12.40</div>
+              </div>
+              <div class="activity-item" data-sync-row data-merchant="Keells Grocery" data-cat="cat-groceries" data-cat-label="GROCERIES" data-amount="38.90">
+                <div class="activity-left">
+                  <div class="activity-merchant">Keells Grocery</div>
+                  <span class="category-badge cat-groceries">GROCERIES</span>
+                </div>
+                <div class="activity-amount num">Rs 38.90</div>
+              </div>
+              <div class="activity-item" data-sync-row data-merchant="Split with Sam" data-cat="cat-banking" data-cat-label="SHARED" data-amount="18.20">
+                <div class="activity-left">
+                  <div class="activity-merchant">Split with Sam</div>
+                  <span class="category-badge cat-banking">SHARED</span>
+                </div>
+                <div class="activity-amount num">Rs 18.20</div>
+              </div>
             </div>
-            <div class="rl-row" data-sync-row>
-              <div class="rl-merchant">Keells Grocery <span class="rl-tag">GROCERIES</span></div>
-              <div class="rl-amt num">Rs 38.90</div>
-            </div>
-            <div class="rl-row" data-sync-row>
-              <div class="rl-merchant">Split with Sam <span class="rl-tag">SHARED</span></div>
-              <div class="rl-amt num">Rs 18.20</div>
-            </div>
-            <div class="rl-total-row"><span>Balance carried</span><span class="num">Rs 69.50</span></div>
+            <div class="rl-total-row"><span>Balance carried</span><span class="num" id="heroTotal">Rs 69.50</span></div>
           </div>
         </div>
       </div>
@@ -147,9 +157,12 @@
               </div>
             </div>
             <div style="display:flex;justify-content:center;margin:14px 0;" id="c2Arrow"><span class="capture-arrow">↓ logged as entry</span></div>
-            <div class="rl-row" id="c2Row" style="border:1px solid var(--rule); border-radius:2px; padding:12px 14px;">
-              <div class="rl-merchant">PickMe Rides</div>
-              <div class="rl-amt num">Rs 12.40</div>
+            <div class="activity-item" id="c2Row">
+              <div class="activity-left">
+                <div class="activity-merchant">PickMe Rides</div>
+                <span class="category-badge cat-travel">TRAVEL</span>
+              </div>
+              <div class="activity-amount num">Rs 12.40</div>
             </div>
           </div>
         </div>
@@ -190,12 +203,12 @@
         </div>
         <div class="chapter-stage">
           <div class="leaf stage-leaf" id="catScene">
-            <div class="rl-row" id="c4Row" style="border:1px solid var(--rule); border-radius:2px; padding:14px 16px; align-items:center;">
-              <div class="rl-merchant">Keells Grocery</div>
-              <div style="display:flex; align-items:center; gap:14px;">
-                <span class="cat-stamp" id="c4Stamp">GROCERIES</span>
-                <span class="rl-amt num" id="c4Amt">Rs 38.90</span>
+            <div class="activity-item" id="c4Row">
+              <div class="activity-left">
+                <div class="activity-merchant">Keells Grocery</div>
+                <span class="category-badge cat-groceries" id="c4Stamp">GROCERIES</span>
               </div>
+              <div class="activity-amount num" id="c4Amt">Rs 38.90</div>
             </div>
           </div>
         </div>
@@ -213,9 +226,12 @@
         </div>
         <div class="chapter-stage">
           <div class="leaf stage-leaf" style="position:relative;">
-            <div class="rl-row" id="c5Unified" style="border:1px solid var(--rule); border-radius:2px; padding:12px 14px;">
-              <div class="rl-merchant">Split with Sam</div>
-              <div class="rl-amt num">Rs 18.20</div>
+            <div class="activity-item" id="c5Unified">
+              <div class="activity-left">
+                <div class="activity-merchant">Split with Sam</div>
+                <button type="button" class="split-badge unsettled">&#x23F3; Owed by Sam · Rs 18.20</button>
+              </div>
+              <div class="activity-amount num">Rs 18.20</div>
             </div>
             <div class="split-cols" id="c5Cols" style="position:absolute; inset:26px; opacity:0;">
               <div class="split-leaf" id="c5You"><div class="split-name">You</div><div class="split-amt num">Rs 18.20</div></div>
@@ -237,13 +253,11 @@
         </div>
         <div class="chapter-stage">
           <div class="leaf stage-leaf">
-            <div class="recon-row">
-              <div>
-                <div class="entry-tag" id="c6Label" style="margin-bottom:8px;">SAM OWES YOU</div>
-                <div class="recon-figure num" id="c6Figure">Rs 18.20</div>
-                <div class="recon-note" id="c6Note">Carried forward from entry 03</div>
-              </div>
-            </div>
+            <article class="stat-card" style="border:none; padding:0;">
+              <h3 id="c6Label">Sam owes you</h3>
+              <div class="value" id="c6Figure">Rs 18.20</div>
+              <div class="change" id="c6Note">Carried forward from entry 03</div>
+            </article>
           </div>
         </div>
       </div>
@@ -263,22 +277,57 @@
         <div class="dashboard" id="dashboardPreview">
           <div class="dashboard-top"><span>LEDGER / AUGUST 2026</span><span>MONTH TO DATE · ALL WORKSPACES</span></div>
           <div class="dashboard-body">
-            <div class="dashboard-metrics">
-              <div class="metric"><div class="metric-label">Income</div><div class="metric-value num" data-insight-count="485000">Rs 0</div><div class="metric-note">↑ 8.4% vs July</div></div>
-              <div class="metric"><div class="metric-label">Spent</div><div class="metric-value num" data-insight-count="294000">Rs 0</div><div class="metric-note">↓ 4.2% vs July</div></div>
-              <div class="metric"><div class="metric-label">Saved</div><div class="metric-value num" data-insight-count="191000">Rs 0</div><div class="metric-note">39.4% of income</div></div>
-              <div class="metric"><div class="metric-label">Shared</div><div class="metric-value num" data-insight-count="84200">Rs 0</div><div class="metric-note">12 entries reconciled</div></div>
+            <div class="stats-grid" style="margin-bottom: 28px;">
+              <article class="stat-card">
+                <h3>Income</h3>
+                <div class="value num" data-insight-count="485000">Rs 0</div>
+                <div class="change">↑ 8.4% vs July</div>
+              </article>
+              <article class="stat-card">
+                <h3>Spent</h3>
+                <div class="value num" data-insight-count="294000">Rs 0</div>
+                <div class="change">↓ 4.2% vs July</div>
+              </article>
+              <article class="stat-card">
+                <h3>Saved</h3>
+                <div class="value num" data-insight-count="191000">Rs 0</div>
+                <div class="change">39.4% of income</div>
+              </article>
+              <article class="stat-card">
+                <h3>Shared</h3>
+                <div class="value num" data-insight-count="84200">Rs 0</div>
+                <div class="change">12 entries reconciled</div>
+              </article>
             </div>
+
             <div class="chart-head"><div class="chart-title">Spending this month</div><div class="chart-period">JUL → AUG</div></div>
-            <div class="chart" aria-label="Spending by category">
-              <div class="bar-col"><div class="bar" style="--bar-height:58%"></div><div class="bar-label">Food</div></div>
-              <div class="bar-col"><div class="bar accent" style="--bar-height:82%"></div><div class="bar-label">Bills</div></div>
-              <div class="bar-col"><div class="bar" style="--bar-height:46%"></div><div class="bar-label">Travel</div></div>
-              <div class="bar-col"><div class="bar" style="--bar-height:34%"></div><div class="bar-label">Shopping</div></div>
-              <div class="bar-col"><div class="bar" style="--bar-height:24%"></div><div class="bar-label">Fun</div></div>
-              <div class="bar-col"><div class="bar" style="--bar-height:18%"></div><div class="bar-label">Other</div></div>
+
+            <div class="donut-wrap" id="insightDonut">
+              <div class="donut-svg-wrap">
+                <svg viewBox="0 0 150 150" role="img" aria-label="Category breakdown donut chart">
+                  <defs>
+                    <filter id="insightDonutGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                    <linearGradient id="insightGrad0" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0c5f59"/><stop offset="100%" stop-color="#0F766E"/></linearGradient>
+                    <linearGradient id="insightGrad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#18409e"/><stop offset="100%" stop-color="#1D4ED8"/></linearGradient>
+                    <linearGradient id="insightGrad2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3c4759"/><stop offset="100%" stop-color="#475569"/></linearGradient>
+                    <linearGradient id="insightGrad3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#126c29"/><stop offset="100%" stop-color="#15803D"/></linearGradient>
+                  </defs>
+                  <circle class="donut-segment" cx="75" cy="75" r="64" fill="none" stroke="url(#insightGrad0)" stroke-width="8" stroke-linecap="round" stroke-dasharray="133.55 268.57" transform="rotate(-90 75 75)" filter="url(#insightDonutGlow)"></circle>
+                  <circle class="donut-segment" cx="75" cy="75" r="64" fill="none" stroke="url(#insightGrad1)" stroke-width="8" stroke-linecap="round" stroke-dasharray="105.27 296.85" stroke-dashoffset="-133.55" transform="rotate(-90 75 75)" filter="url(#insightDonutGlow)"></circle>
+                  <circle class="donut-segment" cx="75" cy="75" r="64" fill="none" stroke="url(#insightGrad2)" stroke-width="8" stroke-linecap="round" stroke-dasharray="81.14 320.98" stroke-dashoffset="-230.55" transform="rotate(-90 75 75)" filter="url(#insightDonutGlow)"></circle>
+                  <circle class="donut-segment" cx="75" cy="75" r="64" fill="none" stroke="url(#insightGrad3)" stroke-width="8" stroke-linecap="round" stroke-dasharray="69.06 333.06" stroke-dashoffset="-303.15" transform="rotate(-90 75 75)" filter="url(#insightDonutGlow)"></circle>
+                </svg>
+                <div class="donut-center"><div class="total-value num" id="insightDonutTotal" data-insight-count="24650">Rs 0</div><div class="total-label">Total spent this period</div></div>
+              </div>
+              <div class="donut-legend">
+                <div class="donut-legend-item"><div class="donut-legend-left"><span class="donut-legend-dot" style="background:#0F766E;"></span><span class="donut-legend-cat">Groceries</span></div><span class="donut-legend-amount" data-insight-count="8380">Rs 0</span></div>
+                <div class="donut-legend-item"><div class="donut-legend-left"><span class="donut-legend-dot" style="background:#1D4ED8;"></span><span class="donut-legend-cat">Travel</span></div><span class="donut-legend-amount" data-insight-count="6650">Rs 0</span></div>
+                <div class="donut-legend-item"><div class="donut-legend-left"><span class="donut-legend-dot" style="background:#475569;"></span><span class="donut-legend-cat">Utilities</span></div><span class="donut-legend-amount" data-insight-count="5175">Rs 0</span></div>
+                <div class="donut-legend-item"><div class="donut-legend-left"><span class="donut-legend-dot" style="background:#15803D;"></span><span class="donut-legend-cat">Other</span></div><span class="donut-legend-amount" data-insight-count="4445">Rs 0</span></div>
+              </div>
             </div>
-            <div class="insight-note"><span>Largest category · Bills</span><span>Last updated just now</span></div>
+
+            <div class="insight-note"><span>Largest category · Groceries</span><span>Last updated just now</span></div>
           </div>
         </div>
       </div>
