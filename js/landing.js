@@ -18,6 +18,10 @@
     document.querySelectorAll('[data-count]').forEach(function(el){
       el.textContent = (el.dataset.prefix || '') + el.dataset.count + (el.dataset.suffix || '');
     });
+    document.querySelectorAll('[data-insight-count]').forEach(function(el){
+      var target = parseInt(el.dataset.insightCount, 10) || 0;
+      el.textContent = 'Rs ' + target.toLocaleString('en-LK');
+    });
     var c5Unified = document.getElementById('c5Unified');
     var c5Cols = document.getElementById('c5Cols');
     if (c5Unified && c5Cols){ c5Unified.style.opacity = 0; c5Cols.style.opacity = 1; }
@@ -28,6 +32,73 @@
     });
     var c3Badge = document.getElementById('c3Badge');
     if (c3Badge) c3Badge.style.opacity = 1;
+  }
+
+  /* Hero "recently entered" list — the same add/remove behavior the real
+     expense list shows: a new entry slides in, the oldest ages out, and the
+     running total recalculates from what's actually on screen. Pure CSS/GSAP,
+     no backend — this is illustrative, same as the rest of the story page. */
+  var HERO_DEMO_POOL = [
+    { merchant:'Uber Eats',        cat:'cat-food',        label:'FOOD',      amount:15.60 },
+    { merchant:'CEB Electricity',  cat:'cat-utilities',   label:'UTILITIES', amount:24.10 },
+    { merchant:'Cargills Food City', cat:'cat-groceries', label:'GROCERIES', amount:21.35 },
+    { merchant:'Dialog Postpaid',  cat:'cat-utilities',   label:'UTILITIES', amount:19.90 },
+    { merchant:'Split with Nadia', cat:'cat-banking',     label:'SHARED',    amount:14.75 },
+    { merchant:'PickMe Rides',     cat:'cat-travel',      label:'TRAVEL',    amount:9.20 }
+  ];
+
+  function heroRowMarkup(entry){
+    var row = document.createElement('div');
+    row.className = 'activity-item';
+    row.setAttribute('data-sync-row', '');
+    row.innerHTML =
+      '<div class="activity-left">' +
+        '<div class="activity-merchant">' + entry.merchant + '</div>' +
+        '<span class="category-badge ' + entry.cat + '">' + entry.label + '</span>' +
+      '</div>' +
+      '<div class="activity-amount num">Rs ' + entry.amount.toFixed(2) + '</div>';
+    return row;
+  }
+
+  function updateHeroTotal(listEl){
+    var total = 0;
+    listEl.querySelectorAll('.activity-amount').forEach(function(el){
+      total += parseFloat(el.textContent.replace('Rs', '').trim()) || 0;
+    });
+    var totalEl = document.getElementById('heroTotal');
+    if (totalEl) totalEl.textContent = 'Rs ' + total.toFixed(2);
+  }
+
+  function startHeroLiveDemo(){
+    var list = document.getElementById('heroActivityList');
+    if (!list) return;
+    var poolIndex = 0;
+
+    var cycle = gsap.timeline({ repeat:-1, repeatDelay:2.2 });
+    cycle.call(function(){
+      var rows = list.querySelectorAll('.activity-item');
+      var oldest = rows[rows.length - 1];
+      var entry = HERO_DEMO_POOL[poolIndex % HERO_DEMO_POOL.length];
+      poolIndex++;
+
+      var newRow = heroRowMarkup(entry);
+      list.insertBefore(newRow, list.firstChild);
+      var targetH = newRow.offsetHeight;
+      newRow.style.overflow = 'hidden';
+      gsap.set(newRow, { height:0, autoAlpha:0, paddingTop:0, paddingBottom:0, marginBottom:0 });
+      gsap.to(newRow, {
+        height:targetH, autoAlpha:1, paddingTop:11, paddingBottom:11, duration:0.5, ease:'power2.out',
+        onComplete:function(){ newRow.style.height = ''; newRow.style.overflow = ''; updateHeroTotal(list); }
+      });
+
+      if (oldest){
+        oldest.style.overflow = 'hidden';
+        gsap.to(oldest, {
+          height:0, autoAlpha:0, paddingTop:0, paddingBottom:0, duration:0.45, ease:'power2.in', delay:0.15,
+          onComplete:function(){ oldest.remove(); updateHeroTotal(list); }
+        });
+      }
+    });
   }
 
   if (!hasGsap || reduceMotion){
@@ -58,18 +129,7 @@
       scrollTrigger: { trigger:'#hero', start:'top top', end:'bottom top', scrub:true }
     });
 
-    var syncRows = gsap.utils.toArray('[data-sync-row]');
-    if (syncRows.length){
-      var syncTl = gsap.timeline({ repeat:-1, repeatDelay:0.7 });
-      syncRows.forEach(function(row){
-        var amount = row.querySelector('.rl-amt');
-        syncTl
-          .to(row, { backgroundColor:'rgba(33,56,107,0.06)', duration:0.35, ease:'power2.out' }, '+=1')
-          .to(amount, { scale:1.06, duration:0.2, ease:'power2.out' }, '<')
-          .to(amount, { scale:1, duration:0.2, ease:'power2.in' })
-          .to(row, { backgroundColor:'rgba(33,56,107,0)', duration:0.4, ease:'power2.in' }, '-=0.05');
-      });
-    }
+    startHeroLiveDemo();
 
     gsap.timeline({ scrollTrigger: { trigger:'#totals', start:'top 78%' } })
       .from('.totals-cell', { autoAlpha:0, y:18, duration:0.6, stagger:0.08, ease:'power2.out' });
@@ -351,7 +411,7 @@
   });
 
   mm.add('(max-width: 700px)', function(){
-    gsap.utils.toArray('[data-anim], .chapter-text > *, .chapter-stage .leaf, .feature-card').forEach(function(el){
+    gsap.utils.toArray('[data-anim], .chapter-text > *, .chapter-stage .leaf, .feature-card, .donut-wrap').forEach(function(el){
       gsap.from(el, {
         autoAlpha:0, y:18, duration:0.55, ease:'power2.out',
         scrollTrigger: { trigger:el, start:'top 90%' }
