@@ -242,13 +242,14 @@
   ========================================================= */
   .totals-strip{
     display:grid; grid-template-columns:repeat(4,1fr);
-    border-top:1px solid var(--ink); border-bottom:1px solid var(--rule-strong);
+    border-top:1px solid var(--rule-strong); border-bottom:1px solid var(--rule-strong);
     margin-top:50px;
+    background:var(--paper);
+    position:relative; z-index:1;
   }
   .totals-cell{
-    padding:26px 22px; border-right:1px solid var(--rule);
+    padding:26px 22px;
   }
-  .totals-cell:last-child{ border-right:none; }
   .totals-figure{
     font-family:var(--font-mono); font-size:clamp(1.8rem,2.8vw,2.4rem); font-weight:600;
     color:var(--ink);
@@ -449,6 +450,24 @@
   .stage-leaf{ width:100%; min-height:320px; padding:30px; display:flex; align-items:center; }
   .chapter-title{ font-size:clamp(1.9rem,3.2vw,2.7rem); max-width:15ch; }
   .chapter-desc{ max-width:46ch; line-height:1.65; }
+
+  /* The ruled paper background sits behind everything (z-index:0). A rule line
+     cutting straight through a line of type reads as broken, not intentional.
+     Fix: wrap each heading/paragraph's text in an inline <span class="ink-line">.
+     With box-decoration-break:clone, an inline element that wraps across several
+     visual lines gets its background/padding applied to EACH line's own fitted
+     box, not one rectangle spanning the whole block — so short lines (like a
+     headline's second line, or a paragraph's last line) don't drag along a
+     blank patch of empty erasure next to them. */
+  .ink-line {
+    position:relative; z-index:1;
+    display:inline;
+    background:var(--paper);
+    padding:5px 8px;
+    margin:0 -8px;
+    -webkit-box-decoration-break:clone;
+    box-decoration-break:clone;
+  }
   .kicker-row{ margin-bottom:18px; }
   .chapter-num{ font-size:3.1rem; margin-bottom:10px; }
 
@@ -540,7 +559,6 @@
     .chapter.reverse .chapter-text{ order:1; }
     .chapter.reverse .chapter-stage{ order:2; }
     .totals-strip{ grid-template-columns:repeat(2,1fr); }
-    .totals-cell:nth-child(2){ border-right:none; }
     .feature-grid{ grid-template-columns:repeat(2,1fr); }
     .split-cols{ grid-template-columns:1fr; }
   }
