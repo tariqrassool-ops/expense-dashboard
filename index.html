@@ -14,26 +14,329 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/landing.css">
 </head>
 <body>
-    <section class="landing" id="landingSection" aria-label="Welcome">
+    <div id="landingSection" aria-label="Welcome">
 
-    <!-- Logo -->
-    <div class="logo">LEDGER</div>
+  <div class="paper-rules" aria-hidden="true"></div>
+  <div class="paper-grain" aria-hidden="true"></div>
+  <div class="paper-margin-line" aria-hidden="true"></div>
 
-    <!-- Headline -->
-    <div>
-        <div class="headline">Every rupee,<br><span class="accent-ink">entered.</span></div>
-        <p class="hero-sub">Receipts log themselves. Spending sorts itself. Split a bill with a roommate and it's written down correctly, the first time.</p>
+  <nav class="nav">
+    <div class="nav-mark">LEDGER <span>EST. 2026</span></div>
+    <button type="button" class="nav-cta" id="signInBtn" onclick="signInWithGoogle()" aria-label="Log in with Google">Log in</button>
+  </nav>
+
+  <div class="margin-rail" aria-hidden="true">
+    <div class="margin-stack">
+      <div class="margin-tag">
+        <div class="margin-tag-num num" id="marginEntry">01</div>
+        <div class="margin-tag-label">ENTRY</div>
+      </div>
+      <div class="margin-folio">FOLIO — LEDGER LANDING PAGE</div>
     </div>
+  </div>
 
-</section>
-       
-        <button class="btn btn-primary landing-login" id="signInBtn" onclick="signInWithGoogle()" aria-label="Log in with Google">
-            Log In
-        </button>
+  <main>
 
+    <!-- 1 — HERO -->
+    <section class="panel hero" id="hero">
+      <div class="panel-inner hero-inner">
+        <div>
+          <div class="eyebrow">No. 000 <em>—</em> The ledger</div>
+          <h1 class="hero-headline" data-anim="hero-h">Every rupee,<br><span class="accent-ink">entered.</span></h1>
+          <p class="hero-sub" data-anim="hero-p">Receipts log themselves. Spending sorts itself. Splitting a bill with a roommate stops requiring a spreadsheet — it just gets written down, correctly, the first time.</p>
+          <div class="cta-row" data-anim="hero-cta">
+            <a class="btn-primary" href="#final">Open a ledger — free for 30 days</a>
+            <a class="btn-ghost" href="#chapter-1">Read the first entry ↓</a>
+          </div>
+        </div>
+
+        <div class="receipt-stack" data-anim="hero-mock" id="heroStack">
+          <div class="leaf receipt-leaf" id="leafBack" style="transform:rotate(3deg) translateY(18px); z-index:1;">
+            <div class="rl-head"><span>PENDING</span><span>2 ITEMS</span></div>
+          </div>
+          <div class="leaf receipt-leaf" id="leafFront" style="transform:rotate(-1.5deg); z-index:2;">
+            <div class="rl-head"><span>RECENTLY ENTERED</span><span class="num" id="heroDate">23 AUG</span></div>
+            <div class="rl-row" data-sync-row>
+              <div class="rl-merchant">PickMe Rides <span class="rl-tag">TRAVEL</span></div>
+              <div class="rl-amt num">Rs 12.40</div>
+            </div>
+            <div class="rl-row" data-sync-row>
+              <div class="rl-merchant">Keells Grocery <span class="rl-tag">GROCERIES</span></div>
+              <div class="rl-amt num">Rs 38.90</div>
+            </div>
+            <div class="rl-row" data-sync-row>
+              <div class="rl-merchant">Split with Sam <span class="rl-tag">SHARED</span></div>
+              <div class="rl-amt num">Rs 18.20</div>
+            </div>
+            <div class="rl-total-row"><span>Balance carried</span><span class="num">Rs 69.50</span></div>
+          </div>
+        </div>
+      </div>
     </section>
+
+    <!-- 2 — LEDGER TOTALS -->
+    <section class="panel" id="totals" style="min-height:auto; padding-top:0; padding-bottom:calc(var(--edge) * 1.3);">
+      <div class="panel-inner">
+        <div class="totals-strip">
+          <div class="totals-cell"><div class="totals-figure num" data-count="2" data-suffix=" min">0</div><div class="totals-label">Average time to your first logged expense</div></div>
+          <div class="totals-cell"><div class="totals-figure num" data-count="0" data-prefix="Rs ">0</div><div class="totals-label">Cost to open a ledger — 30 days, no card</div></div>
+          <div class="totals-cell"><div class="totals-figure num" data-count="100" data-suffix="%">0</div><div class="totals-label">Of your data stays inside your workspace</div></div>
+          <div class="totals-cell"><div class="totals-figure num" data-count="0">0</div><div class="totals-label">Ads. Not now, not ever.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCT STORY NAV -->
+    <nav class="story-nav" aria-label="Ledger product story">
+      <div class="story-nav-inner">
+        <button class="story-link active" data-story-target="chapter-1">Calculate</button>
+        <button class="story-link" data-story-target="chapter-2">Automate</button>
+        <button class="story-link" data-story-target="chapter-3">Protect</button>
+        <button class="story-link" data-story-target="chapter-4">Organize</button>
+        <button class="story-link" data-story-target="chapter-5">Share</button>
+        <button class="story-link" data-story-target="chapter-6">Reconcile</button>
+        <button class="story-link" data-story-target="insight">Insight</button>
+      </div>
+    </nav>
+
+    <!-- 3 — CHAPTER 01: CALCULATE -->
+    <section class="panel chapter" id="chapter-1" data-chapter="0">
+      <div class="panel-inner chapter-inner">
+        <div class="chapter-text">
+          <div class="kicker-row"><div class="entry-tag">Entry <em class="num">No. 01</em></div><div class="entry-tag">Calculate</div></div>
+          <div class="chapter-num num">01</div>
+          <h2 class="chapter-title">Every number is checked before it's entered.</h2>
+          <p class="chapter-desc">Tax, service charge, and split all resolve themselves the moment a receipt arrives. The total you see is already the total that's correct — no mental math required.</p>
+        </div>
+        <div class="chapter-stage">
+          <div class="leaf stage-leaf">
+            <div class="calc-tape" id="c1Tape">
+              <div class="calc-line" id="c1L1"><span>Dinner — Upali's</span><span class="num">Rs 32.00</span></div>
+              <div class="calc-line" id="c1L2"><span>Service charge</span><span class="num">Rs 3.20</span></div>
+              <div class="calc-line" id="c1L3"><span>Tax</span><span class="num">Rs 2.80</span></div>
+              <div class="calc-rule"></div>
+              <div class="calc-total-row">
+                <span>TOTAL, ENTERED</span>
+                <span class="num" id="c1TotalAmt">Rs 0.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — CHAPTER 02: CAPTURE -->
+    <section class="panel chapter reverse" id="chapter-2" data-chapter="1">
+      <div class="panel-inner chapter-inner">
+        <div class="chapter-text">
+          <div class="kicker-row"><div class="entry-tag">Entry <em class="num">No. 02</em></div><div class="entry-tag">Capture</div></div>
+          <div class="chapter-num num">02</div>
+          <h2 class="chapter-title">Receipts become entries on their own.</h2>
+          <p class="chapter-desc">Sign in and optionally sync Gmail — every receipt that lands in your inbox is logged as an expense, with no forwarding and no manual typing.</p>
+        </div>
+        <div class="chapter-stage">
+          <div class="leaf stage-leaf">
+            <div class="capture-row" id="c2Email">
+              <div class="capture-icon">@</div>
+              <div>
+                <div class="capture-a">Receipt from PickMe</div>
+                <div class="capture-b">support@pickme.lk · just now</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:center;margin:14px 0;" id="c2Arrow"><span class="capture-arrow">↓ logged as entry</span></div>
+            <div class="rl-row" id="c2Row" style="border:1px solid var(--rule); border-radius:2px; padding:12px 14px;">
+              <div class="rl-merchant">PickMe Rides</div>
+              <div class="rl-amt num">Rs 12.40</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — CHAPTER 03: SECURITY -->
+    <section class="panel chapter" id="chapter-3" data-chapter="2">
+      <div class="panel-inner chapter-inner">
+        <div class="chapter-text">
+          <div class="kicker-row"><div class="entry-tag">Entry <em class="num">No. 03</em></div><div class="entry-tag">Security</div></div>
+          <div class="chapter-num num">03</div>
+          <h2 class="chapter-title">We only ever look for receipts.</h2>
+          <p class="chapter-desc">Gmail sync runs on a narrow, read-only scope built to find receipts — nothing else in your inbox is opened, read, or stored. Disconnect it in one click, any time.</p>
+        </div>
+        <div class="chapter-stage">
+          <div class="leaf stage-leaf">
+            <div class="sec-inbox" id="c3Inbox">
+              <div class="sec-row" data-kind="receipt" id="c3R1"><span class="sec-dot"></span><span>Receipt — PickMe Rides</span><span class="sec-tick num">✓ found</span></div>
+              <div class="sec-row" data-kind="personal" id="c3R2"><span class="sec-dot"></span><span>Mom — call me later?</span></div>
+              <div class="sec-row" data-kind="receipt" id="c3R3"><span class="sec-dot"></span><span>Receipt — Keells Grocery</span><span class="sec-tick num">✓ found</span></div>
+              <div class="sec-row" data-kind="personal" id="c3R4"><span class="sec-dot"></span><span>Weekly newsletter digest</span></div>
+            </div>
+            <div class="sec-badge" id="c3Badge"><span>🔒</span> READ-ONLY · RECEIPTS ONLY</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — CHAPTER 04: CATEGORIZE -->
+    <section class="panel chapter reverse" id="chapter-4" data-chapter="3">
+      <div class="panel-inner chapter-inner">
+        <div class="chapter-text">
+          <div class="kicker-row"><div class="entry-tag">Entry <em class="num">No. 04</em></div><div class="entry-tag">Categorize</div></div>
+          <div class="chapter-num num">04</div>
+          <h2 class="chapter-title">Every entry finds its column.</h2>
+          <p class="chapter-desc">Expenses are sorted the moment they arrive. Categories are yours to rename, merge, or invent — they belong to your workspace, not ours.</p>
+        </div>
+        <div class="chapter-stage">
+          <div class="leaf stage-leaf" id="catScene">
+            <div class="rl-row" id="c4Row" style="border:1px solid var(--rule); border-radius:2px; padding:14px 16px; align-items:center;">
+              <div class="rl-merchant">Keells Grocery</div>
+              <div style="display:flex; align-items:center; gap:14px;">
+                <span class="cat-stamp" id="c4Stamp">GROCERIES</span>
+                <span class="rl-amt num" id="c4Amt">Rs 38.90</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — CHAPTER 05: SPLIT -->
+    <section class="panel chapter" id="chapter-5" data-chapter="4">
+      <div class="panel-inner chapter-inner">
+        <div class="chapter-text">
+          <div class="kicker-row"><div class="entry-tag">Entry <em class="num">No. 05</em></div><div class="entry-tag">Split</div></div>
+          <div class="chapter-num num">05</div>
+          <h2 class="chapter-title">Shared ledgers, shared truth.</h2>
+          <p class="chapter-desc">Invite a roommate, partner, or family member into a shared workspace. Every entry appears the same way, on both sides, at the same time.</p>
+        </div>
+        <div class="chapter-stage">
+          <div class="leaf stage-leaf" style="position:relative;">
+            <div class="rl-row" id="c5Unified" style="border:1px solid var(--rule); border-radius:2px; padding:12px 14px;">
+              <div class="rl-merchant">Split with Sam</div>
+              <div class="rl-amt num">Rs 18.20</div>
+            </div>
+            <div class="split-cols" id="c5Cols" style="position:absolute; inset:26px; opacity:0;">
+              <div class="split-leaf" id="c5You"><div class="split-name">You</div><div class="split-amt num">Rs 18.20</div></div>
+              <div class="split-leaf" id="c5Sam"><div class="split-name">Sam</div><div class="split-amt num">Rs 18.20</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — CHAPTER 06: RECONCILE -->
+    <section class="panel chapter reverse" id="chapter-6" data-chapter="5">
+      <div class="panel-inner chapter-inner">
+        <div class="chapter-text">
+          <div class="kicker-row"><div class="entry-tag">Entry <em class="num">No. 06</em></div><div class="entry-tag">Reconcile</div></div>
+          <div class="chapter-num num">06</div>
+          <h2 class="chapter-title">Who owes who resolves itself.</h2>
+          <p class="chapter-desc">Balances update the moment an entry is split. No settling up at the end of the month — the ledger already knows.</p>
+        </div>
+        <div class="chapter-stage">
+          <div class="leaf stage-leaf">
+            <div class="recon-row">
+              <div>
+                <div class="entry-tag" id="c6Label" style="margin-bottom:8px;">SAM OWES YOU</div>
+                <div class="recon-figure num" id="c6Figure">Rs 18.20</div>
+                <div class="recon-note" id="c6Note">Carried forward from entry 03</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — INSIGHT / DASHBOARD -->
+    <section class="panel insight-section" id="insight" data-chapter="6">
+      <div class="panel-inner">
+        <div class="insight-head">
+          <div>
+            <div class="eyebrow">The whole picture <em>—</em> Entry No. 07</div>
+            <h2>See where your money is actually going.</h2>
+          </div>
+          <p class="insight-copy">Once every rupee is captured, categorized, and reconciled, the ledger becomes more than a record. It becomes a clear picture of the month — what came in, what went out, and what changed.</p>
+        </div>
+
+        <div class="dashboard" id="dashboardPreview">
+          <div class="dashboard-top"><span>LEDGER / AUGUST 2026</span><span>MONTH TO DATE · ALL WORKSPACES</span></div>
+          <div class="dashboard-body">
+            <div class="dashboard-metrics">
+              <div class="metric"><div class="metric-label">Income</div><div class="metric-value num" data-insight-count="485000">Rs 0</div><div class="metric-note">↑ 8.4% vs July</div></div>
+              <div class="metric"><div class="metric-label">Spent</div><div class="metric-value num" data-insight-count="294000">Rs 0</div><div class="metric-note">↓ 4.2% vs July</div></div>
+              <div class="metric"><div class="metric-label">Saved</div><div class="metric-value num" data-insight-count="191000">Rs 0</div><div class="metric-note">39.4% of income</div></div>
+              <div class="metric"><div class="metric-label">Shared</div><div class="metric-value num" data-insight-count="84200">Rs 0</div><div class="metric-note">12 entries reconciled</div></div>
+            </div>
+            <div class="chart-head"><div class="chart-title">Spending this month</div><div class="chart-period">JUL → AUG</div></div>
+            <div class="chart" aria-label="Spending by category">
+              <div class="bar-col"><div class="bar" style="--bar-height:58%"></div><div class="bar-label">Food</div></div>
+              <div class="bar-col"><div class="bar accent" style="--bar-height:82%"></div><div class="bar-label">Bills</div></div>
+              <div class="bar-col"><div class="bar" style="--bar-height:46%"></div><div class="bar-label">Travel</div></div>
+              <div class="bar-col"><div class="bar" style="--bar-height:34%"></div><div class="bar-label">Shopping</div></div>
+              <div class="bar-col"><div class="bar" style="--bar-height:24%"></div><div class="bar-label">Fun</div></div>
+              <div class="bar-col"><div class="bar" style="--bar-height:18%"></div><div class="bar-label">Other</div></div>
+            </div>
+            <div class="insight-note"><span>Largest category · Bills</span><span>Last updated just now</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — EVERYTHING INCLUDED -->
+    <section class="panel" id="features">
+      <div class="panel-inner">
+        <div class="kicker-row">
+          <div class="eyebrow">Everything included</div>
+          <div class="entry-tag">No add-ons</div>
+        </div>
+        <h2 class="section-headline">One ledger. No line items added later.</h2>
+        <div class="feature-grid">
+          <div class="feature-card" data-anim="feat">
+            <div><div class="feature-name">Shared workspaces</div><p class="feature-desc">Invite anyone by email. Everyone sees the same entries, always in sync.</p></div>
+            <div class="feature-mark">→ up to unlimited members</div>
+          </div>
+          <div class="feature-card" data-anim="feat">
+            <div><div class="feature-name">Smart splits</div><p class="feature-desc">Split evenly, or exactly how it happened, with a real member or a typed name.</p></div>
+            <div class="feature-mark">→ per-entry control</div>
+          </div>
+          <div class="feature-card" data-anim="feat">
+            <div><div class="feature-name">Gmail sync</div><p class="feature-desc">Receipts become entries automatically — no forwarding, no copy-pasting.</p></div>
+            <div class="feature-mark">→ inbox to ledger</div>
+          </div>
+          <div class="feature-card" data-anim="feat">
+            <div><div class="feature-name">Loans &amp; cards</div><p class="feature-desc">Track balances, interest, and due dates alongside everything else.</p></div>
+            <div class="feature-mark">→ due in 6 days</div>
+          </div>
+          <div class="feature-card" data-anim="feat">
+            <div><div class="feature-name">Custom categories</div><p class="feature-desc">Start with the defaults, or build your own — they belong to your workspace.</p></div>
+            <div class="feature-mark">→ rename anytime</div>
+          </div>
+          <div class="feature-card" data-anim="feat">
+            <div><div class="feature-name">Private by design</div><p class="feature-desc">Access is scoped to your workspace and enforced at the data layer.</p></div>
+            <div class="feature-mark">→ workspace-scoped</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — FINAL -->
+    <section class="panel final" id="final">
+      <div class="panel-inner">
+        <div class="eyebrow" style="justify-content:center;">Open an account</div>
+        <h2 class="final-headline" data-anim="final">Free for 30 days.<br>No card required.</h2>
+        <p class="final-sub">Open your ledger in minutes. Cancel anytime — your entries stay yours, exportable, always.</p>
+        <div class="cta-row">
+          <button type="button" class="btn-primary" id="finalSignInBtn" onclick="signInWithGoogle()">Open a ledger — it's free</button>
+        </div>
+        <div class="sign-line"><span>Signed, digitally</span><span id="signDate">23 Aug 2026</span></div>
+      </div>
+    </section>
+
+  </main>
+
+    </div>
 
     <div class="container">
 
@@ -526,6 +829,11 @@
     </div>
 
     <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
+
+    <!-- Landing/marketing story-page animations (GSAP) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="js/landing.js"></script>
 
     <script type="module" src="js/main.js"></script>
 </body>
