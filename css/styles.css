@@ -907,14 +907,14 @@
             display: inline-block;
             letter-spacing: 0.01em;
         }
-        .cat-food { background: rgba(250,75,0,0.18); color: #ff9466; }
-        .cat-travel { background: rgba(0,3,217,0.24); color: #8b8dff; }
-        .cat-groceries { background: rgba(57,255,20,0.16); color: #8dffa8; }
-        .cat-banking { background: rgba(191,0,255,0.20); color: #e08bff; }
-        .cat-transfer { background: rgba(233,191,22,0.18); color: #f0d873; }
-        .cat-utilities { background: rgba(0,184,217,0.18); color: #7ee6f5; }
-        .cat-loan-payment { background: rgba(210,45,45,0.18); color: #d98f89; }
-        .cat-uncategorized { background: rgba(231,255,18,0.14); color: #eaff8a; }
+        .cat-food { background: rgba(168,73,20,0.12); color: #A04914; }
+        .cat-travel { background: rgba(33,56,107,0.12); color: #21386B; }
+        .cat-groceries { background: rgba(46,125,79,0.14); color: #2E7D4F; }
+        .cat-banking { background: rgba(107,33,92,0.12); color: #6B215C; }
+        .cat-transfer { background: rgba(168,121,26,0.16); color: #8A6A1A; }
+        .cat-utilities { background: rgba(21,111,122,0.14); color: #156F7A; }
+        .cat-loan-payment { background: rgba(160,52,52,0.14); color: #A03434; }
+        .cat-uncategorized { background: rgba(78,74,64,0.10); color: #4E4A40; }
         .amount { font-family: var(--font-mono); font-weight: 600; color: var(--danger); font-variant-numeric: tabular-nums; }
         .sync-badge {
             display: inline-flex;
