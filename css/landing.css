@@ -70,14 +70,10 @@
 
   /* =========================================================
      PAPER TEXTURE / RULED BACKDROP
+     Note: the horizontal ruled lines are provided once, site-wide,
+     by body::before in styles.css (identical --rule color). Landing
+     only adds the margin line and grain, which styles.css doesn't have.
   ========================================================= */
-  .paper-rules{
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    background-image:repeating-linear-gradient(
-      to bottom, transparent 0, transparent 37px, var(--rule) 37px, var(--rule) 38px
-    );
-    opacity:0.55;
-  }
   .paper-margin-line{
     position:fixed; top:0; bottom:0; left:var(--margin-w);
     width:1px; background:var(--accent-line); z-index:0; pointer-events:none;
